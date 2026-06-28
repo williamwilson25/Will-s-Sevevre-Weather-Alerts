@@ -1,0 +1,1 @@
+{\n  \"build\": {\n    \"preview\": {\n      \"android\": {\n        \"buildType\": \"apk\"\n      }\n    },\n    \"preview2\": {\n      \"android\": {\n        \"buildType\": \"aab\"\n      }\n    },\n    \"preview3\": {\n      \"developmentClient\": true\n    },\n    \"production\": {}\n  },\n  \"submit\": {\n    \"production\": {}\n  }\n}\n
