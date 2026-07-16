@@ -3,6 +3,7 @@ import type { AlertRecord, DailyForecast, Friend, Location, WeatherSnapshot } fr
 import { fetchWeather } from './api/weather';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import LocationSearch from './components/LocationSearch';
+import LocationChips from './components/LocationChips';
 import CurrentConditions from './components/CurrentConditions';
 import HourlyStrip from './components/HourlyStrip';
 import DailyForecastList from './components/DailyForecastList';
@@ -36,7 +37,11 @@ function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null
 }
 
 export default function App() {
-  const [location, setLocation] = useLocalStorage<Location>('sw_location', DEFAULT_LOCATION);
+  const [locations, setLocations] = useLocalStorage<Location[]>('sw_locations', [DEFAULT_LOCATION]);
+  const [activeLocationId, setActiveLocationId] = useLocalStorage<string>(
+    'sw_active_location',
+    DEFAULT_LOCATION.id,
+  );
   const [friends, setFriends] = useLocalStorage<Friend[]>('sw_friends', []);
   const [history, setHistory] = useLocalStorage<AlertRecord[]>('sw_alert_history', []);
 
@@ -45,6 +50,8 @@ export default function App() {
   const [error, setError] = useState('');
   const [tab, setTab] = useState<Tab>('forecast');
   const [alertDay, setAlertDay] = useState<DailyForecast | null>(null);
+
+  const location = locations.find((l) => l.id === activeLocationId) ?? locations[0] ?? DEFAULT_LOCATION;
 
   useEffect(() => {
     let cancelled = false;
@@ -63,7 +70,25 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [location]);
+  }, [location.id]);
+
+  function handleAddLocation(loc: Location) {
+    if (!locations.some((l) => l.id === loc.id)) {
+      setLocations([...locations, loc]);
+    }
+    setActiveLocationId(loc.id);
+  }
+
+  function handleSelectLocation(id: string) {
+    setActiveLocationId(id);
+  }
+
+  function handleRemoveLocation(id: string) {
+    const next = locations.filter((l) => l.id !== id);
+    if (next.length === 0) return;
+    setLocations(next);
+    if (id === activeLocationId) setActiveLocationId(next[0].id);
+  }
 
   function handleAlertDay(day: DailyForecast) {
     setAlertDay(day);
@@ -88,8 +113,15 @@ export default function App() {
             <img src={logo} alt="" className="app-logo" />
             <h1>Will's Severe Weather Alerts</h1>
           </div>
-          <LocationSearch onSelect={setLocation} />
+          <LocationSearch onSelect={handleAddLocation} />
         </header>
+
+        <LocationChips
+          locations={locations}
+          activeId={location.id}
+          onSelect={handleSelectLocation}
+          onRemove={handleRemoveLocation}
+        />
 
         {loading && <LoadingSkeleton />}
         {error && (

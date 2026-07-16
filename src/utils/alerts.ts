@@ -1,5 +1,6 @@
 import type { AlertSeverity, DailyForecast, Friend } from '../types';
 import { describeWeatherCode } from './weatherCode';
+import { spcOutlookImageUrl } from '../api/spcOutlook';
 
 export const SEVERITY_LABEL: Record<AlertSeverity, string> = {
   advisory: 'Weather Advisory',
@@ -20,7 +21,8 @@ export function buildAlertMessage(
   day: DailyForecast,
   severity: AlertSeverity,
   customNote: string,
-): { headline: string; body: string } {
+  dayIndex = 0,
+): { headline: string; body: string; imageUrl: string | null } {
   const { label } = describeWeatherCode(day.weatherCode);
   const dateLabel = new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
     weekday: 'long',
@@ -29,6 +31,8 @@ export function buildAlertMessage(
   });
 
   const headline = `${SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
+  const spcDay = dayIndex + 1;
+  const imageUrl = spcDay >= 1 && spcDay <= 3 ? spcOutlookImageUrl(spcDay as 1 | 2 | 3) : null;
 
   const lines = [
     headline,
@@ -44,20 +48,27 @@ export function buildAlertMessage(
   if (customNote.trim()) {
     lines.push('', `Note from your friend: ${customNote.trim()}`);
   }
+  if (imageUrl) {
+    lines.push('', `Storm outlook map (best chances of storms): ${imageUrl}`);
+  }
   lines.push('', "Sent via Will's Severe Weather Alerts");
 
-  return { headline, body: lines.join('\n') };
+  return { headline, body: lines.join('\n'), imageUrl };
+}
+
+function encodeParams(params: Record<string, string>): string {
+  return Object.entries(params)
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join('&');
 }
 
 export function buildMailtoLink(friends: Friend[], subject: string, body: string): string | null {
   const emails = friends.map((f) => f.email).filter(Boolean) as string[];
   if (emails.length === 0) return null;
-  const params = new URLSearchParams({ subject, body });
-  return `mailto:${emails.join(',')}?${params.toString()}`;
+  return `mailto:${emails.join(',')}?${encodeParams({ subject, body })}`;
 }
 
 export function buildSmsLink(friend: Friend, body: string): string | null {
   if (!friend.phone) return null;
-  const params = new URLSearchParams({ body });
-  return `sms:${friend.phone}?${params.toString()}`;
+  return `sms:${friend.phone}?${encodeParams({ body })}`;
 }

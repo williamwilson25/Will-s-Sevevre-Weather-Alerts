@@ -46,7 +46,7 @@ export default function LocationSearch({ onSelect }: Props) {
       <input
         type="text"
         value={query}
-        placeholder="Search city, e.g. Austin, TX"
+        placeholder="Add a city, e.g. Dallas, TX"
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => results.length > 0 && setOpen(true)}
         aria-label="Search for a location"

@@ -36,6 +36,10 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
   }, [selectedDate]);
 
   const day = useMemo(() => daily.find((d) => d.date === dateKey) ?? daily[0], [daily, dateKey]);
+  const dayIndex = Math.max(
+    0,
+    daily.findIndex((d) => d.date === day?.date),
+  );
 
   useEffect(() => {
     if (day) setSeverity(riskToSeverity(day.risk.level));
@@ -43,7 +47,7 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
 
   if (!day) return null;
 
-  const { headline, body } = buildAlertMessage(locationName, day, severity, note);
+  const { headline, body, imageUrl } = buildAlertMessage(locationName, day, severity, note, dayIndex);
   const recipients = friends.filter((f) => recipientIds.includes(f.id));
   const emailRecipients = recipients.filter((f) => f.email);
   const phoneOnlyRecipients = recipients.filter((f) => !f.email && f.phone);
@@ -141,6 +145,13 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
 
       <div className="alert-preview">
         <div className="alert-preview-label">Preview</div>
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt="NOAA storm outlook map showing the best chances of storms"
+            className="alert-preview-image"
+          />
+        )}
         <pre>{body}</pre>
       </div>
 

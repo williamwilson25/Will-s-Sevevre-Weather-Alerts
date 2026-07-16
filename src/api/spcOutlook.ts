@@ -36,6 +36,10 @@ function pick(props: Record<string, unknown>, keys: string[]): string | undefine
   return undefined;
 }
 
+export function spcOutlookImageUrl(day: 1 | 2 | 3): string {
+  return `https://www.spc.noaa.gov/products/outlook/day${day}otlk.gif`;
+}
+
 export async function fetchConvectiveOutlook(day: 1 | 2 | 3): Promise<SpcFeature[]> {
   const url = `https://www.spc.noaa.gov/products/outlook/day${day}otlk_cat.nolyr.geojson`;
   const res = await fetch(url);
