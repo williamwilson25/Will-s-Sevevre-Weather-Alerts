@@ -13,6 +13,7 @@ import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import RadarMap from './components/RadarMap';
+import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon, StormLogoIcon } from './components/icons';
 
 const DEFAULT_LOCATION: Location = {
@@ -25,7 +26,7 @@ const DEFAULT_LOCATION: Location = {
   timezone: 'America/Chicago',
 };
 
-type Tab = 'forecast' | 'radar' | 'alerts';
+type Tab = 'forecast' | 'radar' | 'outlook' | 'alerts';
 
 function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null {
   if (!snapshot || snapshot.daily.length === 0) return null;
@@ -110,8 +111,11 @@ export default function App() {
               <button className={tab === 'radar' ? 'active' : ''} onClick={() => setTab('radar')}>
                 Radar
               </button>
+              <button className={tab === 'outlook' ? 'active' : ''} onClick={() => setTab('outlook')}>
+                Outlook
+              </button>
               <button className={tab === 'alerts' ? 'active' : ''} onClick={() => setTab('alerts')}>
-                Friends &amp; Alerts
+                Alerts
                 {history.length > 0 && <span className="tab-count">{history.length}</span>}
               </button>
             </nav>
@@ -128,6 +132,12 @@ export default function App() {
               {tab === 'radar' && (
                 <div className="radar-view">
                   <RadarMap location={snapshot.location} />
+                </div>
+              )}
+
+              {tab === 'outlook' && (
+                <div className="outlook-view">
+                  <StormOutlookMap location={snapshot.location} daily={snapshot.daily} />
                 </div>
               )}
 
