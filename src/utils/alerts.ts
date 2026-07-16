@@ -1,6 +1,5 @@
 import type { AlertSeverity, DailyForecast, Friend } from '../types';
 import { describeWeatherCode } from './weatherCode';
-import { spcOutlookImageUrl, spcThunderstormImageUrl } from '../api/spcOutlook';
 
 export const SEVERITY_LABEL: Record<AlertSeverity, string> = {
   advisory: 'Weather Advisory',
@@ -21,8 +20,7 @@ export function buildAlertMessage(
   day: DailyForecast,
   severity: AlertSeverity,
   customNote: string,
-  dayIndex = 0,
-): { headline: string; body: string; imageUrl: string | null } {
+): { headline: string; body: string } {
   const { label } = describeWeatherCode(day.weatherCode);
   const dateLabel = new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
     weekday: 'long',
@@ -31,13 +29,6 @@ export function buildAlertMessage(
   });
 
   const headline = `${SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
-  const spcDay = dayIndex + 1;
-  const imageUrl =
-    spcDay === 1
-      ? spcThunderstormImageUrl() ?? spcOutlookImageUrl(1)
-      : spcDay <= 3
-        ? spcOutlookImageUrl(spcDay as 2 | 3)
-        : null;
 
   const lines = [
     headline,
@@ -53,12 +44,9 @@ export function buildAlertMessage(
   if (customNote.trim()) {
     lines.push('', `Note from your friend: ${customNote.trim()}`);
   }
-  if (imageUrl) {
-    lines.push('', `Storm chance map: ${imageUrl}`);
-  }
   lines.push('', "Sent via Will's Severe Weather Alerts");
 
-  return { headline, body: lines.join('\n'), imageUrl };
+  return { headline, body: lines.join('\n') };
 }
 
 function encodeParams(params: Record<string, string>): string {

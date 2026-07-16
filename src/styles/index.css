@@ -885,14 +885,6 @@ section h2 {
   font-weight: 700;
 }
 
-.alert-preview-image {
-  display: block;
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid var(--glass-border);
-  margin-bottom: 10px;
-}
-
 .alert-preview pre {
   margin: 0;
   white-space: pre-wrap;
