@@ -12,6 +12,7 @@ import FriendsManager from './components/FriendsManager';
 import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
 import LoadingSkeleton from './components/LoadingSkeleton';
+import RadarMap from './components/RadarMap';
 import { AlertTriangleIcon, BellAlertIcon, StormLogoIcon } from './components/icons';
 
 const DEFAULT_LOCATION: Location = {
@@ -24,7 +25,7 @@ const DEFAULT_LOCATION: Location = {
   timezone: 'America/Chicago',
 };
 
-type Tab = 'forecast' | 'alerts';
+type Tab = 'forecast' | 'radar' | 'alerts';
 
 function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null {
   if (!snapshot || snapshot.daily.length === 0) return null;
@@ -106,6 +107,9 @@ export default function App() {
               <button className={tab === 'forecast' ? 'active' : ''} onClick={() => setTab('forecast')}>
                 Forecast
               </button>
+              <button className={tab === 'radar' ? 'active' : ''} onClick={() => setTab('radar')}>
+                Radar
+              </button>
               <button className={tab === 'alerts' ? 'active' : ''} onClick={() => setTab('alerts')}>
                 Friends &amp; Alerts
                 {history.length > 0 && <span className="tab-count">{history.length}</span>}
@@ -118,6 +122,12 @@ export default function App() {
                   <SevereWeatherBanner daily={snapshot.daily} onAlertDay={handleAlertDay} />
                   <HourlyStrip hourly={snapshot.hourly} />
                   <DailyForecastList daily={snapshot.daily} onAlertDay={handleAlertDay} />
+                </div>
+              )}
+
+              {tab === 'radar' && (
+                <div className="radar-view">
+                  <RadarMap location={snapshot.location} />
                 </div>
               )}
 
