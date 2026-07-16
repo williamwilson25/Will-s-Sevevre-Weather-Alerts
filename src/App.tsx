@@ -13,7 +13,6 @@ import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
 import PasscodeGate from './components/PasscodeGate';
 import LoadingSkeleton from './components/LoadingSkeleton';
-import RadarMap from './components/RadarMap';
 import ExternalRadar from './components/ExternalRadar';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
@@ -31,7 +30,6 @@ const DEFAULT_LOCATION: Location = {
 };
 
 type Tab = 'forecast' | 'radar' | 'outlook' | 'alerts';
-type RadarSource = 'live' | 'news9' | 'twc';
 
 function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null {
   if (!snapshot || snapshot.daily.length === 0) return null;
@@ -52,7 +50,6 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<Tab>('forecast');
-  const [radarSource, setRadarSource] = useState<RadarSource>('live');
   const [alertDay, setAlertDay] = useState<DailyForecast | null>(null);
 
   const location = locations.find((l) => l.id === activeLocationId) ?? locations[0] ?? DEFAULT_LOCATION;
@@ -205,41 +202,11 @@ export default function App() {
 
               {tab === 'radar' && (
                 <div className="radar-view">
-                  <div className="radar-source-toggle">
-                    <button
-                      className={radarSource === 'live' ? 'active' : ''}
-                      onClick={() => setRadarSource('live')}
-                    >
-                      Live Radar
-                    </button>
-                    <button
-                      className={radarSource === 'news9' ? 'active' : ''}
-                      onClick={() => setRadarSource('news9')}
-                    >
-                      News9 OKC
-                    </button>
-                    <button
-                      className={radarSource === 'twc' ? 'active' : ''}
-                      onClick={() => setRadarSource('twc')}
-                    >
-                      Weather Channel
-                    </button>
-                  </div>
-                  {radarSource === 'live' && <RadarMap location={snapshot.location} />}
-                  {radarSource === 'news9' && (
-                    <ExternalRadar
-                      url="https://www.news9.com/nextgen-live-radar"
-                      label="News9 Oklahoma City"
-                      title="News9 NextGen Live Radar"
-                    />
-                  )}
-                  {radarSource === 'twc' && (
-                    <ExternalRadar
-                      url="https://weather.com/maps/radar"
-                      label="The Weather Channel"
-                      title="The Weather Channel Radar"
-                    />
-                  )}
+                  <ExternalRadar
+                    url="https://www.mesonet.org/index.php/weather/category/radar"
+                    label="the Oklahoma Mesonet"
+                    title="Oklahoma Mesonet Radar"
+                  />
                 </div>
               )}
 

@@ -11,8 +11,7 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **7-day forecast with severe weather risk** — each day gets a Low/Moderate/High/Severe
   risk score derived from forecasted weather codes (thunderstorms, hail), wind gusts, and
   precipitation probability. A banner surfaces the next day severe weather is expected.
-- **Live storm radar** — animated precipitation radar (RainViewer) on a Leaflet map centered
-  on your location.
+- **Live storm radar** — embedded Oklahoma Mesonet radar.
 - **Regional storm outlook** — NOAA Storm Prediction Center's Day 1–3 categorical convective
   outlook (Marginal/Slight/Enhanced/Moderate/High risk polygons), continental US.
 - **Friends & alerts** — save friends' email/phone, compose a custom alert (pick the day,
