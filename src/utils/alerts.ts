@@ -1,6 +1,6 @@
 import type { AlertSeverity, DailyForecast, Friend } from '../types';
 import { describeWeatherCode } from './weatherCode';
-import { spcOutlookImageUrl } from '../api/spcOutlook';
+import { spcProbabilityImageUrl } from '../api/spcOutlook';
 
 export const SEVERITY_LABEL: Record<AlertSeverity, string> = {
   advisory: 'Weather Advisory',
@@ -32,7 +32,7 @@ export function buildAlertMessage(
 
   const headline = `${SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
   const spcDay = dayIndex + 1;
-  const imageUrl = spcDay >= 1 && spcDay <= 3 ? spcOutlookImageUrl(spcDay as 1 | 2 | 3) : null;
+  const imageUrl = spcDay >= 1 && spcDay <= 3 ? spcProbabilityImageUrl(spcDay as 1 | 2 | 3) : null;
 
   const lines = [
     headline,
@@ -49,7 +49,7 @@ export function buildAlertMessage(
     lines.push('', `Note from your friend: ${customNote.trim()}`);
   }
   if (imageUrl) {
-    lines.push('', `Storm outlook map (best chances of storms): ${imageUrl}`);
+    lines.push('', `Storm chance map: ${imageUrl}`);
   }
   lines.push('', "Sent via Will's Severe Weather Alerts");
 

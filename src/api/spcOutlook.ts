@@ -40,6 +40,12 @@ export function spcOutlookImageUrl(day: 1 | 2 | 3): string {
   return `https://www.spc.noaa.gov/products/outlook/day${day}otlk.gif`;
 }
 
+/** Percentage-probability graphic (contour %s, no categorical color fill) — the actual "chance of storms" map. */
+export function spcProbabilityImageUrl(day: 1 | 2 | 3): string {
+  if (day === 1) return 'https://www.spc.noaa.gov/products/outlook/day1probotlk_wind.gif';
+  return `https://www.spc.noaa.gov/products/outlook/day${day}probotlk.gif`;
+}
+
 export async function fetchConvectiveOutlook(day: 1 | 2 | 3): Promise<SpcFeature[]> {
   const url = `https://www.spc.noaa.gov/products/outlook/day${day}otlk_cat.nolyr.geojson`;
   const res = await fetch(url);
