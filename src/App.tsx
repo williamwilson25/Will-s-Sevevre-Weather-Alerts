@@ -13,7 +13,7 @@ import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
 import PasscodeGate from './components/PasscodeGate';
 import LoadingSkeleton from './components/LoadingSkeleton';
-import ExternalRadar from './components/ExternalRadar';
+import RadarMap from './components/RadarMap';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
@@ -202,11 +202,7 @@ export default function App() {
 
               {tab === 'radar' && (
                 <div className="radar-view">
-                  <ExternalRadar
-                    url="https://www.mesonet.org/weather/radar/KTLX?ref=1330"
-                    label="the Oklahoma Mesonet"
-                    title="Oklahoma Mesonet Radar"
-                  />
+                  <RadarMap location={snapshot.location} />
                 </div>
               )}
 
