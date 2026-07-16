@@ -189,18 +189,6 @@ export function BellAlertIcon({ size = 24, className }: IconProps) {
   );
 }
 
-export function StormLogoIcon({ size = 24, className }: IconProps) {
-  return (
-    <svg {...base(size)} className={className}>
-      <path
-        d="M7 14.8a4.3 4.3 0 0 1-.6-8.55A5.7 5.7 0 0 1 17.5 7.9a4.05 4.05 0 0 1-.7 8.1H7z"
-        fill="currentColor"
-      />
-      <path d="M12.6 15 9.8 19.2h2.4l-1.2 4 4.4-5.5h-2.3l1.2-2.7z" fill="currentColor" />
-    </svg>
-  );
-}
-
 export function DropletIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>

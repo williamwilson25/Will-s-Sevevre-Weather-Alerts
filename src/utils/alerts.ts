@@ -44,7 +44,7 @@ export function buildAlertMessage(
   if (customNote.trim()) {
     lines.push('', `Note from your friend: ${customNote.trim()}`);
   }
-  lines.push('', 'Sent via StormWatch');
+  lines.push('', "Sent via Will's Severe Weather Alerts");
 
   return { headline, body: lines.join('\n') };
 }

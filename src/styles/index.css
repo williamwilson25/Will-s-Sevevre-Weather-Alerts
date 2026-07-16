@@ -89,16 +89,20 @@ button:active:not(:disabled) {
 }
 
 .app-logo {
-  display: inline-flex;
-  color: var(--text);
-  opacity: 0.95;
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
 .app-title h1 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .location-search {

@@ -15,7 +15,8 @@ import PasscodeGate from './components/PasscodeGate';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import RadarMap from './components/RadarMap';
 import StormOutlookMap from './components/StormOutlookMap';
-import { AlertTriangleIcon, BellAlertIcon, StormLogoIcon } from './components/icons';
+import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
+import logo from './assets/logo.png';
 
 const DEFAULT_LOCATION: Location = {
   id: '4671654',
@@ -85,10 +86,8 @@ export default function App() {
       <div className="app">
         <header className="app-header">
           <div className="app-title">
-            <span className="app-logo" aria-hidden="true">
-              <StormLogoIcon size={22} />
-            </span>
-            <h1>StormWatch</h1>
+            <img src={logo} alt="" className="app-logo" />
+            <h1>Will's Severe Weather Alerts</h1>
           </div>
           <LocationSearch onSelect={setLocation} />
         </header>
@@ -173,8 +172,8 @@ export default function App() {
             )}
 
             <footer className="app-footer">
-              Weather data from Open-Meteo. Alerts are sent through your own email/SMS app —
-              StormWatch never stores your friends' data outside this browser.
+              Weather data from Open-Meteo. Alerts are sent through your own email/SMS app — this
+              app never stores your friends' data outside this browser.
             </footer>
           </>
         )}
