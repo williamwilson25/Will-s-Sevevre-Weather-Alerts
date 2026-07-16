@@ -63,7 +63,8 @@ button:active:not(:disabled) {
 .app-bg {
   position: relative;
   min-height: 100vh;
-  background-size: cover;
+  background-color: #0b1220;
+  background-size: auto 85vh;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
