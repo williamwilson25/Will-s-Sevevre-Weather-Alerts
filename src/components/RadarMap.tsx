@@ -33,12 +33,13 @@ export default function RadarMap({ location }: Props) {
     const map = L.map(containerRef.current, {
       center: [location.latitude, location.longitude],
       zoom: 7,
+      maxZoom: 19,
       zoomControl: true,
       attributionControl: true,
     });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 18,
+      maxZoom: 19,
     }).addTo(map);
     markerRef.current = L.circleMarker([location.latitude, location.longitude], {
       radius: 7,
@@ -46,7 +47,14 @@ export default function RadarMap({ location }: Props) {
       weight: 2,
       fillColor: '#38bdf8',
       fillOpacity: 1,
-    }).addTo(map);
+    })
+      .addTo(map)
+      .bindTooltip(locationLabel(location), {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -8],
+        className: 'radar-location-label',
+      });
     mapRef.current = map;
 
     return () => {
@@ -61,6 +69,7 @@ export default function RadarMap({ location }: Props) {
     if (!mapRef.current) return;
     mapRef.current.setView([location.latitude, location.longitude], mapRef.current.getZoom());
     markerRef.current?.setLatLng([location.latitude, location.longitude]);
+    markerRef.current?.setTooltipContent(locationLabel(location));
   }, [location]);
 
   // Load radar frame list
@@ -99,7 +108,12 @@ export default function RadarMap({ location }: Props) {
     if (radarLayerRef.current) {
       radarLayerRef.current.setUrl(url);
     } else {
-      radarLayerRef.current = L.tileLayer(url, { opacity: 0.65, zIndex: 10 }).addTo(mapRef.current);
+      radarLayerRef.current = L.tileLayer(url, {
+        opacity: 0.65,
+        zIndex: 10,
+        maxZoom: 19,
+        maxNativeZoom: 12,
+      }).addTo(mapRef.current);
     }
   }, [frames, activeIndex]);
 
@@ -161,6 +175,10 @@ export default function RadarMap({ location }: Props) {
       <p className="radar-caption">Radar data from RainViewer, updated every ~10 minutes.</p>
     </section>
   );
+}
+
+function locationLabel(location: Location): string {
+  return location.admin1 ? `${location.name}, ${location.admin1}` : location.name;
 }
 
 function lastPastIndex(frames: TimelineFrame[]): number {

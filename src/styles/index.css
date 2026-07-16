@@ -1257,6 +1257,11 @@ section h2 {
   font-weight: 600;
 }
 
+.radar-location-label {
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
 /* Passcode gate */
 .passcode-unlocked {
   display: flex;
