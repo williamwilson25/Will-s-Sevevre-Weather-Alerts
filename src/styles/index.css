@@ -1161,6 +1161,47 @@ section h2 {
   text-align: center;
 }
 
+.radar-caption a {
+  color: var(--accent);
+}
+
+.radar-source-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+
+.radar-source-toggle button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.radar-source-toggle button.active {
+  color: var(--text);
+  background: var(--glass-bg-strong);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+.news9-iframe {
+  height: 380px;
+  width: 100%;
+  border: none;
+  display: block;
+  background: #0b1220;
+}
+
 /* Storm outlook */
 .outlook-view {
   display: flex;

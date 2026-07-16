@@ -14,6 +14,7 @@ import AlertHistory from './components/AlertHistory';
 import PasscodeGate from './components/PasscodeGate';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import RadarMap from './components/RadarMap';
+import News9Radar from './components/News9Radar';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
@@ -30,6 +31,7 @@ const DEFAULT_LOCATION: Location = {
 };
 
 type Tab = 'forecast' | 'radar' | 'outlook' | 'alerts';
+type RadarSource = 'live' | 'news9';
 
 function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null {
   if (!snapshot || snapshot.daily.length === 0) return null;
@@ -50,6 +52,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<Tab>('forecast');
+  const [radarSource, setRadarSource] = useState<RadarSource>('live');
   const [alertDay, setAlertDay] = useState<DailyForecast | null>(null);
 
   const location = locations.find((l) => l.id === activeLocationId) ?? locations[0] ?? DEFAULT_LOCATION;
@@ -202,7 +205,25 @@ export default function App() {
 
               {tab === 'radar' && (
                 <div className="radar-view">
-                  <RadarMap location={snapshot.location} />
+                  <div className="radar-source-toggle">
+                    <button
+                      className={radarSource === 'live' ? 'active' : ''}
+                      onClick={() => setRadarSource('live')}
+                    >
+                      Live Radar
+                    </button>
+                    <button
+                      className={radarSource === 'news9' ? 'active' : ''}
+                      onClick={() => setRadarSource('news9')}
+                    >
+                      News9 OKC
+                    </button>
+                  </div>
+                  {radarSource === 'live' ? (
+                    <RadarMap location={snapshot.location} />
+                  ) : (
+                    <News9Radar />
+                  )}
                 </div>
               )}
 
