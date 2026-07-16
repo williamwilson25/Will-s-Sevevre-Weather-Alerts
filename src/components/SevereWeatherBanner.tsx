@@ -1,6 +1,7 @@
 import type { DailyForecast } from '../types';
 import { RISK_LABEL } from '../utils/severity';
 import RiskBadge from './RiskBadge';
+import { AlertTriangleIcon, CheckCircleIcon } from './icons';
 
 interface Props {
   daily: DailyForecast[];
@@ -13,8 +14,8 @@ export default function SevereWeatherBanner({ daily, onAlertDay }: Props) {
   if (!next) {
     return (
       <div className="severe-banner severe-banner-calm">
-        <span className="severe-banner-icon" aria-hidden="true">
-          ✅
+        <span className="severe-banner-icon severe-banner-icon-calm">
+          <CheckCircleIcon size={22} />
         </span>
         <div>
           <strong>No severe weather expected</strong>
@@ -32,8 +33,8 @@ export default function SevereWeatherBanner({ daily, onAlertDay }: Props) {
 
   return (
     <div className={`severe-banner severe-banner-${next.risk.level}`}>
-      <span className="severe-banner-icon" aria-hidden="true">
-        ⚠️
+      <span className="severe-banner-icon">
+        <AlertTriangleIcon size={22} />
       </span>
       <div className="severe-banner-body">
         <strong>

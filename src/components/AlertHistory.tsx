@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { AlertRecord, Friend } from '../types';
 import { SEVERITY_COLOR, SEVERITY_LABEL } from '../utils/alerts';
 
@@ -31,7 +32,11 @@ export default function AlertHistory({ history, friends, onClear }: Props) {
         {[...history]
           .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
           .map((record) => (
-            <li key={record.id} className="history-item">
+            <li
+              key={record.id}
+              className="history-item"
+              style={{ '--severity-color': SEVERITY_COLOR[record.severity] } as CSSProperties}
+            >
               <div
                 className="history-severity"
                 style={{ color: SEVERITY_COLOR[record.severity] }}

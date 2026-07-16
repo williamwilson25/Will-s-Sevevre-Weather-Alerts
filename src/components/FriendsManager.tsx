@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Friend } from '../types';
+import Avatar from './Avatar';
 
 interface Props {
   friends: Friend[];
@@ -74,7 +75,8 @@ export default function FriendsManager({ friends, onChange }: Props) {
         <ul className="friend-list">
           {friends.map((friend) => (
             <li key={friend.id} className="friend-item">
-              <div>
+              <Avatar name={friend.name} />
+              <div className="friend-info">
                 <div className="friend-name">{friend.name}</div>
                 <div className="friend-contact">
                   {[friend.email, friend.phone].filter(Boolean).join(' · ')}

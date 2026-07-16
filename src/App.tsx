@@ -11,6 +11,8 @@ import SevereWeatherBanner from './components/SevereWeatherBanner';
 import FriendsManager from './components/FriendsManager';
 import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
+import LoadingSkeleton from './components/LoadingSkeleton';
+import { AlertTriangleIcon, BellAlertIcon, StormLogoIcon } from './components/icons';
 
 const DEFAULT_LOCATION: Location = {
   id: '4671654',
@@ -81,15 +83,20 @@ export default function App() {
         <header className="app-header">
           <div className="app-title">
             <span className="app-logo" aria-hidden="true">
-              ⛈️
+              <StormLogoIcon size={22} />
             </span>
             <h1>StormWatch</h1>
           </div>
           <LocationSearch onSelect={setLocation} />
         </header>
 
-        {loading && <div className="status-panel">Loading weather for {location.name}…</div>}
-        {error && <div className="status-panel status-error">Couldn't load weather: {error}</div>}
+        {loading && <LoadingSkeleton />}
+        {error && (
+          <div className="status-panel status-error">
+            <AlertTriangleIcon size={28} />
+            <p>Couldn't load weather: {error}</p>
+          </div>
+        )}
 
         {!loading && !error && snapshot && (
           <>
@@ -137,7 +144,8 @@ export default function App() {
                 className={`fab fab-${worstRisk.risk.level}`}
                 onClick={handleQuickAlert}
               >
-                🚨 Alert friends
+                <BellAlertIcon size={17} />
+                Alert friends
               </button>
             )}
 

@@ -1,5 +1,6 @@
 import type { WeatherSnapshot } from '../types';
 import { describeWeatherCode } from '../utils/weatherCode';
+import WeatherIcon from './WeatherIcon';
 
 interface Props {
   snapshot: WeatherSnapshot;
@@ -7,7 +8,7 @@ interface Props {
 
 export default function CurrentConditions({ snapshot }: Props) {
   const { current, location, daily } = snapshot;
-  const { label, icon } = describeWeatherCode(current.weatherCode);
+  const { label } = describeWeatherCode(current.weatherCode);
   const today = daily[0];
 
   return (
@@ -16,8 +17,8 @@ export default function CurrentConditions({ snapshot }: Props) {
         {location.name}
         {location.admin1 ? `, ${location.admin1}` : ''}
       </div>
-      <div className="hero-icon" aria-hidden="true">
-        {icon}
+      <div className="hero-icon">
+        <WeatherIcon code={current.weatherCode} isDay={current.isDay} size={88} />
       </div>
       <div className="hero-temp">{Math.round(current.temperature)}°</div>
       <div className="hero-label">{label}</div>

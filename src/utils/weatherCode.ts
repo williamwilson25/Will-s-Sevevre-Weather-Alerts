@@ -1,39 +1,34 @@
-interface CodeInfo {
-  label: string;
-  icon: string;
-}
-
-const CODES: Record<number, CodeInfo> = {
-  0: { label: 'Clear sky', icon: '☀️' },
-  1: { label: 'Mainly clear', icon: '🌤️' },
-  2: { label: 'Partly cloudy', icon: '⛅' },
-  3: { label: 'Overcast', icon: '☁️' },
-  45: { label: 'Fog', icon: '🌫️' },
-  48: { label: 'Depositing rime fog', icon: '🌫️' },
-  51: { label: 'Light drizzle', icon: '🌦️' },
-  53: { label: 'Drizzle', icon: '🌦️' },
-  55: { label: 'Dense drizzle', icon: '🌦️' },
-  56: { label: 'Freezing drizzle', icon: '🌧️' },
-  57: { label: 'Dense freezing drizzle', icon: '🌧️' },
-  61: { label: 'Light rain', icon: '🌧️' },
-  63: { label: 'Rain', icon: '🌧️' },
-  65: { label: 'Heavy rain', icon: '🌧️' },
-  66: { label: 'Freezing rain', icon: '🌧️' },
-  67: { label: 'Heavy freezing rain', icon: '🌧️' },
-  71: { label: 'Light snow', icon: '🌨️' },
-  73: { label: 'Snow', icon: '🌨️' },
-  75: { label: 'Heavy snow', icon: '❄️' },
-  77: { label: 'Snow grains', icon: '❄️' },
-  80: { label: 'Light rain showers', icon: '🌦️' },
-  81: { label: 'Rain showers', icon: '🌧️' },
-  82: { label: 'Violent rain showers', icon: '⛈️' },
-  85: { label: 'Snow showers', icon: '🌨️' },
-  86: { label: 'Heavy snow showers', icon: '❄️' },
-  95: { label: 'Thunderstorm', icon: '⛈️' },
-  96: { label: 'Thunderstorm with hail', icon: '⛈️' },
-  99: { label: 'Severe thunderstorm with hail', icon: '⛈️' },
+const LABELS: Record<number, string> = {
+  0: 'Clear sky',
+  1: 'Mainly clear',
+  2: 'Partly cloudy',
+  3: 'Overcast',
+  45: 'Fog',
+  48: 'Depositing rime fog',
+  51: 'Light drizzle',
+  53: 'Drizzle',
+  55: 'Dense drizzle',
+  56: 'Freezing drizzle',
+  57: 'Dense freezing drizzle',
+  61: 'Light rain',
+  63: 'Rain',
+  65: 'Heavy rain',
+  66: 'Freezing rain',
+  67: 'Heavy freezing rain',
+  71: 'Light snow',
+  73: 'Snow',
+  75: 'Heavy snow',
+  77: 'Snow grains',
+  80: 'Light rain showers',
+  81: 'Rain showers',
+  82: 'Violent rain showers',
+  85: 'Snow showers',
+  86: 'Heavy snow showers',
+  95: 'Thunderstorm',
+  96: 'Thunderstorm with hail',
+  99: 'Severe thunderstorm with hail',
 };
 
-export function describeWeatherCode(code: number): CodeInfo {
-  return CODES[code] ?? { label: 'Unknown', icon: '❔' };
+export function describeWeatherCode(code: number): { label: string } {
+  return { label: LABELS[code] ?? 'Unknown' };
 }

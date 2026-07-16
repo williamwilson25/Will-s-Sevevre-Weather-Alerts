@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { AlertRecord, AlertSeverity, DailyForecast, Friend } from '../types';
 import { buildAlertMessage, buildMailtoLink, buildSmsLink, SEVERITY_LABEL } from '../utils/alerts';
+import Avatar from './Avatar';
 
 interface Props {
   locationName: string;
@@ -130,6 +131,7 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
                   checked={recipientIds.includes(friend.id)}
                   onChange={() => toggleRecipient(friend.id)}
                 />
+                <Avatar name={friend.name} size={20} />
                 {friend.name}
               </label>
             ))}
