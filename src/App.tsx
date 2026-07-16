@@ -47,6 +47,7 @@ export default function App() {
 
   const [snapshot, setSnapshot] = useState<WeatherSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<Tab>('forecast');
   const [alertDay, setAlertDay] = useState<DailyForecast | null>(null);
@@ -71,6 +72,45 @@ export default function App() {
       cancelled = true;
     };
   }, [location.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    function refresh() {
+      setRefreshing(true);
+      fetchWeather(location)
+        .then((data) => {
+          if (!cancelled) setSnapshot(data);
+        })
+        .catch(() => {
+          // silent refresh — keep showing the last good snapshot on failure
+        })
+        .finally(() => {
+          if (!cancelled) setRefreshing(false);
+        });
+    }
+
+    const interval = setInterval(refresh, 5 * 60 * 1000);
+
+    function handleVisibility() {
+      if (document.visibilityState === 'visible') refresh();
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [location.id]);
+
+  function handleManualRefresh() {
+    setRefreshing(true);
+    fetchWeather(location)
+      .then((data) => setSnapshot(data))
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load weather'))
+      .finally(() => setRefreshing(false));
+  }
 
   function handleAddLocation(loc: Location) {
     if (!locations.some((l) => l.id === loc.id)) {
@@ -133,7 +173,7 @@ export default function App() {
 
         {!loading && !error && snapshot && (
           <>
-            <CurrentConditions snapshot={snapshot} />
+            <CurrentConditions snapshot={snapshot} refreshing={refreshing} onRefresh={handleManualRefresh} />
 
             <nav className="tabs">
               <button className={tab === 'forecast' ? 'active' : ''} onClick={() => setTab('forecast')}>

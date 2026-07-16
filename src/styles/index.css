@@ -294,6 +294,43 @@ button:active:not(:disabled) {
   color: var(--text);
 }
 
+.hero-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: color 150ms var(--ease), background 150ms var(--ease);
+}
+
+.hero-updated:hover:not(:disabled) {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hero-updated:disabled {
+  cursor: default;
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .hero-icon {
   display: flex;
   justify-content: center;
@@ -344,6 +381,9 @@ button:active:not(:disabled) {
 }
 
 .hero-stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;

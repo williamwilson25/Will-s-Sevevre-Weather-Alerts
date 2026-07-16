@@ -200,6 +200,21 @@ export function DropletIcon({ size = 24, className }: IconProps) {
   );
 }
 
+export function RefreshIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M4.5 12a7.5 7.5 0 0 1 12.6-5.5M19.5 12a7.5 7.5 0 0 1-12.6 5.5"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path d="M17.5 3.5v3.6h-3.6M6.5 20.5v-3.6h3.6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  );
+}
+
 export function LockIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
