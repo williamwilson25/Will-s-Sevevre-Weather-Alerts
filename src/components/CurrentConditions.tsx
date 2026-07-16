@@ -6,42 +6,44 @@ interface Props {
 }
 
 export default function CurrentConditions({ snapshot }: Props) {
-  const { current, location } = snapshot;
+  const { current, location, daily } = snapshot;
   const { label, icon } = describeWeatherCode(current.weatherCode);
+  const today = daily[0];
 
   return (
-    <section className="current-conditions">
-      <div className="current-main">
-        <div className="current-icon" aria-hidden="true">
-          {icon}
+    <section className="hero">
+      <div className="hero-location">
+        {location.name}
+        {location.admin1 ? `, ${location.admin1}` : ''}
+      </div>
+      <div className="hero-icon" aria-hidden="true">
+        {icon}
+      </div>
+      <div className="hero-temp">{Math.round(current.temperature)}°</div>
+      <div className="hero-label">{label}</div>
+      {today && (
+        <div className="hero-hilo">
+          H:{Math.round(today.tempMax)}° L:{Math.round(today.tempMin)}°
         </div>
-        <div>
-          <div className="current-temp">{Math.round(current.temperature)}°F</div>
-          <div className="current-label">{label}</div>
-          <div className="current-location">
-            {location.name}
-            {location.admin1 ? `, ${location.admin1}` : ''}
-          </div>
+      )}
+      <div className="hero-stats">
+        <div className="hero-stat">
+          <span className="hero-stat-label">Feels like</span>
+          <span className="hero-stat-value">{Math.round(current.apparentTemperature)}°</span>
+        </div>
+        <div className="hero-stat">
+          <span className="hero-stat-label">Humidity</span>
+          <span className="hero-stat-value">{Math.round(current.humidity)}%</span>
+        </div>
+        <div className="hero-stat">
+          <span className="hero-stat-label">Wind</span>
+          <span className="hero-stat-value">{Math.round(current.windSpeed)} mph</span>
+        </div>
+        <div className="hero-stat">
+          <span className="hero-stat-label">Gusts</span>
+          <span className="hero-stat-value">{Math.round(current.windGusts)} mph</span>
         </div>
       </div>
-      <dl className="current-stats">
-        <div>
-          <dt>Feels like</dt>
-          <dd>{Math.round(current.apparentTemperature)}°F</dd>
-        </div>
-        <div>
-          <dt>Humidity</dt>
-          <dd>{Math.round(current.humidity)}%</dd>
-        </div>
-        <div>
-          <dt>Wind</dt>
-          <dd>{Math.round(current.windSpeed)} mph</dd>
-        </div>
-        <div>
-          <dt>Gusts</dt>
-          <dd>{Math.round(current.windGusts)} mph</dd>
-        </div>
-      </dl>
     </section>
   );
 }
