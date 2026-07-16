@@ -203,7 +203,7 @@ export default function App() {
               {tab === 'radar' && (
                 <div className="radar-view">
                   <ExternalRadar
-                    url="https://www.mesonet.org/index.php/weather/category/radar"
+                    url="https://www.mesonet.org/weather/radar/KTLX?ref=1330"
                     label="the Oklahoma Mesonet"
                     title="Oklahoma Mesonet Radar"
                   />
