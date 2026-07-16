@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import type { AlertRecord, DailyForecast, Friend, Location, WeatherSnapshot } from './types';
 import { fetchWeather } from './api/weather';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { DEFAULT_THEME, getWeatherTheme } from './utils/weatherTheme';
 import LocationSearch from './components/LocationSearch';
 import CurrentConditions from './components/CurrentConditions';
 import HourlyStrip from './components/HourlyStrip';
@@ -17,6 +16,7 @@ import RadarMap from './components/RadarMap';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
+import background from './assets/background.jpg';
 
 const DEFAULT_LOCATION: Location = {
   id: '4671654',
@@ -74,7 +74,6 @@ export default function App() {
     setHistory([record, ...history]);
   }
 
-  const theme = snapshot ? getWeatherTheme(snapshot.current.weatherCode, snapshot.current.isDay) : DEFAULT_THEME;
   const worstRisk = getWorstRiskDay(snapshot);
 
   function handleQuickAlert() {
@@ -82,7 +81,7 @@ export default function App() {
   }
 
   return (
-    <div className={`app-bg theme-${theme.key}`} style={{ background: theme.gradient }}>
+    <div className="app-bg" style={{ backgroundImage: `url(${background})` }}>
       <div className="app">
         <header className="app-header">
           <div className="app-title">

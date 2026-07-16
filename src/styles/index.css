@@ -61,8 +61,26 @@ button:active:not(:disabled) {
 }
 
 .app-bg {
+  position: relative;
   min-height: 100vh;
-  transition: background 900ms ease;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.app-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 10, 20, 0.55) 0%, rgba(6, 10, 20, 0.72) 45%, rgba(6, 10, 20, 0.88) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-bg > .app {
+  position: relative;
+  z-index: 1;
 }
 
 .app {
