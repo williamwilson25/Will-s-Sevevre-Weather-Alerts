@@ -928,7 +928,8 @@ section h2 {
 }
 
 .field select,
-.field textarea {
+.field textarea,
+.field input {
   padding: 9px 12px;
   border-radius: 10px;
   border: 1px solid var(--glass-border);
@@ -1330,20 +1331,112 @@ section h2 {
 }
 
 /* Passcode gate */
-.passcode-unlocked {
+.auth-screen {
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
 }
 
-.passcode-relock {
-  align-self: flex-start;
-  display: inline-flex;
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  text-align: center;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 32px 26px;
+  box-shadow: var(--shadow-pop);
+}
+
+.auth-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.auth-card h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.auth-subtitle {
+  margin: 6px 0 22px;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.auth-form {
+  width: 100%;
+  text-align: left;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: var(--accent);
+  color: #04202f;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-submit:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.auth-toggle {
+  margin-top: 18px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-toggle:hover {
+  color: var(--text);
+}
+
+.auth-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 0.76rem;
+  color: var(--text-faint);
+}
+
+.auth-bar-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-signout {
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--glass-border);
-  color: var(--text-faint);
+  color: var(--text-muted);
   padding: 5px 12px;
   border-radius: 999px;
   font-size: 0.72rem;
@@ -1351,77 +1444,9 @@ section h2 {
   cursor: pointer;
 }
 
-.passcode-relock:hover {
+.auth-signout:hover {
   color: var(--text);
   border-color: var(--accent);
-}
-
-.passcode-gate {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 40px 24px;
-}
-
-.passcode-icon {
-  color: var(--accent);
-  margin-bottom: 12px;
-}
-
-.passcode-gate h2 {
-  margin: 0 0 6px;
-  font-size: 1.1rem;
-  text-transform: none;
-  letter-spacing: normal;
-  color: var(--text);
-}
-
-.passcode-gate p {
-  margin: 0 0 18px;
-  font-size: 0.86rem;
-  color: var(--text-muted);
-  max-width: 280px;
-}
-
-.passcode-form {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-  max-width: 240px;
-}
-
-.passcode-form input {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
-  font-size: 1rem;
-  letter-spacing: 0.1em;
-  text-align: center;
-}
-
-.passcode-form button {
-  padding: 0 16px;
-  border-radius: 10px;
-  border: none;
-  background: var(--accent);
-  color: #04202f;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.passcode-form button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.passcode-gate .form-error {
-  margin-top: 12px;
 }
 
 @media (max-width: 480px) {

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
+import { signOut } from 'firebase/auth';
 import type { AlertRecord, DailyForecast, Friend, Location, WeatherSnapshot } from './types';
 import { fetchWeather } from './api/weather';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useAuth } from './hooks/useAuth';
+import { auth, OWNER_EMAIL } from './firebase';
+import SignIn from './components/SignIn';
 import LocationSearch from './components/LocationSearch';
 import LocationChips from './components/LocationChips';
 import CurrentConditions from './components/CurrentConditions';
@@ -13,7 +17,6 @@ import { detectRainOnset } from './utils/rainOnset';
 import FriendsManager from './components/FriendsManager';
 import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
-import PasscodeGate from './components/PasscodeGate';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import RadarMap from './components/RadarMap';
 import StormOutlookMap from './components/StormOutlookMap';
@@ -39,6 +42,7 @@ function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null
 }
 
 export default function App() {
+  const { user, loading: authLoading } = useAuth();
   const [locations, setLocations] = useLocalStorage<Location[]>('sw_locations', [DEFAULT_LOCATION]);
   const [activeLocationId, setActiveLocationId] = useLocalStorage<string>(
     'sw_active_location',
@@ -63,6 +67,7 @@ export default function App() {
   const location = locations.find((l) => l.id === activeLocationId) ?? locations[0] ?? DEFAULT_LOCATION;
 
   useEffect(() => {
+    if (!user) return;
     let cancelled = false;
     setLoading(true);
     setError('');
@@ -79,9 +84,10 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [location.id]);
+  }, [location.id, user]);
 
   useEffect(() => {
+    if (!user) return;
     let cancelled = false;
 
     function refresh() {
@@ -110,7 +116,7 @@ export default function App() {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [location.id]);
+  }, [location.id, user]);
 
   function handleManualRefresh() {
     setRefreshing(true);
@@ -181,6 +187,22 @@ export default function App() {
     if (worstRisk) handleAlertDay(worstRisk);
   }
 
+  const isOwner = user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase();
+
+  if (authLoading) {
+    return (
+      <div className="app-bg" style={{ backgroundImage: `url(${background})` }}>
+        <div className="app">
+          <LoadingSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <SignIn />;
+  }
+
   return (
     <div className="app-bg" style={{ backgroundImage: `url(${background})` }}>
       <div className="app">
@@ -191,6 +213,13 @@ export default function App() {
           </div>
           <LocationSearch onSelect={handleAddLocation} />
         </header>
+
+        <div className="auth-bar">
+          <span className="auth-bar-email">{user.email}</span>
+          <button type="button" className="auth-signout" onClick={() => signOut(auth)}>
+            Sign out
+          </button>
+        </div>
 
         <LocationChips
           locations={locations}
@@ -221,10 +250,12 @@ export default function App() {
               <button className={tab === 'outlook' ? 'active' : ''} onClick={() => setTab('outlook')}>
                 Outlook
               </button>
-              <button className={tab === 'alerts' ? 'active' : ''} onClick={() => setTab('alerts')}>
-                Alerts
-                {history.length > 0 && <span className="tab-count">{history.length}</span>}
-              </button>
+              {isOwner && (
+                <button className={tab === 'alerts' ? 'active' : ''} onClick={() => setTab('alerts')}>
+                  Alerts
+                  {history.length > 0 && <span className="tab-count">{history.length}</span>}
+                </button>
+              )}
             </nav>
 
             <main>
@@ -240,9 +271,15 @@ export default function App() {
                       onDismiss={() => setDismissedOnsetKey(onsetKey)}
                     />
                   )}
-                  <SevereWeatherBanner daily={snapshot.daily} onAlertDay={handleAlertDay} />
+                  <SevereWeatherBanner
+                    daily={snapshot.daily}
+                    onAlertDay={isOwner ? handleAlertDay : undefined}
+                  />
                   <HourlyStrip hourly={snapshot.hourly} />
-                  <DailyForecastList daily={snapshot.daily} onAlertDay={handleAlertDay} />
+                  <DailyForecastList
+                    daily={snapshot.daily}
+                    onAlertDay={isOwner ? handleAlertDay : undefined}
+                  />
                 </div>
               )}
 
@@ -258,26 +295,24 @@ export default function App() {
                 </div>
               )}
 
-              {tab === 'alerts' && (
+              {tab === 'alerts' && isOwner && (
                 <div className="alerts-view">
-                  <PasscodeGate>
-                    <FriendsManager friends={friends} onChange={setFriends} />
-                    <AlertComposer
-                      locationName={`${snapshot.location.name}${
-                        snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
-                      }`}
-                      daily={snapshot.daily}
-                      friends={friends}
-                      selectedDate={alertDay?.date ?? null}
-                      onSent={handleSent}
-                    />
-                    <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
-                  </PasscodeGate>
+                  <FriendsManager friends={friends} onChange={setFriends} />
+                  <AlertComposer
+                    locationName={`${snapshot.location.name}${
+                      snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
+                    }`}
+                    daily={snapshot.daily}
+                    friends={friends}
+                    selectedDate={alertDay?.date ?? null}
+                    onSent={handleSent}
+                  />
+                  <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
                 </div>
               )}
             </main>
 
-            {tab === 'forecast' && worstRisk && (
+            {tab === 'forecast' && isOwner && worstRisk && (
               <button
                 type="button"
                 className={`fab fab-${worstRisk.risk.level}`}
