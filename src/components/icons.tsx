@@ -211,3 +211,35 @@ export function DropletIcon({ size = 24, className }: IconProps) {
     </svg>
   );
 }
+
+export function LockIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="5.5" y="11" width="13" height="9.5" rx="2.2" fill="currentColor" opacity="0.85" />
+      <path
+        d="M8 11V8a4 4 0 0 1 8 0v3"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <circle cx="12" cy="15.4" r="1.4" fill="#0b1220" />
+    </svg>
+  );
+}
+
+export function LockOpenIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="5.5" y="11" width="13" height="9.5" rx="2.2" fill="currentColor" opacity="0.85" />
+      <path
+        d="M8 11V8a4 4 0 0 1 7.7-1.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <circle cx="12" cy="15.4" r="1.4" fill="#0b1220" />
+    </svg>
+  );
+}

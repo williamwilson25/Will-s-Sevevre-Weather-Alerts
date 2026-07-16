@@ -11,6 +11,7 @@ import SevereWeatherBanner from './components/SevereWeatherBanner';
 import FriendsManager from './components/FriendsManager';
 import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
+import PasscodeGate from './components/PasscodeGate';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import RadarMap from './components/RadarMap';
 import StormOutlookMap from './components/StormOutlookMap';
@@ -143,17 +144,19 @@ export default function App() {
 
               {tab === 'alerts' && (
                 <div className="alerts-view">
-                  <FriendsManager friends={friends} onChange={setFriends} />
-                  <AlertComposer
-                    locationName={`${snapshot.location.name}${
-                      snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
-                    }`}
-                    daily={snapshot.daily}
-                    friends={friends}
-                    selectedDate={alertDay?.date ?? null}
-                    onSent={handleSent}
-                  />
-                  <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
+                  <PasscodeGate>
+                    <FriendsManager friends={friends} onChange={setFriends} />
+                    <AlertComposer
+                      locationName={`${snapshot.location.name}${
+                        snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
+                      }`}
+                      daily={snapshot.daily}
+                      friends={friends}
+                      selectedDate={alertDay?.date ?? null}
+                      onSent={handleSent}
+                    />
+                    <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
+                  </PasscodeGate>
                 </div>
               )}
             </main>
