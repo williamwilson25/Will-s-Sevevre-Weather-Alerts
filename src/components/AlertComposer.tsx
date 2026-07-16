@@ -148,7 +148,7 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
         {imageUrl && (
           <img
             src={imageUrl}
-            alt="NOAA percentage chance of storms map"
+            alt="NOAA Storm Prediction Center outlook map showing chance of storms"
             className="alert-preview-image"
           />
         )}
