@@ -14,7 +14,7 @@ import AlertHistory from './components/AlertHistory';
 import PasscodeGate from './components/PasscodeGate';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import RadarMap from './components/RadarMap';
-import News9Radar from './components/News9Radar';
+import ExternalRadar from './components/ExternalRadar';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
@@ -31,7 +31,7 @@ const DEFAULT_LOCATION: Location = {
 };
 
 type Tab = 'forecast' | 'radar' | 'outlook' | 'alerts';
-type RadarSource = 'live' | 'news9';
+type RadarSource = 'live' | 'news9' | 'twc';
 
 function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null {
   if (!snapshot || snapshot.daily.length === 0) return null;
@@ -218,11 +218,27 @@ export default function App() {
                     >
                       News9 OKC
                     </button>
+                    <button
+                      className={radarSource === 'twc' ? 'active' : ''}
+                      onClick={() => setRadarSource('twc')}
+                    >
+                      Weather Channel
+                    </button>
                   </div>
-                  {radarSource === 'live' ? (
-                    <RadarMap location={snapshot.location} />
-                  ) : (
-                    <News9Radar />
+                  {radarSource === 'live' && <RadarMap location={snapshot.location} />}
+                  {radarSource === 'news9' && (
+                    <ExternalRadar
+                      url="https://www.news9.com/nextgen-live-radar"
+                      label="News9 Oklahoma City"
+                      title="News9 NextGen Live Radar"
+                    />
+                  )}
+                  {radarSource === 'twc' && (
+                    <ExternalRadar
+                      url="https://weather.com/maps/radar"
+                      label="The Weather Channel"
+                      title="The Weather Channel Radar"
+                    />
                   )}
                 </div>
               )}
