@@ -55,26 +55,34 @@ export default function StormOutlookMap({ location, daily }: Props) {
     mapRef.current?.setView([location.latitude, location.longitude], 6);
   }, [location]);
 
-  // Fetch the SPC outlook for the selected day
+  // Fetch the SPC outlook for the selected day, then keep it fresh in the background
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError('');
-    fetchConvectiveOutlook(day)
-      .then((data) => {
-        if (!cancelled) setFeatures(data);
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load outlook');
-          setFeatures([]);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+
+    function load(initial: boolean) {
+      if (initial) setLoading(true);
+      setError('');
+      fetchConvectiveOutlook(day)
+        .then((data) => {
+          if (!cancelled) setFeatures(data);
+        })
+        .catch((err) => {
+          if (!cancelled && initial) {
+            setError(err instanceof Error ? err.message : 'Failed to load outlook');
+            setFeatures([]);
+          }
+        })
+        .finally(() => {
+          if (!cancelled && initial) setLoading(false);
+        });
+    }
+
+    load(true);
+    const interval = setInterval(() => load(false), 15 * 60 * 1000);
+
     return () => {
       cancelled = true;
+      clearInterval(interval);
     };
   }, [day]);
 

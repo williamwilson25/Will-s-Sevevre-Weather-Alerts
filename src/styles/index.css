@@ -528,6 +528,73 @@ section h2 {
   filter: brightness(1.06);
 }
 
+/* Rain-starting-soon banner */
+.rain-soon-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.rain-soon-icon {
+  flex-shrink: 0;
+  color: #38bdf8;
+}
+
+.rain-soon-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rain-soon-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.rain-soon-detail {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.rain-soon-notify {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rain-soon-notify:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.rain-soon-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+
+.rain-soon-dismiss:hover {
+  color: var(--text);
+}
+
 /* Hourly strip */
 .hourly-scroll {
   display: flex;

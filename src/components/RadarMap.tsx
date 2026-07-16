@@ -20,12 +20,17 @@ export default function RadarMap({ location }: Props) {
   const radarLayerRef = useRef<L.TileLayer | null>(null);
   const markerRef = useRef<L.CircleMarker | null>(null);
   const hostRef = useRef<string>('');
+  const playingRef = useRef(false);
 
   const [frames, setFrames] = useState<TimelineFrame[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    playingRef.current = playing;
+  }, [playing]);
 
   // Init map once
   useEffect(() => {
@@ -72,30 +77,42 @@ export default function RadarMap({ location }: Props) {
     markerRef.current?.setTooltipContent(locationLabel(location));
   }, [location]);
 
-  // Load radar frame list
+  // Load radar frame list, then keep it fresh in the background
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError('');
-    fetchRadarData()
-      .then((data) => {
-        if (cancelled) return;
-        hostRef.current = data.host;
-        const combined: TimelineFrame[] = [
-          ...data.past.map((f) => ({ ...f, isForecast: false })),
-          ...data.nowcast.map((f) => ({ ...f, isForecast: true })),
-        ];
-        setFrames(combined);
-        setActiveIndex(Math.max(0, data.past.length - 1));
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load radar');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+
+    function load(initial: boolean) {
+      if (initial) setLoading(true);
+      setError('');
+      fetchRadarData()
+        .then((data) => {
+          if (cancelled) return;
+          hostRef.current = data.host;
+          const combined: TimelineFrame[] = [
+            ...data.past.map((f) => ({ ...f, isForecast: false })),
+            ...data.nowcast.map((f) => ({ ...f, isForecast: true })),
+          ];
+          setFrames(combined);
+          if (initial || !playingRef.current) {
+            setActiveIndex(Math.max(0, data.past.length - 1));
+          }
+        })
+        .catch((err) => {
+          if (!cancelled && initial) {
+            setError(err instanceof Error ? err.message : 'Failed to load radar');
+          }
+        })
+        .finally(() => {
+          if (!cancelled && initial) setLoading(false);
+        });
+    }
+
+    load(true);
+    const interval = setInterval(() => load(false), 5 * 60 * 1000);
+
     return () => {
       cancelled = true;
+      clearInterval(interval);
     };
   }, []);
 

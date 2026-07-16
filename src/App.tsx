@@ -8,6 +8,8 @@ import CurrentConditions from './components/CurrentConditions';
 import HourlyStrip from './components/HourlyStrip';
 import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
+import RainSoonBanner from './components/RainSoonBanner';
+import { detectRainOnset } from './utils/rainOnset';
 import FriendsManager from './components/FriendsManager';
 import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
@@ -44,6 +46,12 @@ export default function App() {
   );
   const [friends, setFriends] = useLocalStorage<Friend[]>('sw_friends', []);
   const [history, setHistory] = useLocalStorage<AlertRecord[]>('sw_alert_history', []);
+  const [notifyRain, setNotifyRain] = useLocalStorage<boolean>('sw_notify_rain', false);
+  const [lastNotifiedKey, setLastNotifiedKey] = useLocalStorage<string>('sw_last_rain_notify', '');
+  const [dismissedOnsetKey, setDismissedOnsetKey] = useState<string | null>(null);
+  const [notifyDenied, setNotifyDenied] = useState(
+    typeof Notification !== 'undefined' && Notification.permission === 'denied',
+  );
 
   const [snapshot, setSnapshot] = useState<WeatherSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -140,6 +148,34 @@ export default function App() {
   }
 
   const worstRisk = getWorstRiskDay(snapshot);
+  const rainOnset = snapshot ? detectRainOnset(snapshot.hourly) : null;
+  const onsetKey = rainOnset ? `${location.id}:${rainOnset.hour.time}` : null;
+  const notifySupported = typeof window !== 'undefined' && 'Notification' in window;
+
+  useEffect(() => {
+    if (!onsetKey || !notifyRain || onsetKey === lastNotifiedKey) return;
+    if (!notifySupported || Notification.permission !== 'granted' || !rainOnset) return;
+    new Notification('Rain expected soon', {
+      body: `${Math.round(rainOnset.hour.precipitationProbability)}% chance around ${new Date(
+        rainOnset.hour.time,
+      ).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })} in ${location.name}`,
+      icon: logo,
+    });
+    setLastNotifiedKey(onsetKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onsetKey, notifyRain]);
+
+  function handleEnableRainNotify() {
+    if (!notifySupported) return;
+    if (Notification.permission === 'granted') {
+      setNotifyRain(true);
+      return;
+    }
+    Notification.requestPermission().then((perm) => {
+      if (perm === 'granted') setNotifyRain(true);
+      else if (perm === 'denied') setNotifyDenied(true);
+    });
+  }
 
   function handleQuickAlert() {
     if (worstRisk) handleAlertDay(worstRisk);
@@ -194,6 +230,16 @@ export default function App() {
             <main>
               {tab === 'forecast' && (
                 <div className="forecast-view">
+                  {rainOnset && onsetKey !== dismissedOnsetKey && (
+                    <RainSoonBanner
+                      onset={rainOnset}
+                      notifyEnabled={notifyRain}
+                      notifySupported={notifySupported}
+                      notifyDenied={notifyDenied}
+                      onEnableNotify={handleEnableRainNotify}
+                      onDismiss={() => setDismissedOnsetKey(onsetKey)}
+                    />
+                  )}
                   <SevereWeatherBanner daily={snapshot.daily} onAlertDay={handleAlertDay} />
                   <HourlyStrip hourly={snapshot.hourly} />
                   <DailyForecastList daily={snapshot.daily} onAlertDay={handleAlertDay} />
