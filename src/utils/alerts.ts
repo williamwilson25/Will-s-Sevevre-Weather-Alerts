@@ -1,6 +1,6 @@
 import type { AlertSeverity, DailyForecast, Friend } from '../types';
 import { describeWeatherCode } from './weatherCode';
-import { spcOutlookImageUrl } from '../api/spcOutlook';
+import { spcOutlookImageUrl, spcThunderstormImageUrl } from '../api/spcOutlook';
 
 export const SEVERITY_LABEL: Record<AlertSeverity, string> = {
   advisory: 'Weather Advisory',
@@ -32,7 +32,12 @@ export function buildAlertMessage(
 
   const headline = `${SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
   const spcDay = dayIndex + 1;
-  const imageUrl = spcDay >= 1 && spcDay <= 3 ? spcOutlookImageUrl(spcDay as 1 | 2 | 3) : null;
+  const imageUrl =
+    spcDay === 1
+      ? spcThunderstormImageUrl() ?? spcOutlookImageUrl(1)
+      : spcDay <= 3
+        ? spcOutlookImageUrl(spcDay as 2 | 3)
+        : null;
 
   const lines = [
     headline,

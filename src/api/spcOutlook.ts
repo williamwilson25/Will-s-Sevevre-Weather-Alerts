@@ -41,6 +41,21 @@ export function spcOutlookImageUrl(day: 1 | 2 | 3): string {
   return `https://www.spc.noaa.gov/products/outlook/day${day}otlk.gif`;
 }
 
+/**
+ * SPC's Enhanced Thunderstorm Outlook — a pure % chance-of-thunderstorm map for the current
+ * afternoon/evening window (16-20Z, 20-00Z, 00-04Z). Only covers "today"; returns null outside
+ * those windows since there's no valid image to show.
+ */
+export function spcThunderstormImageUrl(): string | null {
+  const hourUTC = new Date().getUTCHours();
+  let period: '1600' | '2000' | '0000' | null = null;
+  if (hourUTC >= 16 && hourUTC < 20) period = '1600';
+  else if (hourUTC >= 20) period = '2000';
+  else if (hourUTC < 4) period = '0000';
+  if (!period) return null;
+  return `https://www.spc.noaa.gov/products/exper/enhtstm/imgs/enh_${period}.gif`;
+}
+
 export async function fetchConvectiveOutlook(day: 1 | 2 | 3): Promise<SpcFeature[]> {
   const url = `https://www.spc.noaa.gov/products/outlook/day${day}otlk_cat.nolyr.geojson`;
   const res = await fetch(url);
