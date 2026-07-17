@@ -45,8 +45,8 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Live storm radar** — the National Weather Service's own radar loop for the Norman, OK
   station (KTLX, radar.weather.gov), embedded directly, with a link to open it full-screen if
   it doesn't load.
-- **Regional storm outlook** — NOAA Storm Prediction Center's Day 1–3 categorical convective
-  outlook (Marginal/Slight/Enhanced/Moderate/High risk polygons), continental US.
+- **Regional storm outlook** — an embed of NOAA Storm Prediction Center's own Day 1–3 categorical
+  convective outlook page, with a link to open it full-screen if it doesn't load.
 - **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert
   sent), one-tap quick-alert presets for common warning types (Tornado Warning/Watch, Severe
   T-Storm Warning/Watch, Flash Flood Warning, High Wind Warning) that pre-fill the composer, and
@@ -70,8 +70,8 @@ Forecast, Radar, Outlook, and Alerts are real swipeable pages, not one long scro
 document — a compact status bar (icon, temperature, location) and the tab bar stay pinned at
 the top, and each tab's content scrolls independently underneath. Swipe left/right anywhere
 on a tab to page to the next/previous one, in addition to tapping the tab bar. Swipes starting
-on the hourly-forecast scroll strip, the radar/outlook maps, or the radar scrubber are ignored
-so they don't fight with those elements' own gestures.
+on the hourly-forecast scroll strip or the location search results are ignored so they don't
+fight with those elements' own gestures.
 
 ## Getting started
 
@@ -89,8 +89,9 @@ severe weather risk scoring, active alerts, and the primary forecast text — co
 National Weather Service's public API (api.weather.gov), free and keyless: current conditions
 from the nearest live observation station, forecasts from the NWS office responsible for each
 location (Norman/OUN for this app's Great Plains focus). Live radar is an embed of NWS's own
-radar.weather.gov loop for the Norman station (KTLX). The only non-NWS call is Open-Meteo's free
-geocoding search, used purely to
+radar.weather.gov loop for the Norman station (KTLX), and the Outlook tab embeds NOAA's Storm
+Prediction Center outlook page directly. The only non-NWS call is Open-Meteo's free geocoding
+search, used purely to
 turn a typed city name into coordinates — no weather data comes from it. Sunrise/sunset are
 computed locally (NWS doesn't publish them) via the standard solar-position algorithm, accurate
 to within about a quarter hour. Firebase Authentication handles sign-in, and Cloud Firestore

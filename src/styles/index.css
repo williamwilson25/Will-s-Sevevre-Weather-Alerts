@@ -2080,100 +2080,6 @@ section h2::before {
   flex-direction: column;
 }
 
-.outlook-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.outlook-header h2 {
-  margin: 0;
-}
-
-.outlook-subtitle {
-  margin: 2px 0 0;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.outlook-day-select {
-  padding: 7px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
-  font-size: 0.82rem;
-  flex-shrink: 0;
-}
-
-.outlook-day-select option {
-  color: #0f172a;
-}
-
-.outlook-map-wrap {
-  position: relative;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
-
-.outlook-legend {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  z-index: 500;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 0.7rem;
-  color: #f8fafc;
-}
-
-.outlook-legend-title {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.64rem;
-  color: rgba(248, 250, 252, 0.6);
-  margin-bottom: 4px;
-}
-
-.outlook-legend-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-}
-
-.outlook-legend-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-
-.leaflet-tooltip {
-  background: rgba(15, 23, 42, 0.9);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.radar-location-label {
-  border-radius: 999px;
-  padding: 4px 10px;
-}
-
 /* Passcode gate */
 .auth-screen {
   height: 100%;
@@ -2399,11 +2305,5 @@ section h2::before {
   .tabs button {
     padding: 9px 6px;
     font-size: 0.76rem;
-  }
-  .outlook-header {
-    flex-direction: column;
-  }
-  .outlook-day-select {
-    width: 100%;
   }
 }

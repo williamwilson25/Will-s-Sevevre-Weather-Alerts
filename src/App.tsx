@@ -27,7 +27,6 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
-import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
 
@@ -48,7 +47,7 @@ const TAB_ORDER: Tab[] = ['forecast', 'radar', 'outlook', 'alerts'];
 // Swipe gestures starting inside these shouldn't switch tabs — they need
 // horizontal touch for their own scrolling/panning/dragging.
 const SWIPE_EXEMPT_SELECTOR =
-  '.hourly-scroll, .leaflet-container, input[type="range"], .location-results, textarea, select';
+  '.hourly-scroll, .location-results, textarea, select';
 
 function isSwipeExempt(target: EventTarget | null): boolean {
   return target instanceof Element && !!target.closest(SWIPE_EXEMPT_SELECTOR);
@@ -437,14 +436,19 @@ export default function App() {
                           url="https://radar.weather.gov/station/KTLX/standard"
                           title="Live Storm Radar"
                           label="LIVE"
-                          source="the National Weather Service — Norman, OK (KTLX)"
+                          caption="Live radar from the National Weather Service — Norman, OK (KTLX)."
                         />
                       </div>
                     )}
 
                     {t === 'outlook' && (
                       <div className="outlook-view">
-                        <StormOutlookMap location={snapshot.location} daily={snapshot.daily} />
+                        <ExternalRadar
+                          url="https://www.spc.noaa.gov/products/outlook/"
+                          title="Storm Outlook"
+                          label="SPC"
+                          caption="Day 1–3 convective outlooks from NOAA's Storm Prediction Center."
+                        />
                       </div>
                     )}
 
