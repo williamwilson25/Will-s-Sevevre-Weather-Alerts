@@ -1475,6 +1475,10 @@ section h2::before {
   background: #0b1220;
 }
 
+.external-radar-iframe {
+  border: 0;
+}
+
 .radar-controls {
   display: flex;
   align-items: center;
