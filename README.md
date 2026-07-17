@@ -15,13 +15,16 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Multiple locations** — search and save any number of cities, switch between them with a tap,
   and send alerts for whichever one is active.
 - **Real-time updates** — forecast, radar, and outlook data all auto-refresh in the background
-  (and whenever you return to the tab), plus a "Rain expected to start soon" banner that fires
-  the moment the hourly data shows a jump in rain chance, with an optional push notification
-  (delivered through a service worker so it actually arrives on iOS home-screen installs). Every
-  signed-in user gets a one-tap prompt on the Forecast tab to turn this on for their own
-  location — no backend needed, it just runs locally on their device while the app is open. A
-  "Test alert" button next to the current-conditions card lets you confirm notifications work
-  without waiting for real rain.
+  (and whenever you return to the tab).
+- **Minute-by-minute rain nowcast** — a bar-chart card (like Apple Weather's) showing whether
+  rain is imminent, sourced from live radar: it samples the actual pixel under your coordinates
+  across the most recent radar frame and RainViewer's short-term nowcast frames to say "Rain
+  is expected to start in N min" with a ramping intensity chart. Falls back to a smoothed
+  estimate from the hourly forecast if live radar sampling isn't available. Backed by an
+  optional push notification (delivered through a service worker so it actually arrives on
+  iOS home-screen installs) — every signed-in user gets a one-tap prompt on the Forecast tab to
+  turn this on for their own location, no backend needed. A "Test alert" button next to the
+  current-conditions card lets you confirm notifications work without waiting for real rain.
 - **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,
   UV index, pressure, visibility, dew point, sunrise, and sunset.
 - **7-day forecast with severe weather risk** — each day gets a Low/Moderate/High/Severe

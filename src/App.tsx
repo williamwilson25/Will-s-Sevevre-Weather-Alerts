@@ -12,7 +12,7 @@ import CurrentConditions from './components/CurrentConditions';
 import HourlyStrip from './components/HourlyStrip';
 import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
-import RainSoonBanner from './components/RainSoonBanner';
+import RainNowcast from './components/RainNowcast';
 import EnableNotificationsBanner from './components/EnableNotificationsBanner';
 import { detectRainOnset } from './utils/rainOnset';
 import { showNotification } from './utils/notify';
@@ -59,7 +59,6 @@ export default function App() {
   const [discordWebhookUrl, setDiscordWebhookUrl] = useLocalStorage<string>('sw_discord_webhook', '');
   const [notifyRain, setNotifyRain] = useLocalStorage<boolean>('sw_notify_rain', false);
   const [lastNotifiedKey, setLastNotifiedKey] = useLocalStorage<string>('sw_last_rain_notify', '');
-  const [dismissedOnsetKey, setDismissedOnsetKey] = useState<string | null>(null);
   const [notifyPromptDismissed, setNotifyPromptDismissed] = useLocalStorage<boolean>(
     'sw_notify_prompt_dismissed',
     false,
@@ -312,26 +311,13 @@ export default function App() {
             <main>
               {tab === 'forecast' && (
                 <div className="forecast-view">
-                  {!rainOnset &&
-                    notifySupported &&
-                    !notifyDenied &&
-                    !notifyRain &&
-                    !notifyPromptDismissed && (
-                      <EnableNotificationsBanner
-                        onEnable={handleEnableRainNotify}
-                        onDismiss={() => setNotifyPromptDismissed(true)}
-                      />
-                    )}
-                  {rainOnset && onsetKey !== dismissedOnsetKey && (
-                    <RainSoonBanner
-                      onset={rainOnset}
-                      notifyEnabled={notifyRain}
-                      notifySupported={notifySupported}
-                      notifyDenied={notifyDenied}
-                      onEnableNotify={handleEnableRainNotify}
-                      onDismiss={() => setDismissedOnsetKey(onsetKey)}
+                  {notifySupported && !notifyDenied && !notifyRain && !notifyPromptDismissed && (
+                    <EnableNotificationsBanner
+                      onEnable={handleEnableRainNotify}
+                      onDismiss={() => setNotifyPromptDismissed(true)}
                     />
                   )}
+                  <RainNowcast location={snapshot.location} hourly={snapshot.hourly} />
                   <SevereWeatherBanner
                     daily={snapshot.daily}
                     onAlertDay={isOwner ? handleAlertDay : undefined}
