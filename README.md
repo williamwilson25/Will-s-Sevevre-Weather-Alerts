@@ -12,7 +12,10 @@ the next chance of severe weather, and sending customized alerts to friends.
   and send alerts for whichever one is active.
 - **Real-time updates** — forecast, radar, and outlook data all auto-refresh in the background
   (and whenever you return to the tab), plus a "Rain expected to start soon" banner that fires
-  the moment the hourly data shows a jump in rain chance, with an optional browser notification.
+  the moment the hourly data shows a jump in rain chance, with an optional push notification
+  (delivered through a service worker so it actually arrives on iOS home-screen installs). A
+  "Test alert" button next to the current-conditions card lets you confirm notifications work
+  without waiting for real rain.
 - **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,
   UV index, pressure, visibility, dew point, sunrise, and sunset.
 - **7-day forecast with severe weather risk** — each day gets a Low/Moderate/High/Severe

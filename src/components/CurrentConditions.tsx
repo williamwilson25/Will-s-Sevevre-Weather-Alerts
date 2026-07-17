@@ -13,12 +13,18 @@ import {
   SunsetIcon,
   SunIcon,
   ThermometerIcon,
+  BellAlertIcon,
 } from './icons';
 
 interface Props {
   snapshot: WeatherSnapshot;
   refreshing: boolean;
   onRefresh: () => void;
+  notifyRain: boolean;
+  notifySupported: boolean;
+  notifyDenied: boolean;
+  onEnableNotify: () => void;
+  onTestNotify: () => void;
 }
 
 function formatClockTime(iso: string): string {
@@ -29,7 +35,16 @@ function metersToMiles(m: number): number {
   return m / 1609.34;
 }
 
-export default function CurrentConditions({ snapshot, refreshing, onRefresh }: Props) {
+export default function CurrentConditions({
+  snapshot,
+  refreshing,
+  onRefresh,
+  notifyRain,
+  notifySupported,
+  notifyDenied,
+  onEnableNotify,
+  onTestNotify,
+}: Props) {
   const { current, location, daily, hourly, fetchedAt } = snapshot;
   const { label } = describeWeatherCode(current.weatherCode);
   const today = daily[0];
@@ -49,10 +64,23 @@ export default function CurrentConditions({ snapshot, refreshing, onRefresh }: P
           {location.name}
           {location.admin1 ? `, ${location.admin1}` : ''}
         </div>
-        <button type="button" className="hero-updated" onClick={onRefresh} disabled={refreshing}>
-          <RefreshIcon size={12} className={refreshing ? 'spin' : ''} />
-          {refreshing ? 'Updating…' : `Updated ${formatTimeAgo(fetchedAt)}`}
-        </button>
+        <div className="hero-actions">
+          <button type="button" className="hero-updated" onClick={onRefresh} disabled={refreshing}>
+            <RefreshIcon size={12} className={refreshing ? 'spin' : ''} />
+            {refreshing ? 'Updating…' : `Updated ${formatTimeAgo(fetchedAt)}`}
+          </button>
+          {notifySupported && !notifyDenied && (
+            <button
+              type="button"
+              className="hero-updated"
+              onClick={notifyRain ? onTestNotify : onEnableNotify}
+              title={notifyRain ? 'Send a test rain alert' : 'Turn on rain alerts'}
+            >
+              <BellAlertIcon size={12} />
+              {notifyRain ? 'Test alert' : 'Enable rain alerts'}
+            </button>
+          )}
+        </div>
         <div className="hero-icon">
           <WeatherIcon code={current.weatherCode} isDay={current.isDay} size={88} />
         </div>

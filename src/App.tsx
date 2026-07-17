@@ -14,6 +14,7 @@ import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainSoonBanner from './components/RainSoonBanner';
 import { detectRainOnset } from './utils/rainOnset';
+import { showNotification } from './utils/notify';
 import FriendsManager from './components/FriendsManager';
 import DiscordSettings from './components/DiscordSettings';
 import AlertComposer from './components/AlertComposer';
@@ -164,7 +165,7 @@ export default function App() {
   useEffect(() => {
     if (!onsetKey || !notifyRain || onsetKey === lastNotifiedKey) return;
     if (!notifySupported || Notification.permission !== 'granted' || !rainOnset) return;
-    new Notification('Rain expected soon', {
+    showNotification('Rain expected soon', {
       body: `${Math.round(rainOnset.hour.precipitationProbability)}% chance around ${new Date(
         rainOnset.hour.time,
       ).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })} in ${location.name}`,
@@ -183,6 +184,13 @@ export default function App() {
     Notification.requestPermission().then((perm) => {
       if (perm === 'granted') setNotifyRain(true);
       else if (perm === 'denied') setNotifyDenied(true);
+    });
+  }
+
+  function handleTestNotify() {
+    showNotification('Test alert', {
+      body: `This is what a rain alert will look like for ${location.name}.`,
+      icon: logo,
     });
   }
 
@@ -245,7 +253,16 @@ export default function App() {
 
         {!loading && !error && snapshot && (
           <>
-            <CurrentConditions snapshot={snapshot} refreshing={refreshing} onRefresh={handleManualRefresh} />
+            <CurrentConditions
+              snapshot={snapshot}
+              refreshing={refreshing}
+              onRefresh={handleManualRefresh}
+              notifyRain={notifyRain}
+              notifySupported={notifySupported}
+              notifyDenied={notifyDenied}
+              onEnableNotify={handleEnableRainNotify}
+              onTestNotify={handleTestNotify}
+            />
 
             <nav className="tabs">
               <button className={tab === 'forecast' ? 'active' : ''} onClick={() => setTab('forecast')}>
