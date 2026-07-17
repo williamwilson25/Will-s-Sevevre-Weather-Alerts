@@ -7,6 +7,21 @@ function base(size: number) {
   return { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true } as const;
 }
 
+export function ChevronDownIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M5.5 9l6.5 6.5L18.5 9"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
 export function SunIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>

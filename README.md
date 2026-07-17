@@ -17,7 +17,8 @@ the next chance of severe weather, and sending customized alerts to friends.
   UV index, pressure, visibility, dew point, sunrise, and sunset.
 - **7-day forecast with severe weather risk** — each day gets a Low/Moderate/High/Severe
   risk score derived from forecasted weather codes (thunderstorms, hail), wind gusts, and
-  precipitation probability. A banner surfaces the next day severe weather is expected.
+  precipitation probability. A banner surfaces the next day severe weather is expected. Tap
+  a day to expand it for a tonight summary (low temp, wind speed/direction, gusts).
 - **Live storm radar** — animated precipitation radar (RainViewer) on a Leaflet map centered
   on your location.
 - **Regional storm outlook** — NOAA Storm Prediction Center's Day 1–3 categorical convective

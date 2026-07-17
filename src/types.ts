@@ -41,6 +41,7 @@ export interface DailyForecast {
   precipitationProbability: number;
   windSpeedMax: number;
   windGustsMax: number;
+  windDirection: number;
   uvIndexMax: number;
   sunrise: string;
   sunset: string;
