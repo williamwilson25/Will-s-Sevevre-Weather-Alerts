@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
 import type { HourlyPoint, Location } from '../types';
-import { buildRadarNowcast, buildHourlyNowcast, summarizeNowcast, type NowcastPoint } from '../utils/nowcast';
+import {
+  buildRadarNowcast,
+  buildHourlyNowcast,
+  summarizeNowcast,
+  type NowcastPoint,
+  type NowcastState,
+} from '../utils/nowcast';
 
 interface Props {
   location: Location;
   hourly: HourlyPoint[];
+  onSummary?: (summary: NowcastState) => void;
 }
 
 function minuteLabel(minutes: number): string {
@@ -12,7 +19,7 @@ function minuteLabel(minutes: number): string {
   return `${minutes}m`;
 }
 
-export default function RainNowcast({ location, hourly }: Props) {
+export default function RainNowcast({ location, hourly, onSummary }: Props) {
   const [points, setPoints] = useState<NowcastPoint[] | null>(null);
   const [source, setSource] = useState<'radar' | 'hourly'>('radar');
 
@@ -23,11 +30,14 @@ export default function RainNowcast({ location, hourly }: Props) {
         if (cancelled) return;
         setPoints(pts);
         setSource('radar');
+        onSummary?.(summarizeNowcast(pts));
       })
       .catch(() => {
         if (cancelled) return;
-        setPoints(buildHourlyNowcast(hourly));
+        const pts = buildHourlyNowcast(hourly);
+        setPoints(pts);
         setSource('hourly');
+        onSummary?.(summarizeNowcast(pts));
       });
     return () => {
       cancelled = true;

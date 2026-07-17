@@ -14,7 +14,7 @@ import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainNowcast from './components/RainNowcast';
 import EnableNotificationsBanner from './components/EnableNotificationsBanner';
-import { detectRainOnset } from './utils/rainOnset';
+import type { NowcastState } from './utils/nowcast';
 import { showNotification } from './utils/notify';
 import { watchSubscribers } from './api/subscribers';
 import FriendsManager from './components/FriendsManager';
@@ -67,6 +67,7 @@ export default function App() {
     typeof Notification !== 'undefined' && Notification.permission === 'denied',
   );
 
+  const [nowcastSummary, setNowcastSummary] = useState<NowcastState | null>(null);
   const [snapshot, setSnapshot] = useState<WeatherSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -185,22 +186,35 @@ export default function App() {
   }
 
   const worstRisk = getWorstRiskDay(snapshot);
-  const rainOnset = snapshot ? detectRainOnset(snapshot.hourly) : null;
-  const onsetKey = rainOnset ? `${location.id}:${rainOnset.hour.time}` : null;
   const notifySupported = typeof window !== 'undefined' && 'Notification' in window;
 
   useEffect(() => {
-    if (!onsetKey || !notifyRain || onsetKey === lastNotifiedKey) return;
-    if (!notifySupported || Notification.permission !== 'granted' || !rainOnset) return;
-    showNotification('Rain expected soon', {
-      body: `${Math.round(rainOnset.hour.precipitationProbability)}% chance around ${new Date(
-        rainOnset.hour.time,
-      ).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })} in ${location.name}`,
-      icon: logo,
-    });
-    setLastNotifiedKey(onsetKey);
+    if (!nowcastSummary || !notifyRain) return;
+    if (!notifySupported || Notification.permission !== 'granted') return;
+
+    if (nowcastSummary.kind === 'clear') {
+      // rain has passed (or never came) — clear so the next rain event notifies again
+      if (lastNotifiedKey.startsWith(`${location.id}:`)) setLastNotifiedKey('');
+      return;
+    }
+
+    const key = `${location.id}:${nowcastSummary.kind}`;
+    if (key === lastNotifiedKey) return;
+
+    if (nowcastSummary.kind === 'raining') {
+      showNotification('Rain is starting', {
+        body: `Rain is happening now in ${location.name}.`,
+        icon: logo,
+      });
+    } else {
+      showNotification('Rain expected soon', {
+        body: `Rain is expected to start in about ${nowcastSummary.minutesAway} min in ${location.name}.`,
+        icon: logo,
+      });
+    }
+    setLastNotifiedKey(key);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onsetKey, notifyRain]);
+  }, [nowcastSummary, notifyRain, location.id]);
 
   function handleEnableRainNotify() {
     if (!notifySupported) return;
@@ -317,7 +331,11 @@ export default function App() {
                       onDismiss={() => setNotifyPromptDismissed(true)}
                     />
                   )}
-                  <RainNowcast location={snapshot.location} hourly={snapshot.hourly} />
+                  <RainNowcast
+                    location={snapshot.location}
+                    hourly={snapshot.hourly}
+                    onSummary={setNowcastSummary}
+                  />
                   <SevereWeatherBanner
                     daily={snapshot.daily}
                     onAlertDay={isOwner ? handleAlertDay : undefined}
