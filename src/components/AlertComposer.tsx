@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { AlertRecord, AlertSeverity, DailyForecast, Friend } from '../types';
-import { buildAlertMessage, buildSmsLink, SEVERITY_LABEL } from '../utils/alerts';
+import { buildAlertMessage, buildSmsLink, SEVERITY_COLOR, SEVERITY_LABEL } from '../utils/alerts';
+import { postToDiscord } from '../utils/discord';
 import Avatar from './Avatar';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   daily: DailyForecast[];
   friends: Friend[];
   selectedDate: string | null;
+  discordWebhookUrl: string;
   onSent: (record: AlertRecord) => void;
 }
 
@@ -24,12 +26,22 @@ function riskToSeverity(level: DailyForecast['risk']['level']): AlertSeverity {
   }
 }
 
-export default function AlertComposer({ locationName, daily, friends, selectedDate, onSent }: Props) {
+export default function AlertComposer({
+  locationName,
+  daily,
+  friends,
+  selectedDate,
+  discordWebhookUrl,
+  onSent,
+}: Props) {
   const [dateKey, setDateKey] = useState(selectedDate ?? daily[0]?.date ?? '');
   const [severity, setSeverity] = useState<AlertSeverity>('advisory');
   const [note, setNote] = useState('');
   const [recipientIds, setRecipientIds] = useState<string[]>([]);
+  const [alsoDiscord, setAlsoDiscord] = useState(true);
+  const [sending, setSending] = useState(false);
   const [sentFlash, setSentFlash] = useState('');
+  const [sendError, setSendError] = useState('');
 
   useEffect(() => {
     if (selectedDate) setDateKey(selectedDate);
@@ -50,11 +62,24 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
     setRecipientIds((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
   }
 
-  function handleSend() {
-    if (recipients.length === 0) return;
+  const willPostToDiscord = Boolean(discordWebhookUrl) && alsoDiscord;
+
+  async function handleSend() {
+    if (recipients.length === 0 && !willPostToDiscord) return;
+    setSending(true);
+    setSendError('');
+
     recipients.forEach((friend) => {
       window.open(buildSmsLink(friend, body), '_blank');
     });
+
+    if (willPostToDiscord) {
+      try {
+        await postToDiscord(discordWebhookUrl, headline, body, SEVERITY_COLOR[severity]);
+      } catch {
+        setSendError("Texts were sent, but the Discord post failed — check the webhook URL in settings.");
+      }
+    }
 
     const record: AlertRecord = {
       id: crypto.randomUUID(),
@@ -66,7 +91,11 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
       locationName,
     };
     onSent(record);
-    setSentFlash(`Alert queued for ${recipients.length} friend${recipients.length === 1 ? '' : 's'}.`);
+    setSending(false);
+    const parts = [];
+    if (recipients.length > 0) parts.push(`${recipients.length} friend${recipients.length === 1 ? '' : 's'}`);
+    if (willPostToDiscord) parts.push('Discord');
+    setSentFlash(`Alert sent to ${parts.join(' and ')}.`);
     setTimeout(() => setSentFlash(''), 4000);
   }
 
@@ -134,6 +163,17 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
         )}
       </fieldset>
 
+      {discordWebhookUrl && (
+        <label className="discord-toggle">
+          <input
+            type="checkbox"
+            checked={alsoDiscord}
+            onChange={(e) => setAlsoDiscord(e.target.checked)}
+          />
+          Also post to Discord
+        </label>
+      )}
+
       <div className="alert-preview">
         <div className="alert-preview-label">Preview</div>
         <pre>{body}</pre>
@@ -142,11 +182,14 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
       <button
         type="button"
         className="send-button"
-        disabled={recipients.length === 0}
+        disabled={(recipients.length === 0 && !willPostToDiscord) || sending}
         onClick={handleSend}
       >
-        Send alert to {recipients.length || 0} friend{recipients.length === 1 ? '' : 's'}
+        {sending
+          ? 'Sending…'
+          : `Send alert${recipients.length > 0 ? ` to ${recipients.length} friend${recipients.length === 1 ? '' : 's'}` : ''}${willPostToDiscord ? (recipients.length > 0 ? ' + Discord' : ' to Discord') : ''}`}
       </button>
+      {sendError && <p className="form-error">{sendError}</p>}
       {sentFlash && <p className="sent-flash">{sentFlash}</p>}
     </section>
   );

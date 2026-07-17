@@ -15,6 +15,7 @@ import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainSoonBanner from './components/RainSoonBanner';
 import { detectRainOnset } from './utils/rainOnset';
 import FriendsManager from './components/FriendsManager';
+import DiscordSettings from './components/DiscordSettings';
 import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
 import LoadingSkeleton from './components/LoadingSkeleton';
@@ -50,6 +51,7 @@ export default function App() {
   );
   const [friends, setFriends] = useLocalStorage<Friend[]>('sw_friends', []);
   const [history, setHistory] = useLocalStorage<AlertRecord[]>('sw_alert_history', []);
+  const [discordWebhookUrl, setDiscordWebhookUrl] = useLocalStorage<string>('sw_discord_webhook', '');
   const [notifyRain, setNotifyRain] = useLocalStorage<boolean>('sw_notify_rain', false);
   const [lastNotifiedKey, setLastNotifiedKey] = useLocalStorage<string>('sw_last_rain_notify', '');
   const [dismissedOnsetKey, setDismissedOnsetKey] = useState<string | null>(null);
@@ -298,6 +300,7 @@ export default function App() {
               {tab === 'alerts' && isOwner && (
                 <div className="alerts-view">
                   <FriendsManager friends={friends} onChange={setFriends} />
+                  <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
                   <AlertComposer
                     locationName={`${snapshot.location.name}${
                       snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
@@ -305,6 +308,7 @@ export default function App() {
                     daily={snapshot.daily}
                     friends={friends}
                     selectedDate={alertDay?.date ?? null}
+                    discordWebhookUrl={discordWebhookUrl}
                     onSent={handleSent}
                   />
                   <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
