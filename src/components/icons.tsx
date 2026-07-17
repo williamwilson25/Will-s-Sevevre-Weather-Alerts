@@ -7,6 +7,41 @@ function base(size: number) {
   return { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true } as const;
 }
 
+export function TornadoIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M3.5 4h17M5 8h14M6.5 12h11M8 16h8M9.5 20h5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function WaveIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M2.5 9.5c1.4-1.6 2.8-1.6 4.2 0s2.8 1.6 4.2 0 2.8-1.6 4.2 0 2.8 1.6 4.2 0 2.8-1.6 2.2-1.6"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M2.5 15.5c1.4-1.6 2.8-1.6 4.2 0s2.8 1.6 4.2 0 2.8-1.6 4.2 0 2.8 1.6 4.2 0"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.6"
+      />
+    </svg>
+  );
+}
+
 export function ChevronDownIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>

@@ -23,13 +23,15 @@ the next chance of severe weather, and sending customized alerts to friends.
   on your location.
 - **Regional storm outlook** — NOAA Storm Prediction Center's Day 1–3 categorical convective
   outlook (Marginal/Slight/Enhanced/Moderate/High risk polygons), continental US.
-- **Friends & alerts** — save friends' phone numbers, compose a custom alert (pick the day,
-  severity, and an optional personal note), preview the message, and send it. Alerts go out
-  through your own Messages app (`sms:` links), and friend data never leaves your browser
-  (stored in `localStorage`). Only visible to the owner's account.
+- **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert
+  sent), one-tap quick-alert presets for common warning types (Tornado Warning/Watch, Severe
+  T-Storm Warning/Watch, Flash Flood Warning, High Wind Warning) that pre-fill the composer, and
+  a sent-alert history with a status badge. Save friends' phone numbers, compose a custom alert
+  (pick the day, severity, and an optional personal note), preview the message, and send it.
+  Alerts go out through your own Messages app (`sms:` links), and friend data never leaves your
+  browser (stored in `localStorage`). Only visible to the owner's account.
 - **Discord alerts** — optionally paste a channel webhook URL to also post every alert straight
   to a Discord channel, with a one-tap test message to confirm it's wired up correctly.
-- **Alert history** — a log of everything you've sent.
 
 ## Getting started
 

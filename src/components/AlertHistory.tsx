@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { AlertRecord, Friend } from '../types';
 import { SEVERITY_COLOR, SEVERITY_LABEL } from '../utils/alerts';
+import { AlertTriangleIcon } from './icons';
 
 interface Props {
   history: AlertRecord[];
@@ -37,17 +38,23 @@ export default function AlertHistory({ history, friends, onClear }: Props) {
               className="history-item"
               style={{ '--severity-color': SEVERITY_COLOR[record.severity] } as CSSProperties}
             >
-              <div
-                className="history-severity"
-                style={{ color: SEVERITY_COLOR[record.severity] }}
-              >
-                {SEVERITY_LABEL[record.severity]}
+              <span className="history-icon" style={{ color: SEVERITY_COLOR[record.severity] }}>
+                <AlertTriangleIcon size={16} />
+              </span>
+              <div className="history-body">
+                <div
+                  className="history-severity"
+                  style={{ color: SEVERITY_COLOR[record.severity] }}
+                >
+                  {SEVERITY_LABEL[record.severity]}
+                </div>
+                <div className="history-headline">{record.headline}</div>
+                <div className="history-meta">
+                  To: {record.recipientIds.map(nameFor).join(', ')} ·{' '}
+                  {new Date(record.createdAt).toLocaleString()}
+                </div>
               </div>
-              <div className="history-headline">{record.headline}</div>
-              <div className="history-meta">
-                To: {record.recipientIds.map(nameFor).join(', ')} ·{' '}
-                {new Date(record.createdAt).toLocaleString()}
-              </div>
+              <span className="history-badge">Sent</span>
             </li>
           ))}
       </ul>

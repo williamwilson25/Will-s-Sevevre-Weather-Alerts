@@ -20,6 +20,7 @@ export function buildAlertMessage(
   day: DailyForecast,
   severity: AlertSeverity,
   customNote: string,
+  typeLabel?: string,
 ): { headline: string; body: string } {
   const { label } = describeWeatherCode(day.weatherCode);
   const dateLabel = new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
@@ -28,7 +29,7 @@ export function buildAlertMessage(
     day: 'numeric',
   });
 
-  const headline = `${SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
+  const headline = `${typeLabel || SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
 
   const lines = [
     headline,
@@ -42,7 +43,7 @@ export function buildAlertMessage(
     lines.push('', `Why: ${day.risk.reasons.join('; ')}`);
   }
   if (customNote.trim()) {
-    lines.push('', `Note from your friend: ${customNote.trim()}`);
+    lines.push('', `Note: ${customNote.trim()}`);
   }
   lines.push('', "Sent via Will's Severe Weather Alerts");
 

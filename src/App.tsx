@@ -18,6 +18,7 @@ import FriendsManager from './components/FriendsManager';
 import DiscordSettings from './components/DiscordSettings';
 import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
+import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import RadarMap from './components/RadarMap';
 import StormOutlookMap from './components/StormOutlookMap';
@@ -299,6 +300,7 @@ export default function App() {
 
               {tab === 'alerts' && isOwner && (
                 <div className="alerts-view">
+                  <AlertStats history={history} friends={friends} />
                   <FriendsManager friends={friends} onChange={setFriends} />
                   <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
                   <AlertComposer

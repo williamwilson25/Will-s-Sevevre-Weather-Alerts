@@ -3,6 +3,7 @@ import type { AlertRecord, AlertSeverity, DailyForecast, Friend } from '../types
 import { buildAlertMessage, buildSmsLink, SEVERITY_COLOR, SEVERITY_LABEL } from '../utils/alerts';
 import { postToDiscord } from '../utils/discord';
 import Avatar from './Avatar';
+import QuickAlertPresets, { type AlertPreset } from './QuickAlertPresets';
 
 interface Props {
   locationName: string;
@@ -37,6 +38,7 @@ export default function AlertComposer({
   const [dateKey, setDateKey] = useState(selectedDate ?? daily[0]?.date ?? '');
   const [severity, setSeverity] = useState<AlertSeverity>('advisory');
   const [note, setNote] = useState('');
+  const [typeLabel, setTypeLabel] = useState('');
   const [recipientIds, setRecipientIds] = useState<string[]>([]);
   const [alsoDiscord, setAlsoDiscord] = useState(true);
   const [sending, setSending] = useState(false);
@@ -51,15 +53,22 @@ export default function AlertComposer({
 
   useEffect(() => {
     if (day) setSeverity(riskToSeverity(day.risk.level));
+    setTypeLabel('');
   }, [day]);
 
   if (!day) return null;
 
-  const { headline, body } = buildAlertMessage(locationName, day, severity, note);
+  const { headline, body } = buildAlertMessage(locationName, day, severity, note, typeLabel);
   const recipients = friends.filter((f) => recipientIds.includes(f.id));
 
   function toggleRecipient(id: string) {
     setRecipientIds((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
+  }
+
+  function applyPreset(preset: AlertPreset) {
+    setSeverity(preset.severity);
+    setNote(preset.note);
+    setTypeLabel(preset.label);
   }
 
   const willPostToDiscord = Boolean(discordWebhookUrl) && alsoDiscord;
@@ -103,6 +112,8 @@ export default function AlertComposer({
     <section className="alert-composer">
       <h2>Compose alert</h2>
 
+      <QuickAlertPresets onSelect={applyPreset} />
+
       <label className="field">
         <span>Day</span>
         <select value={dateKey} onChange={(e) => setDateKey(e.target.value)}>
@@ -123,7 +134,13 @@ export default function AlertComposer({
 
       <label className="field">
         <span>Severity</span>
-        <select value={severity} onChange={(e) => setSeverity(e.target.value as AlertSeverity)}>
+        <select
+          value={severity}
+          onChange={(e) => {
+            setSeverity(e.target.value as AlertSeverity);
+            setTypeLabel('');
+          }}
+        >
           {(Object.keys(SEVERITY_LABEL) as AlertSeverity[]).map((key) => (
             <option key={key} value={key}>
               {SEVERITY_LABEL[key]}
