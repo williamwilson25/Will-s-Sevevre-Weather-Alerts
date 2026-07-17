@@ -51,6 +51,13 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Discord alerts** — optionally paste a channel webhook URL to also post every alert straight
   to a Discord channel, with a one-tap test message to confirm it's wired up correctly.
 
+## Navigation
+
+Swipe left/right anywhere on the Forecast, Radar, Outlook, or Alerts view to move between
+tabs, in addition to tapping the tab bar. Swipes starting on the hourly-forecast scroll strip,
+the radar/outlook maps, or the radar scrubber are ignored so they don't fight with those
+elements' own gestures.
+
 ## Getting started
 
 ```bash

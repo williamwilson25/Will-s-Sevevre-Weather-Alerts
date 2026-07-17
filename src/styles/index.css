@@ -536,6 +536,36 @@ button:active:not(:disabled) {
   gap: 16px;
 }
 
+@keyframes sw-tab-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes sw-tab-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tab-slide-left {
+  animation: sw-tab-slide-left 260ms var(--ease) both;
+}
+
+.tab-slide-right {
+  animation: sw-tab-slide-right 260ms var(--ease) both;
+}
+
 .forecast-view > *,
 .alerts-view > *,
 .radar-view > *,

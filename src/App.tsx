@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { TouchEvent } from 'react';
 import { signOut } from 'firebase/auth';
 import type { AlertRecord, DailyForecast, Friend, Location, WeatherSnapshot } from './types';
 import { fetchWeather } from './api/weather';
@@ -42,6 +43,17 @@ const DEFAULT_LOCATION: Location = {
 
 type Tab = 'forecast' | 'radar' | 'outlook' | 'alerts';
 
+const TAB_ORDER: Tab[] = ['forecast', 'radar', 'outlook', 'alerts'];
+
+// Swipe gestures starting inside these shouldn't switch tabs — they need
+// horizontal touch for their own scrolling/panning/dragging.
+const SWIPE_EXEMPT_SELECTOR =
+  '.hourly-scroll, .leaflet-container, input[type="range"], .location-results, textarea, select';
+
+function isSwipeExempt(target: EventTarget | null): boolean {
+  return target instanceof Element && !!target.closest(SWIPE_EXEMPT_SELECTOR);
+}
+
 function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null {
   if (!snapshot || snapshot.daily.length === 0) return null;
   return snapshot.daily.reduce((worst, day) => (day.risk.score > worst.risk.score ? day : worst));
@@ -74,7 +86,9 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<Tab>('forecast');
+  const [slideDir, setSlideDir] = useState<'left' | 'right'>('left');
   const [alertDay, setAlertDay] = useState<DailyForecast | null>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const location = locations.find((l) => l.id === activeLocationId) ?? locations[0] ?? DEFAULT_LOCATION;
 
@@ -177,9 +191,43 @@ export default function App() {
     if (id === activeLocationId) setActiveLocationId(next[0].id);
   }
 
+  const visibleTabs = isOwner ? TAB_ORDER : TAB_ORDER.filter((t) => t !== 'alerts');
+
+  function goToTab(next: Tab) {
+    const from = visibleTabs.indexOf(tab);
+    const to = visibleTabs.indexOf(next);
+    setSlideDir(to < from ? 'right' : 'left');
+    setTab(next);
+  }
+
+  function handleTouchStart(e: TouchEvent) {
+    if (isSwipeExempt(e.target)) {
+      touchStart.current = null;
+      return;
+    }
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+
+  function handleTouchEnd(e: TouchEvent) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+
+    const dx = e.changedTouches[0].clientX - start.x;
+    const dy = e.changedTouches[0].clientY - start.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    const currentIndex = visibleTabs.indexOf(tab);
+    if (dx < 0 && currentIndex < visibleTabs.length - 1) {
+      goToTab(visibleTabs[currentIndex + 1]);
+    } else if (dx > 0 && currentIndex > 0) {
+      goToTab(visibleTabs[currentIndex - 1]);
+    }
+  }
+
   function handleAlertDay(day: DailyForecast) {
     setAlertDay(day);
-    setTab('alerts');
+    goToTab('alerts');
   }
 
   function handleSent(record: AlertRecord) {
@@ -309,26 +357,26 @@ export default function App() {
             />
 
             <nav className="tabs">
-              <button className={tab === 'forecast' ? 'active' : ''} onClick={() => setTab('forecast')}>
+              <button className={tab === 'forecast' ? 'active' : ''} onClick={() => goToTab('forecast')}>
                 Forecast
               </button>
-              <button className={tab === 'radar' ? 'active' : ''} onClick={() => setTab('radar')}>
+              <button className={tab === 'radar' ? 'active' : ''} onClick={() => goToTab('radar')}>
                 Radar
               </button>
-              <button className={tab === 'outlook' ? 'active' : ''} onClick={() => setTab('outlook')}>
+              <button className={tab === 'outlook' ? 'active' : ''} onClick={() => goToTab('outlook')}>
                 Outlook
               </button>
               {isOwner && (
-                <button className={tab === 'alerts' ? 'active' : ''} onClick={() => setTab('alerts')}>
+                <button className={tab === 'alerts' ? 'active' : ''} onClick={() => goToTab('alerts')}>
                   Alerts
                   {history.length > 0 && <span className="tab-count">{history.length}</span>}
                 </button>
               )}
             </nav>
 
-            <main>
+            <main onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
               {tab === 'forecast' && (
-                <div className="forecast-view">
+                <div className={`forecast-view tab-slide-${slideDir}`} key={tab}>
                   <ActiveAlerts location={snapshot.location} />
                   {notifySupported && !notifyDenied && !notifyRain && !notifyPromptDismissed && (
                     <EnableNotificationsBanner
@@ -354,19 +402,19 @@ export default function App() {
               )}
 
               {tab === 'radar' && (
-                <div className="radar-view">
+                <div className={`radar-view tab-slide-${slideDir}`} key={tab}>
                   <RadarMap location={snapshot.location} />
                 </div>
               )}
 
               {tab === 'outlook' && (
-                <div className="outlook-view">
+                <div className={`outlook-view tab-slide-${slideDir}`} key={tab}>
                   <StormOutlookMap location={snapshot.location} daily={snapshot.daily} />
                 </div>
               )}
 
               {tab === 'alerts' && isOwner && (
-                <div className="alerts-view">
+                <div className={`alerts-view tab-slide-${slideDir}`} key={tab}>
                   <AlertStats history={history} friends={friends} />
                   <FriendsManager friends={friends} onChange={setFriends} onViewLocation={handleAddLocation} />
                   <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
