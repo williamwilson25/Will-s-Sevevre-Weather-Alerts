@@ -595,6 +595,110 @@ section h2::before {
   flex-shrink: 0;
 }
 
+/* NWS active alerts */
+.nws-alerts h2 {
+  color: #fca5a5;
+}
+
+.nws-alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nws-alert-item {
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--nws-color) 45%, var(--glass-border));
+  background: color-mix(in srgb, var(--nws-color) 16%, transparent);
+  overflow: hidden;
+}
+
+.nws-alert-item[data-severity='Extreme'],
+.nws-alert-item[data-severity='Severe'] {
+  animation: nws-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes nws-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--nws-color) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--nws-color) 0%, transparent);
+  }
+}
+
+.nws-alert-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.nws-alert-icon {
+  flex-shrink: 0;
+  color: var(--nws-color);
+}
+
+.nws-alert-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.nws-alert-event {
+  font-weight: 800;
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.nws-alert-meta {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.nws-alert-chevron {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  transition: transform 200ms var(--ease);
+}
+
+.nws-alert-chevron-open {
+  transform: rotate(180deg);
+  color: var(--text);
+}
+
+.nws-alert-detail {
+  padding: 0 14px 14px 46px;
+}
+
+.nws-alert-area {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.nws-alert-detail p {
+  font-size: 0.84rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-line;
+}
+
 /* Severe weather banner */
 .severe-banner {
   display: flex;

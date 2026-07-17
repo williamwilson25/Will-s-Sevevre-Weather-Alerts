@@ -27,6 +27,11 @@ the next chance of severe weather, and sending customized alerts to friends.
   current-conditions card lets you confirm notifications work without waiting for real rain.
 - **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,
   UV index, pressure, visibility, dew point, sunrise, and sunset.
+- **Active NWS alerts** — official Tornado Warnings, Severe Thunderstorm Warnings, Flash Flood
+  Warnings, and more, pulled directly from the National Weather Service's own alerts feed for
+  your exact location and shown the moment they're issued. Severity-colored, expandable for the
+  full instructions (e.g. "TAKE COVER NOW"), and hidden entirely when nothing's active so it
+  never adds clutter.
 - **7-day forecast with severe weather risk** — each day gets a Low/Moderate/High/Severe
   risk score derived from forecasted weather codes (thunderstorms, hail), wind gusts, and
   precipitation probability. A banner surfaces the next day severe weather is expected. Tap

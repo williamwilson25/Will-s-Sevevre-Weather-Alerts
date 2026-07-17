@@ -13,6 +13,7 @@ import HourlyStrip from './components/HourlyStrip';
 import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainNowcast from './components/RainNowcast';
+import ActiveAlerts from './components/ActiveAlerts';
 import EnableNotificationsBanner from './components/EnableNotificationsBanner';
 import type { NowcastState } from './utils/nowcast';
 import { showNotification } from './utils/notify';
@@ -328,6 +329,7 @@ export default function App() {
             <main>
               {tab === 'forecast' && (
                 <div className="forecast-view">
+                  <ActiveAlerts location={snapshot.location} />
                   {notifySupported && !notifyDenied && !notifyRain && !notifyPromptDismissed && (
                     <EnableNotificationsBanner
                       onEnable={handleEnableRainNotify}
