@@ -1,5 +1,4 @@
 import type { AlertSeverity, DailyForecast, Friend } from '../types';
-import { describeWeatherCode } from './weatherCode';
 
 export const SEVERITY_LABEL: Record<AlertSeverity, string> = {
   advisory: 'Weather Advisory',
@@ -22,7 +21,6 @@ export function buildAlertMessage(
   customNote: string,
   typeLabel?: string,
 ): { headline: string; body: string } {
-  const { label } = describeWeatherCode(day.weatherCode);
   const dateLabel = new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
     weekday: 'long',
     month: 'short',
@@ -31,17 +29,8 @@ export function buildAlertMessage(
 
   const headline = `${typeLabel || SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
 
-  const lines = [
-    headline,
-    '',
-    `Forecast: ${label}, high ${Math.round(day.tempMax)}°F / low ${Math.round(day.tempMin)}°F`,
-    `Chance of severe weather: ${day.risk.score}% (${day.risk.level.toUpperCase()})`,
-    `Wind gusts up to ${Math.round(day.windGustsMax)} mph, ${Math.round(day.precipitationProbability)}% chance of precipitation`,
-  ];
+  const lines = [headline];
 
-  if (day.risk.reasons.length) {
-    lines.push('', `Why: ${day.risk.reasons.join('; ')}`);
-  }
   if (customNote.trim()) {
     lines.push('', `Note: ${customNote.trim()}`);
   }
