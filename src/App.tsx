@@ -15,6 +15,7 @@ import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainSoonBanner from './components/RainSoonBanner';
 import { detectRainOnset } from './utils/rainOnset';
 import { showNotification } from './utils/notify';
+import { watchSubscribers } from './api/subscribers';
 import FriendsManager from './components/FriendsManager';
 import DiscordSettings from './components/DiscordSettings';
 import AlertComposer from './components/AlertComposer';
@@ -46,6 +47,7 @@ function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
+  const isOwner = user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase();
   const [locations, setLocations] = useLocalStorage<Location[]>('sw_locations', [DEFAULT_LOCATION]);
   const [activeLocationId, setActiveLocationId] = useLocalStorage<string>(
     'sw_active_location',
@@ -130,6 +132,27 @@ export default function App() {
       .finally(() => setRefreshing(false));
   }
 
+  useEffect(() => {
+    if (!isOwner) return;
+    const unsubscribe = watchSubscribers((subscribers) => {
+      setFriends((prev) => {
+        const knownUids = new Set(prev.map((f) => f.uid).filter(Boolean));
+        const additions: Friend[] = subscribers
+          .filter((s) => !knownUids.has(s.uid))
+          .map((s) => ({
+            id: crypto.randomUUID(),
+            uid: s.uid,
+            name: s.email.split('@')[0],
+            phone: s.phone,
+            location: s.location,
+          }));
+        return additions.length > 0 ? [...prev, ...additions] : prev;
+      });
+    });
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOwner]);
+
   function handleAddLocation(loc: Location) {
     if (!locations.some((l) => l.id === loc.id)) {
       setLocations([...locations, loc]);
@@ -198,7 +221,6 @@ export default function App() {
     if (worstRisk) handleAlertDay(worstRisk);
   }
 
-  const isOwner = user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase();
   const isNight = snapshot ? !snapshot.current.isDay : false;
 
   if (authLoading) {
@@ -326,7 +348,7 @@ export default function App() {
               {tab === 'alerts' && isOwner && (
                 <div className="alerts-view">
                   <AlertStats history={history} friends={friends} />
-                  <FriendsManager friends={friends} onChange={setFriends} />
+                  <FriendsManager friends={friends} onChange={setFriends} onViewLocation={handleAddLocation} />
                   <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
                   <AlertComposer
                     locationName={`${snapshot.location.name}${

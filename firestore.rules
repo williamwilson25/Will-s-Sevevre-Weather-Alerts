@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in user can create/update only their own subscriber record
+    // (their uid must match the document id). The app owner can read every
+    // subscriber's record so they can see who signed up and where; everyone
+    // else can only read their own.
+    match /subscribers/{uid} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == uid || request.auth.token.email == 'williamwilson25@icloud.com');
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

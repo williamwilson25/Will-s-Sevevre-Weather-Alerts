@@ -68,6 +68,15 @@ export interface Friend {
   id: string;
   name: string;
   phone: string;
+  location?: Location;
+  uid?: string;
+}
+
+export interface Subscriber {
+  uid: string;
+  email: string;
+  phone: string;
+  location: Location;
 }
 
 export type AlertSeverity = 'advisory' | 'watch' | 'warning' | 'emergency';

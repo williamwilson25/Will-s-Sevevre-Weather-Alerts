@@ -7,7 +7,11 @@ the next chance of severe weather, and sending customized alerts to friends.
 
 - **Accounts** — sign-in required to use the app (Firebase Authentication, email + password).
   Only the app owner's account sees the Alerts tab; everyone else gets the forecast, radar, and
-  outlook views.
+  outlook views. Signing up also asks for a phone number and auto-detects the signer-upper's
+  location (GPS, with a manual city-search fallback) and saves it to Firestore, so the owner's
+  Alerts tab automatically picks up every new signup as a ready-to-alert friend — name, phone,
+  and location already filled in. The owner can tap "View" on any friend with a location to
+  switch the whole app to that place before sending them a storm alert.
 - **Multiple locations** — search and save any number of cities, switch between them with a tap,
   and send alerts for whichever one is active.
 - **Real-time updates** — forecast, radar, and outlook data all auto-refresh in the background
@@ -47,5 +51,8 @@ Then open the printed local URL. Build for production with `npm run build`.
 ## Stack
 
 Vite + React + TypeScript, weather data from [Open-Meteo](https://open-meteo.com/) (free,
-keyless). Firebase Authentication handles sign-in; everything else (friends, alert history,
-saved locations) is `localStorage` — no other backend.
+keyless). Firebase Authentication handles sign-in, and Cloud Firestore stores one small
+`subscribers/{uid}` record per signed-up user (email, phone, location) so the owner can see
+who's signed up — see `firestore.rules` for the exact access rules (each user can only write
+their own record; only the owner can read everyone's). Everything else (friends list, alert
+history, saved locations, Discord webhook) stays in `localStorage` on the owner's device.

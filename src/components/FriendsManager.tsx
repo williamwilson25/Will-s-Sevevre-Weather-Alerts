@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import type { Friend } from '../types';
+import type { Friend, Location } from '../types';
 import Avatar from './Avatar';
+import { MapPinIcon } from './icons';
 
 interface Props {
   friends: Friend[];
   onChange: (friends: Friend[]) => void;
+  onViewLocation?: (location: Location) => void;
 }
 
-export default function FriendsManager({ friends, onChange }: Props) {
+export default function FriendsManager({ friends, onChange, onViewLocation }: Props) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
@@ -67,9 +69,32 @@ export default function FriendsManager({ friends, onChange }: Props) {
             <li key={friend.id} className="friend-item">
               <Avatar name={friend.name} />
               <div className="friend-info">
-                <div className="friend-name">{friend.name}</div>
-                <div className="friend-contact">{friend.phone}</div>
+                <div className="friend-name">
+                  {friend.name}
+                  {friend.uid && <span className="friend-subscriber-badge">Signed up</span>}
+                </div>
+                <div className="friend-contact">
+                  {friend.phone}
+                  {friend.location && (
+                    <>
+                      {' · '}
+                      <MapPinIcon size={11} />{' '}
+                      {friend.location.name}
+                      {friend.location.admin1 ? `, ${friend.location.admin1}` : ''}
+                    </>
+                  )}
+                </div>
               </div>
+              {friend.location && onViewLocation && (
+                <button
+                  type="button"
+                  className="friend-view-location"
+                  onClick={() => onViewLocation(friend.location!)}
+                  title="Switch the app to their location"
+                >
+                  View
+                </button>
+              )}
               <button type="button" className="friend-remove" onClick={() => removeFriend(friend.id)}>
                 Remove
               </button>
