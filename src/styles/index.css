@@ -31,6 +31,12 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
 body {
   margin: 0;
   background: #0b1220;
@@ -39,6 +45,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
+  overflow: hidden;
 }
 
 button,
@@ -88,7 +95,9 @@ button:active:not(:disabled) {
 
 .app-bg {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background-color: #0b1220;
   background-size: auto 85vh;
   background-position: center;
@@ -121,8 +130,15 @@ button:active:not(:disabled) {
   max-width: 620px;
   margin: 0 auto;
   padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    calc(110px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-  min-height: 100vh;
+    max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app > *:not(.tab-pager) {
+  flex-shrink: 0;
 }
 
 /* Header */
@@ -325,6 +341,54 @@ button:active:not(:disabled) {
 
 .status-error {
   color: #fecaca;
+}
+
+/* Compact always-visible status bar (temp/location/refresh) above the tabs.
+   Full current-conditions detail lives inside the Forecast tab itself. */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card), inset 0 1px 0 var(--glass-highlight);
+}
+
+.status-bar-temp {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.status-bar-location {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.status-bar-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--text-muted);
+}
+
+.status-bar-refresh:disabled {
+  opacity: 0.6;
 }
 
 /* Hero */
@@ -536,34 +600,29 @@ button:active:not(:disabled) {
   gap: 16px;
 }
 
-@keyframes sw-tab-slide-left {
-  from {
-    opacity: 0;
-    transform: translateX(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Swipeable tab pager: panels sit side by side in .tab-track, which slides
+   via transform to the active panel. Each panel scrolls independently. */
+.tab-pager {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: pan-y;
 }
 
-@keyframes sw-tab-slide-right {
-  from {
-    opacity: 0;
-    transform: translateX(-28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.tab-track {
+  display: flex;
+  height: 100%;
+  transition: transform 320ms var(--ease);
 }
 
-.tab-slide-left {
-  animation: sw-tab-slide-left 260ms var(--ease) both;
-}
-
-.tab-slide-right {
-  animation: sw-tab-slide-right 260ms var(--ease) both;
+.tab-panel {
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 2px 2px calc(96px + env(safe-area-inset-bottom));
 }
 
 .forecast-view > *,
@@ -1829,7 +1888,6 @@ section h2::before {
 }
 
 .app-footer {
-  margin-top: 26px;
   text-align: center;
   font-size: 0.74rem;
   color: var(--text-faint);

@@ -61,10 +61,12 @@ the next chance of severe weather, and sending customized alerts to friends.
 
 ## Navigation
 
-Swipe left/right anywhere on the Forecast, Radar, Outlook, or Alerts view to move between
-tabs, in addition to tapping the tab bar. Swipes starting on the hourly-forecast scroll strip,
-the radar/outlook maps, or the radar scrubber are ignored so they don't fight with those
-elements' own gestures.
+Forecast, Radar, Outlook, and Alerts are real swipeable pages, not one long scrolling
+document — a compact status bar (icon, temperature, location) and the tab bar stay pinned at
+the top, and each tab's content scrolls independently underneath. Swipe left/right anywhere
+on a tab to page to the next/previous one, in addition to tapping the tab bar. Swipes starting
+on the hourly-forecast scroll strip, the radar/outlook maps, or the radar scrubber are ignored
+so they don't fight with those elements' own gestures.
 
 ## Getting started
 

@@ -10,6 +10,7 @@ import SignIn from './components/SignIn';
 import LocationSearch from './components/LocationSearch';
 import LocationChips from './components/LocationChips';
 import CurrentConditions from './components/CurrentConditions';
+import StatusBar from './components/StatusBar';
 import HourlyStrip from './components/HourlyStrip';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainNowcast from './components/RainNowcast';
@@ -89,7 +90,6 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<Tab>('forecast');
-  const [slideDir, setSlideDir] = useState<'left' | 'right'>('left');
   const [alertDay, setAlertDay] = useState<DailyForecast | null>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -195,11 +195,9 @@ export default function App() {
   }
 
   const visibleTabs = isOwner ? TAB_ORDER : TAB_ORDER.filter((t) => t !== 'alerts');
+  const activeIndex = visibleTabs.indexOf(tab);
 
   function goToTab(next: Tab) {
-    const from = visibleTabs.indexOf(tab);
-    const to = visibleTabs.indexOf(next);
-    setSlideDir(to < from ? 'right' : 'left');
     setTab(next);
   }
 
@@ -354,16 +352,7 @@ export default function App() {
 
         {!loading && !error && snapshot && (
           <>
-            <CurrentConditions
-              snapshot={snapshot}
-              refreshing={refreshing}
-              onRefresh={handleManualRefresh}
-              notifyRain={notifyRain}
-              notifySupported={notifySupported}
-              notifyDenied={notifyDenied}
-              onEnableNotify={handleEnableRainNotify}
-              onTestNotify={handleTestNotify}
-            />
+            <StatusBar snapshot={snapshot} refreshing={refreshing} onRefresh={handleManualRefresh} />
 
             <nav className="tabs">
               <button className={tab === 'forecast' ? 'active' : ''} onClick={() => goToTab('forecast')}>
@@ -383,66 +372,112 @@ export default function App() {
               )}
             </nav>
 
-            <main onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-              {tab === 'forecast' && (
-                <div className={`forecast-view tab-slide-${slideDir}`} key={tab}>
-                  <ActiveAlerts location={snapshot.location} />
-                  {notifySupported && !notifyDenied && !notifyRain && !notifyPromptDismissed && (
-                    <EnableNotificationsBanner
-                      onEnable={handleEnableRainNotify}
-                      onDismiss={() => setNotifyPromptDismissed(true)}
-                    />
-                  )}
-                  <RainNowcast
-                    location={snapshot.location}
-                    hourly={snapshot.hourly}
-                    onSummary={(summary, locationId) => setNowcastSummary({ summary, locationId })}
-                  />
-                  <SevereWeatherBanner
-                    daily={snapshot.daily}
-                    onAlertDay={isOwner ? handleAlertDay : undefined}
-                  />
-                  <HourlyStrip hourly={snapshot.hourly} />
-                  <NwsForecastCard location={snapshot.location} />
-                </div>
-              )}
+            <div className="tab-pager" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+              <div
+                className="tab-track"
+                style={{
+                  width: `${visibleTabs.length * 100}%`,
+                  transform: `translateX(-${(activeIndex / visibleTabs.length) * 100}%)`,
+                }}
+              >
+                {visibleTabs.map((t) => (
+                  <div
+                    key={t}
+                    className="tab-panel"
+                    style={{ width: `${100 / visibleTabs.length}%` }}
+                    aria-hidden={t !== tab}
+                  >
+                    {t === 'forecast' && (
+                      <div className="forecast-view">
+                        <CurrentConditions
+                          snapshot={snapshot}
+                          refreshing={refreshing}
+                          onRefresh={handleManualRefresh}
+                          notifyRain={notifyRain}
+                          notifySupported={notifySupported}
+                          notifyDenied={notifyDenied}
+                          onEnableNotify={handleEnableRainNotify}
+                          onTestNotify={handleTestNotify}
+                        />
+                        <ActiveAlerts location={snapshot.location} />
+                        {notifySupported && !notifyDenied && !notifyRain && !notifyPromptDismissed && (
+                          <EnableNotificationsBanner
+                            onEnable={handleEnableRainNotify}
+                            onDismiss={() => setNotifyPromptDismissed(true)}
+                          />
+                        )}
+                        <RainNowcast
+                          location={snapshot.location}
+                          hourly={snapshot.hourly}
+                          onSummary={(summary, locationId) => setNowcastSummary({ summary, locationId })}
+                        />
+                        <SevereWeatherBanner
+                          daily={snapshot.daily}
+                          onAlertDay={isOwner ? handleAlertDay : undefined}
+                        />
+                        <HourlyStrip hourly={snapshot.hourly} />
+                        <NwsForecastCard location={snapshot.location} />
+                        <footer className="app-footer">
+                          <p>
+                            Forecast &amp; current conditions: National Weather Service · Radar: NWS ·
+                            Outlook: NOAA Storm Prediction Center.
+                          </p>
+                          <p>
+                            Will's Severe Weather Alerts is an independent local project, not an
+                            official National Weather Service product — always follow official NWS
+                            warnings and local emergency guidance during severe weather.
+                          </p>
+                          <p>
+                            Alerts are sent through your own Messages app; friend data never leaves
+                            this browser.
+                          </p>
+                        </footer>
+                      </div>
+                    )}
 
-              {tab === 'radar' && (
-                <div className={`radar-view tab-slide-${slideDir}`} key={tab}>
-                  <ExternalRadar
-                    url="https://radar.weather.gov/station/KTLX/standard"
-                    title="Live Storm Radar"
-                    label="LIVE"
-                    source="the National Weather Service — Norman, OK (KTLX)"
-                  />
-                </div>
-              )}
+                    {t === 'radar' && (
+                      <div className="radar-view">
+                        <ExternalRadar
+                          url="https://radar.weather.gov/station/KTLX/standard"
+                          title="Live Storm Radar"
+                          label="LIVE"
+                          source="the National Weather Service — Norman, OK (KTLX)"
+                        />
+                      </div>
+                    )}
 
-              {tab === 'outlook' && (
-                <div className={`outlook-view tab-slide-${slideDir}`} key={tab}>
-                  <StormOutlookMap location={snapshot.location} daily={snapshot.daily} />
-                </div>
-              )}
+                    {t === 'outlook' && (
+                      <div className="outlook-view">
+                        <StormOutlookMap location={snapshot.location} daily={snapshot.daily} />
+                      </div>
+                    )}
 
-              {tab === 'alerts' && isOwner && (
-                <div className={`alerts-view tab-slide-${slideDir}`} key={tab}>
-                  <AlertStats history={history} friends={friends} />
-                  <FriendsManager friends={friends} onChange={setFriends} onViewLocation={handleAddLocation} />
-                  <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
-                  <AlertComposer
-                    locationName={`${snapshot.location.name}${
-                      snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
-                    }`}
-                    daily={snapshot.daily}
-                    friends={friends}
-                    selectedDate={alertDay?.date ?? null}
-                    discordWebhookUrl={discordWebhookUrl}
-                    onSent={handleSent}
-                  />
-                  <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
-                </div>
-              )}
-            </main>
+                    {t === 'alerts' && isOwner && (
+                      <div className="alerts-view">
+                        <AlertStats history={history} friends={friends} />
+                        <FriendsManager
+                          friends={friends}
+                          onChange={setFriends}
+                          onViewLocation={handleAddLocation}
+                        />
+                        <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
+                        <AlertComposer
+                          locationName={`${snapshot.location.name}${
+                            snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
+                          }`}
+                          daily={snapshot.daily}
+                          friends={friends}
+                          selectedDate={alertDay?.date ?? null}
+                          discordWebhookUrl={discordWebhookUrl}
+                          onSent={handleSent}
+                        />
+                        <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {tab === 'forecast' && isOwner && worstRisk && (
               <button
@@ -454,22 +489,6 @@ export default function App() {
                 Alert friends
               </button>
             )}
-
-            <footer className="app-footer">
-              <p>
-                Forecast &amp; current conditions: National Weather Service · Radar: NWS · Outlook:
-                NOAA Storm Prediction Center.
-              </p>
-              <p>
-                Will's Severe Weather Alerts is an independent local project, not an official
-                National Weather Service product — always follow official NWS warnings and local
-                emergency guidance during severe weather.
-              </p>
-              <p>
-                Alerts are sent through your own Messages app; friend data never leaves this
-                browser.
-              </p>
-            </footer>
           </>
         )}
       </div>
