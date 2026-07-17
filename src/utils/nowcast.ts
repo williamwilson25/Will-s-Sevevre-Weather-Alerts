@@ -11,7 +11,7 @@ export type NowcastState =
   | { kind: 'starting'; minutesAway: number }
   | { kind: 'clear' };
 
-const ZOOM = 9;
+const ZOOM = 8; // RainViewer's radar tiles don't support deeper native zoom than this
 const ONSET_INTENSITY = 14; // out of 100 — minimum sampled intensity that counts as "rain"
 
 interface TileLocation {

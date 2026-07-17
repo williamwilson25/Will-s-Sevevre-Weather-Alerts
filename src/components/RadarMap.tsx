@@ -129,7 +129,7 @@ export default function RadarMap({ location }: Props) {
         opacity: 0.65,
         zIndex: 10,
         maxZoom: 19,
-        maxNativeZoom: 12,
+        maxNativeZoom: 8,
       }).addTo(mapRef.current);
     }
   }, [frames, activeIndex]);
