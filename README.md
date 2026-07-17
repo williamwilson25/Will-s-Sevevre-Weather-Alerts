@@ -27,6 +27,10 @@ the next chance of severe weather, and sending customized alerts to friends.
   current-conditions card lets you confirm notifications work without waiting for real rain.
 - **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,
   UV index, pressure, visibility, dew point, sunrise, and sunset.
+- **Official NWS forecast** — the actual human-written forecast text from the National Weather
+  Service office responsible for your location (Norman, OK for this app's Great Plains focus),
+  pulled from the NWS's own point-forecast API — day/night periods with official icons,
+  temperatures, and the full forecast discussion text, expandable per period.
 - **Active NWS alerts** — official Tornado Warnings, Severe Thunderstorm Warnings, Flash Flood
   Warnings, and more, pulled directly from the National Weather Service's own alerts feed for
   your exact location and shown the moment they're issued. Severity-colored, expandable for the

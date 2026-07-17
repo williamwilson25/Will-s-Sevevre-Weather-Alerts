@@ -729,6 +729,111 @@ section h2::before {
   white-space: pre-line;
 }
 
+/* Official NWS forecast */
+.nws-forecast-office {
+  margin: -4px 0 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.nws-forecast-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nws-forecast-item {
+  border-top: 1px solid var(--glass-border);
+}
+
+.nws-forecast-item:first-child {
+  border-top: none;
+}
+
+.nws-forecast-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 2px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.nws-forecast-icon {
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.nws-forecast-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.nws-forecast-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.nws-forecast-short {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nws-forecast-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.nws-forecast-temp {
+  font-weight: 700;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nws-forecast-pop {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.nws-forecast-chevron {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  transition: transform 200ms var(--ease);
+}
+
+.nws-forecast-chevron-open {
+  transform: rotate(180deg);
+  color: var(--text);
+}
+
+.nws-forecast-detail {
+  padding: 0 2px 14px 50px;
+}
+
+.nws-forecast-detail p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 /* Severe weather banner */
 .severe-banner {
   display: flex;
