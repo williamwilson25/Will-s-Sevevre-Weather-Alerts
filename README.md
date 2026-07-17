@@ -58,7 +58,9 @@ Then open the printed local URL. Build for production with `npm run build`.
 ## Stack
 
 Vite + React + TypeScript, weather data from [Open-Meteo](https://open-meteo.com/) (free,
-keyless). Firebase Authentication handles sign-in, and Cloud Firestore stores one small
+keyless), sourced from NOAA's GFS/HRRR model blend for better short-term US severe-weather
+accuracy than Open-Meteo's default multi-country blend. Firebase Authentication handles
+sign-in, and Cloud Firestore stores one small
 `subscribers/{uid}` record per signed-up user (email, phone, location) so the owner can see
 who's signed up — see `firestore.rules` for the exact access rules (each user can only write
 their own record; only the owner can read everyone's). Everything else (friends list, alert

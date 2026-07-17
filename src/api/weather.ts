@@ -97,6 +97,11 @@ export async function fetchWeather(location: Location): Promise<WeatherSnapshot>
   url.searchParams.set('wind_speed_unit', 'mph');
   url.searchParams.set('temperature_unit', 'fahrenheit');
   url.searchParams.set('precipitation_unit', 'inch');
+  // NOAA GFS blended with HRRR (their storm-scale, 3km convective model) instead of
+  // Open-Meteo's default multi-country blend — HRRR is what NWS itself uses for
+  // short-term severe weather over the US, and "seamless" falls back to plain GFS
+  // for the outer forecast days and for locations outside HRRR's coverage.
+  url.searchParams.set('models', 'gfs_seamless');
 
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error(`Weather fetch failed (${res.status})`);
