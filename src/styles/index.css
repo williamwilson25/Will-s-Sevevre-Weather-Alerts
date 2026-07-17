@@ -1838,6 +1838,10 @@ section h2::before {
   gap: 8px;
 }
 
+.quick-alerts-grid > .quick-alert-button:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .quick-alert-button {
   display: flex;
   align-items: center;

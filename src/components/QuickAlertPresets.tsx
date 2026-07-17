@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { AlertSeverity } from '../types';
 import { SEVERITY_COLOR } from '../utils/alerts';
-import { TornadoIcon, CloudLightningIcon, WaveIcon, WindIcon } from './icons';
+import { TornadoIcon, CloudLightningIcon, WaveIcon, WindIcon, AlertTriangleIcon } from './icons';
 
 export interface AlertPreset {
   label: string;
@@ -45,6 +45,12 @@ const PRESETS: (AlertPreset & { icon: typeof TornadoIcon })[] = [
     severity: 'warning',
     note: 'High Wind Warning issued. Expect damaging winds — secure loose outdoor objects.',
     icon: WindIcon,
+  },
+  {
+    label: '🚨⚠️Stay Weather Aware ⚠️🚨',
+    severity: 'advisory',
+    note: '',
+    icon: AlertTriangleIcon,
   },
 ];
 
