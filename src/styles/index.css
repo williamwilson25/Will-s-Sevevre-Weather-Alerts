@@ -98,27 +98,17 @@ button:active:not(:disabled) {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: #0b1220;
-  background-size: auto 85vh;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-color: #0a0f1c;
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(56, 189, 248, 0.16) 0%, rgba(10, 15, 28, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(99, 102, 241, 0.12) 0%, rgba(10, 15, 28, 0) 62%),
+    linear-gradient(180deg, #101a30 0%, #0a0f1c 48%, #060a14 100%);
+  transition: background-image 600ms var(--ease);
 }
 
-.app-bg::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(120% 60% at 50% -10%, rgba(56, 189, 248, 0.16) 0%, rgba(6, 10, 20, 0) 55%),
-    linear-gradient(180deg, rgba(6, 10, 20, 0.5) 0%, rgba(6, 10, 20, 0.74) 45%, rgba(6, 10, 20, 0.92) 100%);
-  pointer-events: none;
-  z-index: 0;
-  transition: background 600ms var(--ease);
-}
-
-.app-bg-night::before {
-  background: radial-gradient(120% 60% at 50% -10%, rgba(99, 102, 241, 0.14) 0%, rgba(4, 6, 14, 0) 55%),
-    linear-gradient(180deg, rgba(4, 6, 14, 0.62) 0%, rgba(4, 6, 14, 0.82) 45%, rgba(4, 6, 14, 0.95) 100%);
+.app-bg-night {
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(99, 102, 241, 0.14) 0%, rgba(6, 9, 17, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(56, 189, 248, 0.08) 0%, rgba(6, 9, 17, 0) 62%),
+    linear-gradient(180deg, #0a0e1a 0%, #06090f 48%, #04060b 100%);
 }
 
 .app-bg > .app {

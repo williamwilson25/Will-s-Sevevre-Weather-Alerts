@@ -9,7 +9,6 @@ import { searchLocations } from '../api/weather';
 import { saveSubscriber } from '../api/subscribers';
 import { MapPinIcon, DiscordIcon } from './icons';
 import logo from '../assets/logo.png';
-import background from '../assets/background.jpg';
 
 type LocationStatus = 'idle' | 'detecting' | 'detected' | 'manual';
 
@@ -99,7 +98,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="app-bg" style={{ backgroundImage: `url(${background})` }}>
+    <div className="app-bg">
       <div className="auth-screen">
         <div className="auth-card">
           <img src={logo} alt="" className="auth-logo" />

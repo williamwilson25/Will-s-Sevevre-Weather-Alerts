@@ -30,7 +30,6 @@ import ExternalRadar from './components/ExternalRadar';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
-import background from './assets/background.jpg';
 
 const DEFAULT_LOCATION: Location = {
   id: '4671654',
@@ -299,7 +298,7 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="app-bg" style={{ backgroundImage: `url(${background})` }}>
+      <div className="app-bg">
         <div className="app">
           <LoadingSkeleton />
         </div>
@@ -312,10 +311,7 @@ export default function App() {
   }
 
   return (
-    <div
-      className={`app-bg${isNight ? ' app-bg-night' : ''}`}
-      style={{ backgroundImage: `url(${background})` }}
-    >
+    <div className={`app-bg${isNight ? ' app-bg-night' : ''}`}>
       <div className="app">
         <header className="app-header">
           <div className="app-title">
