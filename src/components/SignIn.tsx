@@ -3,11 +3,11 @@ import type { FormEvent } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, AuthErrorCodes } from 'firebase/auth';
 import type { AuthError } from 'firebase/auth';
 import type { Location } from '../types';
-import { auth } from '../firebase';
+import { auth, DISCORD_INVITE_URL } from '../firebase';
 import { detectLocation } from '../api/geolocation';
 import { searchLocations } from '../api/weather';
 import { saveSubscriber } from '../api/subscribers';
-import { MapPinIcon } from './icons';
+import { MapPinIcon, DiscordIcon } from './icons';
 import logo from '../assets/logo.png';
 import background from '../assets/background.jpg';
 
@@ -208,6 +208,16 @@ export default function SignIn() {
           >
             {mode === 'signin' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>
+
+          {DISCORD_INVITE_URL && (
+            <div className="auth-discord">
+              <span>Don't want to make an account?</span>
+              <a href={DISCORD_INVITE_URL} target="_blank" rel="noreferrer" className="auth-discord-link">
+                <DiscordIcon size={16} />
+                Join our Discord for storm alerts
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>

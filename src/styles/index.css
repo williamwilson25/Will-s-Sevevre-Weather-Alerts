@@ -1390,10 +1390,56 @@ section h2::before {
 
 /* Friends manager */
 .friend-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   margin-bottom: 10px;
+}
+
+.friend-delivery-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.friend-delivery-toggle button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.friend-delivery-toggle button.active {
+  background: var(--glass-bg-strong);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.friend-discord-hint {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--text-faint);
+}
+
+.friend-delivery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #5865f2;
+  font-weight: 600;
+}
+
+.discord-toggle-hint {
+  color: var(--text-faint);
+  font-weight: 400;
 }
 
 .friend-form input {
@@ -2147,7 +2193,9 @@ section h2::before {
 
 /* Passcode gate */
 .auth-screen {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2294,6 +2342,36 @@ section h2::before {
   color: var(--text);
 }
 
+.auth-discord {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.auth-discord span {
+  font-size: 0.76rem;
+  color: var(--text-faint);
+}
+
+.auth-discord-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #5865f2;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-discord-link:hover {
+  text-decoration: underline;
+}
+
 .auth-bar {
   display: flex;
   align-items: center;
@@ -2328,9 +2406,6 @@ section h2::before {
 }
 
 @media (max-width: 480px) {
-  .friend-form {
-    grid-template-columns: 1fr;
-  }
   .hero-temp {
     font-size: 4.6rem;
   }

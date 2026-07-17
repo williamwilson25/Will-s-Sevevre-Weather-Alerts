@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import type { Friend, Location } from '../types';
+import type { DeliveryMethod, Friend, Location } from '../types';
 import Avatar from './Avatar';
-import { MapPinIcon } from './icons';
+import { MapPinIcon, DiscordIcon } from './icons';
 
 interface Props {
   friends: Friend[];
@@ -12,6 +12,7 @@ interface Props {
 export default function FriendsManager({ friends, onChange, onViewLocation }: Props) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('text');
   const [error, setError] = useState('');
 
   function addFriend(e: React.FormEvent) {
@@ -20,8 +21,8 @@ export default function FriendsManager({ friends, onChange, onViewLocation }: Pr
       setError('Name is required.');
       return;
     }
-    if (!phone.trim()) {
-      setError('Add a phone number so they can receive alerts.');
+    if (deliveryMethod === 'text' && !phone.trim()) {
+      setError('Add a phone number so they can receive text alerts.');
       return;
     }
     setError('');
@@ -29,10 +30,12 @@ export default function FriendsManager({ friends, onChange, onViewLocation }: Pr
       id: crypto.randomUUID(),
       name: name.trim(),
       phone: phone.trim(),
+      deliveryMethod,
     };
     onChange([...friends, friend]);
     setName('');
     setPhone('');
+    setDeliveryMethod('text');
   }
 
   function removeFriend(id: string) {
@@ -50,13 +53,37 @@ export default function FriendsManager({ friends, onChange, onViewLocation }: Pr
           onChange={(e) => setName(e.target.value)}
           aria-label="Friend name"
         />
-        <input
-          type="tel"
-          placeholder="Phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          aria-label="Friend phone"
-        />
+        <div className="friend-delivery-toggle" role="radiogroup" aria-label="How they receive alerts">
+          <button
+            type="button"
+            className={deliveryMethod === 'text' ? 'active' : ''}
+            onClick={() => setDeliveryMethod('text')}
+          >
+            Text
+          </button>
+          <button
+            type="button"
+            className={deliveryMethod === 'discord' ? 'active' : ''}
+            onClick={() => setDeliveryMethod('discord')}
+          >
+            <DiscordIcon size={13} />
+            Discord
+          </button>
+        </div>
+        {deliveryMethod === 'text' && (
+          <input
+            type="tel"
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            aria-label="Friend phone"
+          />
+        )}
+        {deliveryMethod === 'discord' && (
+          <p className="friend-discord-hint">
+            They'll get alerts through the shared Discord channel — no phone number needed.
+          </p>
+        )}
         <button type="submit">Add friend</button>
       </form>
       {error && <p className="form-error">{error}</p>}
@@ -74,7 +101,13 @@ export default function FriendsManager({ friends, onChange, onViewLocation }: Pr
                   {friend.uid && <span className="friend-subscriber-badge">Signed up</span>}
                 </div>
                 <div className="friend-contact">
-                  {friend.phone}
+                  {friend.deliveryMethod === 'discord' ? (
+                    <span className="friend-delivery-badge">
+                      <DiscordIcon size={12} /> Discord
+                    </span>
+                  ) : (
+                    friend.phone
+                  )}
                   {friend.location && (
                     <>
                       {' · '}

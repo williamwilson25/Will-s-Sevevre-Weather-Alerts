@@ -56,8 +56,15 @@ the next chance of severe weather, and sending customized alerts to friends.
   (pick the day, severity, and an optional personal note), preview the message, and send it.
   Alerts go out through your own Messages app (`sms:` links), and friend data never leaves your
   browser (stored in `localStorage`). Only visible to the owner's account.
+- **Per-friend delivery choice** — when adding a friend, pick whether they get alerts by text or
+  through the shared Discord channel; Discord friends skip the phone number entirely and are
+  automatically excluded from the text-recipient list (they're already covered by the Discord
+  post).
 - **Discord alerts** — optionally paste a channel webhook URL to also post every alert straight
   to a Discord channel, with a one-tap test message to confirm it's wired up correctly.
+- **Public Discord option** — the sign-in screen shows a "Join our Discord for storm alerts"
+  link for anyone who doesn't want to create an account, so people can opt in to alerts without
+  signing up or handing over a phone number.
 
 ## Navigation
 

@@ -59,7 +59,9 @@ export default function AlertComposer({
   if (!day) return null;
 
   const { headline, body } = buildAlertMessage(locationName, day, severity, note, typeLabel);
-  const recipients = friends.filter((f) => recipientIds.includes(f.id));
+  const textFriends = friends.filter((f) => f.deliveryMethod !== 'discord');
+  const discordFriends = friends.filter((f) => f.deliveryMethod === 'discord');
+  const recipients = textFriends.filter((f) => recipientIds.includes(f.id));
 
   function toggleRecipient(id: string) {
     setRecipientIds((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
@@ -163,9 +165,11 @@ export default function AlertComposer({
         <legend>Send to</legend>
         {friends.length === 0 ? (
           <p className="empty-state">Add friends first to select recipients.</p>
+        ) : textFriends.length === 0 ? (
+          <p className="empty-state">All your friends get alerts via Discord — nothing to text.</p>
         ) : (
           <div className="recipient-grid">
-            {friends.map((friend) => (
+            {textFriends.map((friend) => (
               <label key={friend.id} className="recipient-checkbox">
                 <input
                   type="checkbox"
@@ -188,7 +192,20 @@ export default function AlertComposer({
             onChange={(e) => setAlsoDiscord(e.target.checked)}
           />
           Also post to Discord
+          {discordFriends.length > 0 && (
+            <span className="discord-toggle-hint">
+              — reaches {discordFriends.length} friend{discordFriends.length === 1 ? '' : 's'} who
+              {discordFriends.length === 1 ? ' gets' : ' get'} alerts this way
+            </span>
+          )}
         </label>
+      )}
+      {discordFriends.length > 0 && !discordWebhookUrl && (
+        <p className="form-error">
+          {discordFriends.length} friend{discordFriends.length === 1 ? '' : 's'}{' '}
+          {discordFriends.length === 1 ? 'gets' : 'get'} alerts via Discord, but no webhook is set
+          up yet — add one in Discord alerts below.
+        </p>
       )}
 
       <div className="alert-preview">

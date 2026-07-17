@@ -382,3 +382,19 @@ export function RefreshIcon({ size = 24, className }: IconProps) {
   );
 }
 
+export function DiscordIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M6.2 6.8C8 5.9 9.9 5.4 12 5.4s4 .5 5.8 1.4c1.3 2.1 2 4.6 2 7.4 0 0-1.8 1.9-4.4 2.4l-.7-1.4c.9-.3 1.7-.7 2.4-1.2-2 .9-4 1.4-6.1 1.4s-4.1-.5-6.1-1.4c.7.5 1.5.9 2.4 1.2l-.7 1.4c-2.6-.5-4.4-2.4-4.4-2.4 0-2.8.7-5.3 2-7.4z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <ellipse cx="9.2" cy="12.3" rx="1.1" ry="1.3" fill="currentColor" />
+      <ellipse cx="14.8" cy="12.3" rx="1.1" ry="1.3" fill="currentColor" />
+    </svg>
+  );
+}
+
