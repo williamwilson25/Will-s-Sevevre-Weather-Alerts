@@ -69,61 +69,61 @@ export default function CurrentConditions({ snapshot, refreshing, onRefresh }: P
         <h2>Current conditions</h2>
         <div className="conditions-grid">
           <div className="condition-cell">
-            <DropletIcon size={18} className="condition-icon" />
+            <DropletIcon size={14} className="condition-icon" />
             <span className="condition-label">Rain chance</span>
             <span className="condition-value">{Math.round(rainChance)}%</span>
           </div>
           <div className="condition-cell">
-            <ThermometerIcon size={18} className="condition-icon" />
+            <ThermometerIcon size={14} className="condition-icon" />
             <span className="condition-label">Feels like</span>
             <span className="condition-value">{Math.round(current.apparentTemperature)}°</span>
           </div>
           <div className="condition-cell">
-            <DropletIcon size={18} className="condition-icon" />
+            <DropletIcon size={14} className="condition-icon" />
             <span className="condition-label">Humidity</span>
             <span className="condition-value">{Math.round(current.humidity)}%</span>
           </div>
           <div className="condition-cell">
-            <WindIcon size={18} className="condition-icon" />
+            <WindIcon size={14} className="condition-icon" />
             <span className="condition-label">Wind</span>
             <span className="condition-value">{Math.round(current.windSpeed)} mph</span>
           </div>
           <div className="condition-cell">
-            <WindIcon size={18} className="condition-icon" />
+            <WindIcon size={14} className="condition-icon" />
             <span className="condition-label">Gusts</span>
             <span className="condition-value">{Math.round(current.windGusts)} mph</span>
           </div>
           <div className="condition-cell">
-            <SunIcon size={18} className="condition-icon" />
+            <SunIcon size={14} className="condition-icon" />
             <span className="condition-label">UV index</span>
             <span className="condition-value">{Math.round(nowHour?.uvIndex ?? 0)}</span>
           </div>
           <div className="condition-cell">
-            <GaugeIcon size={18} className="condition-icon" />
+            <GaugeIcon size={14} className="condition-icon" />
             <span className="condition-label">Pressure</span>
             <span className="condition-value">{Math.round(current.pressure)} hPa</span>
           </div>
           <div className="condition-cell">
-            <EyeIcon size={18} className="condition-icon" />
+            <EyeIcon size={14} className="condition-icon" />
             <span className="condition-label">Visibility</span>
             <span className="condition-value">
               {Math.round(metersToMiles(nowHour?.visibility ?? 0))} mi
             </span>
           </div>
           <div className="condition-cell">
-            <DropletIcon size={18} className="condition-icon" />
+            <DropletIcon size={14} className="condition-icon" />
             <span className="condition-label">Dew point</span>
             <span className="condition-value">{Math.round(nowHour?.dewPoint ?? 0)}°</span>
           </div>
           {today && (
             <>
               <div className="condition-cell">
-                <SunriseIcon size={18} className="condition-icon" />
+                <SunriseIcon size={14} className="condition-icon" />
                 <span className="condition-label">Sunrise</span>
                 <span className="condition-value">{formatClockTime(today.sunrise)}</span>
               </div>
               <div className="condition-cell">
-                <SunsetIcon size={18} className="condition-icon" />
+                <SunsetIcon size={14} className="condition-icon" />
                 <span className="condition-label">Sunset</span>
                 <span className="condition-value">{formatClockTime(today.sunset)}</span>
               </div>
