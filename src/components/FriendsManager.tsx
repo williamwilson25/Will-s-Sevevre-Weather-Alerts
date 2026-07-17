@@ -9,7 +9,6 @@ interface Props {
 
 export default function FriendsManager({ friends, onChange }: Props) {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
 
@@ -19,20 +18,18 @@ export default function FriendsManager({ friends, onChange }: Props) {
       setError('Name is required.');
       return;
     }
-    if (!email.trim() && !phone.trim()) {
-      setError('Add an email or phone number so they can receive alerts.');
+    if (!phone.trim()) {
+      setError('Add a phone number so they can receive alerts.');
       return;
     }
     setError('');
     const friend: Friend = {
       id: crypto.randomUUID(),
       name: name.trim(),
-      email: email.trim() || undefined,
-      phone: phone.trim() || undefined,
+      phone: phone.trim(),
     };
     onChange([...friends, friend]);
     setName('');
-    setEmail('');
     setPhone('');
   }
 
@@ -52,15 +49,8 @@ export default function FriendsManager({ friends, onChange }: Props) {
           aria-label="Friend name"
         />
         <input
-          type="email"
-          placeholder="Email (optional)"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          aria-label="Friend email"
-        />
-        <input
           type="tel"
-          placeholder="Phone (optional)"
+          placeholder="Phone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           aria-label="Friend phone"
@@ -78,9 +68,7 @@ export default function FriendsManager({ friends, onChange }: Props) {
               <Avatar name={friend.name} />
               <div className="friend-info">
                 <div className="friend-name">{friend.name}</div>
-                <div className="friend-contact">
-                  {[friend.email, friend.phone].filter(Boolean).join(' · ')}
-                </div>
+                <div className="friend-contact">{friend.phone}</div>
               </div>
               <button type="button" className="friend-remove" onClick={() => removeFriend(friend.id)}>
                 Remove

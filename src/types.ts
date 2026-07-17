@@ -60,8 +60,7 @@ export interface WeatherSnapshot {
 export interface Friend {
   id: string;
   name: string;
-  email?: string;
-  phone?: string;
+  phone: string;
 }
 
 export type AlertSeverity = 'advisory' | 'watch' | 'warning' | 'emergency';

@@ -55,13 +55,6 @@ function encodeParams(params: Record<string, string>): string {
     .join('&');
 }
 
-export function buildMailtoLink(friends: Friend[], subject: string, body: string): string | null {
-  const emails = friends.map((f) => f.email).filter(Boolean) as string[];
-  if (emails.length === 0) return null;
-  return `mailto:${emails.join(',')}?${encodeParams({ subject, body })}`;
-}
-
-export function buildSmsLink(friend: Friend, body: string): string | null {
-  if (!friend.phone) return null;
+export function buildSmsLink(friend: Friend, body: string): string {
   return `sms:${friend.phone}?${encodeParams({ body })}`;
 }

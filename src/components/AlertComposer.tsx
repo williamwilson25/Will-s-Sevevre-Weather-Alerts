@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { AlertRecord, AlertSeverity, DailyForecast, Friend } from '../types';
-import { buildAlertMessage, buildMailtoLink, buildSmsLink, SEVERITY_LABEL } from '../utils/alerts';
+import { buildAlertMessage, buildSmsLink, SEVERITY_LABEL } from '../utils/alerts';
 import Avatar from './Avatar';
 
 interface Props {
@@ -45,9 +45,6 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
 
   const { headline, body } = buildAlertMessage(locationName, day, severity, note);
   const recipients = friends.filter((f) => recipientIds.includes(f.id));
-  const emailRecipients = recipients.filter((f) => f.email);
-  const phoneOnlyRecipients = recipients.filter((f) => !f.email && f.phone);
-  const mailtoLink = buildMailtoLink(emailRecipients, headline, body);
 
   function toggleRecipient(id: string) {
     setRecipientIds((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
@@ -55,10 +52,8 @@ export default function AlertComposer({ locationName, daily, friends, selectedDa
 
   function handleSend() {
     if (recipients.length === 0) return;
-    if (mailtoLink) window.open(mailtoLink, '_blank');
-    phoneOnlyRecipients.forEach((friend) => {
-      const link = buildSmsLink(friend, body);
-      if (link) window.open(link, '_blank');
+    recipients.forEach((friend) => {
+      window.open(buildSmsLink(friend, body), '_blank');
     });
 
     const record: AlertRecord = {

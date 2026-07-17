@@ -324,7 +324,7 @@ export default function App() {
             )}
 
             <footer className="app-footer">
-              Weather data from Open-Meteo. Alerts are sent through your own email/SMS app — this
+              Weather data from Open-Meteo. Alerts are sent through your own Messages app — this
               app never stores your friends' data outside this browser.
             </footer>
           </>

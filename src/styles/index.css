@@ -829,7 +829,7 @@ section h2 {
 /* Friends manager */
 .friend-form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr auto;
   gap: 8px;
   margin-bottom: 10px;
 }

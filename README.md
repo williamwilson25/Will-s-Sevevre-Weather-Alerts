@@ -21,10 +21,10 @@ the next chance of severe weather, and sending customized alerts to friends.
   on your location.
 - **Regional storm outlook** — NOAA Storm Prediction Center's Day 1–3 categorical convective
   outlook (Marginal/Slight/Enhanced/Moderate/High risk polygons), continental US.
-- **Friends & alerts** — save friends' email/phone, compose a custom alert (pick the day,
+- **Friends & alerts** — save friends' phone numbers, compose a custom alert (pick the day,
   severity, and an optional personal note), preview the message, and send it. Alerts go out
-  through your own email/SMS app (`mailto:` / `sms:` links), and friend data never leaves your
-  browser (stored in `localStorage`). Only visible to the owner's account.
+  through your own Messages app (`sms:` links), and friend data never leaves your browser
+  (stored in `localStorage`). Only visible to the owner's account.
 - **Alert history** — a log of everything you've sent.
 
 ## Getting started
