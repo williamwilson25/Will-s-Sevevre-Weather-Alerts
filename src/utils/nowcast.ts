@@ -10,7 +10,13 @@ export type NowcastState =
   | { kind: 'starting'; minutesAway: number }
   | { kind: 'clear' };
 
-const ONSET_INTENSITY = 14; // out of 100 — minimum intensity that counts as "rain"
+// Out of 100 — minimum intensity that counts as "rain" worth a notification.
+// NWS's hourly precipitation chance is a coarse per-hour bucket, not a real
+// minute-by-minute nowcast, so a low bar here means ordinary hour-to-hour
+// forecast noise (e.g. 0% now, 20% next hour) reads as "rain starting soon"
+// even when nothing meaningful is actually expected. 40 roughly matches NWS's
+// own "likely" wording threshold.
+const ONSET_INTENSITY = 40;
 
 /** Short-term precipitation timeline built from the NWS hourly forecast's rain chance. */
 export function buildNwsNowcast(hourly: HourlyPoint[]): NowcastPoint[] {
