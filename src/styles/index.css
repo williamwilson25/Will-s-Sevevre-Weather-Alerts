@@ -10,15 +10,25 @@
   --accent: #7dd3fc;
   --accent-strong: #38bdf8;
   --radius: 20px;
+  --radius-sm: 12px;
   --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.1), 0 14px 34px -14px rgba(0, 0, 0, 0.6);
   --shadow-pop: 0 20px 48px -14px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 8px 22px -6px rgba(56, 189, 248, 0.45);
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --font-display: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
     sans-serif;
 }
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -26,6 +36,9 @@ body {
   background: #0b1220;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
 }
 
 button,
@@ -38,7 +51,7 @@ textarea {
 
 button {
   transition: transform 150ms var(--ease), background 150ms var(--ease), border-color 150ms var(--ease),
-    color 150ms var(--ease), opacity 150ms var(--ease);
+    color 150ms var(--ease), opacity 150ms var(--ease), box-shadow 150ms var(--ease);
 }
 
 button:active:not(:disabled) {
@@ -48,6 +61,17 @@ button:active:not(:disabled) {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+@keyframes sw-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .sr-only {
@@ -76,9 +100,16 @@ button:active:not(:disabled) {
   content: '';
   position: fixed;
   inset: 0;
-  background: linear-gradient(180deg, rgba(6, 10, 20, 0.55) 0%, rgba(6, 10, 20, 0.72) 45%, rgba(6, 10, 20, 0.88) 100%);
+  background: radial-gradient(120% 60% at 50% -10%, rgba(56, 189, 248, 0.16) 0%, rgba(6, 10, 20, 0) 55%),
+    linear-gradient(180deg, rgba(6, 10, 20, 0.5) 0%, rgba(6, 10, 20, 0.74) 45%, rgba(6, 10, 20, 0.92) 100%);
   pointer-events: none;
   z-index: 0;
+  transition: background 600ms var(--ease);
+}
+
+.app-bg-night::before {
+  background: radial-gradient(120% 60% at 50% -10%, rgba(99, 102, 241, 0.14) 0%, rgba(4, 6, 14, 0) 55%),
+    linear-gradient(180deg, rgba(4, 6, 14, 0.62) 0%, rgba(4, 6, 14, 0.82) 45%, rgba(4, 6, 14, 0.95) 100%);
 }
 
 .app-bg > .app {
@@ -89,7 +120,8 @@ button:active:not(:disabled) {
 .app {
   max-width: 620px;
   margin: 0 auto;
-  padding: 18px 16px 110px;
+  padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    calc(110px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   min-height: 100vh;
 }
 
@@ -120,9 +152,10 @@ button:active:not(:disabled) {
 
 .app-title h1 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 1.02rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   line-height: 1.2;
 }
 
@@ -178,6 +211,7 @@ button:active:not(:disabled) {
   max-height: 260px;
   overflow-y: auto;
   box-shadow: var(--shadow-pop);
+  animation: sw-rise 180ms var(--ease) both;
 }
 
 .location-results button {
@@ -335,18 +369,33 @@ button:active:not(:disabled) {
 }
 
 .hero-icon {
+  position: relative;
   display: flex;
   justify-content: center;
-  margin: 6px 0 2px;
+  margin: 10px 0 2px;
   color: #fff;
   filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
 }
 
+.hero-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(125, 211, 252, 0.28) 0%, rgba(125, 211, 252, 0) 70%);
+  z-index: -1;
+}
+
 .hero-temp {
+  font-family: var(--font-display);
   font-size: 5.6rem;
   font-weight: 200;
   line-height: 1;
   letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
   background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -355,6 +404,7 @@ button:active:not(:disabled) {
 
 .hero-label {
   font-size: 1.05rem;
+  font-weight: 500;
   color: var(--text-muted);
   margin-top: 2px;
 }
@@ -384,6 +434,12 @@ button:active:not(:disabled) {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
+  transition: background 200ms var(--ease), border-color 200ms var(--ease);
+}
+
+.condition-cell:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .condition-icon {
@@ -416,6 +472,7 @@ button:active:not(:disabled) {
   border-radius: 999px;
   padding: 4px;
   margin-bottom: 18px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .tabs button {
@@ -432,12 +489,18 @@ button:active:not(:disabled) {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  transition: transform 150ms var(--ease), background 200ms var(--ease), color 200ms var(--ease),
+    box-shadow 200ms var(--ease);
 }
 
 .tabs button.active {
   color: var(--text);
   background: var(--glass-bg-strong);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.tabs button:hover:not(.active) {
+  color: var(--text);
 }
 
 .tab-count {
@@ -456,6 +519,33 @@ button:active:not(:disabled) {
   gap: 16px;
 }
 
+.forecast-view > *,
+.alerts-view > *,
+.radar-view > *,
+.outlook-view > * {
+  animation: sw-rise 480ms var(--ease) both;
+}
+
+.forecast-view > *:nth-child(2),
+.alerts-view > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.forecast-view > *:nth-child(3),
+.alerts-view > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.forecast-view > *:nth-child(4),
+.alerts-view > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+.forecast-view > *:nth-child(5),
+.alerts-view > *:nth-child(5) {
+  animation-delay: 160ms;
+}
+
 section {
   background: var(--glass-bg);
   backdrop-filter: blur(24px);
@@ -463,6 +553,7 @@ section {
   border-radius: var(--radius);
   padding: 18px;
   box-shadow: var(--shadow-card), inset 0 1px 0 var(--glass-highlight);
+  transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease);
 }
 
 section h2 {
@@ -470,6 +561,7 @@ section h2 {
   align-items: center;
   gap: 7px;
   margin: 0 0 14px;
+  font-family: var(--font-display);
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -544,6 +636,7 @@ section h2::before {
   font-size: 0.82rem;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: var(--shadow-glow);
 }
 
 .severe-banner-button:hover {
@@ -623,6 +716,12 @@ section h2::before {
   gap: 16px;
   overflow-x: auto;
   padding-bottom: 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hourly-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .hourly-item {
@@ -706,12 +805,18 @@ section h2::before {
   width: 100%;
   background: none;
   border: none;
-  padding: 0;
-  margin: 0;
+  border-radius: 10px;
+  padding: 4px 6px;
+  margin: 0 -6px;
   font: inherit;
   color: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background 150ms var(--ease);
+}
+
+.daily-row:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .daily-day {
@@ -858,7 +963,7 @@ section h2::before {
 .fab {
   position: fixed;
   left: 50%;
-  bottom: 22px;
+  bottom: calc(22px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   display: flex;
   align-items: center;
@@ -874,6 +979,7 @@ section h2::before {
   cursor: pointer;
   box-shadow: var(--shadow-pop);
   z-index: 20;
+  animation: sw-rise 400ms var(--ease-spring) both;
 }
 
 .fab:active {
@@ -1172,6 +1278,7 @@ section h2::before {
   font-weight: 700;
   font-size: 0.94rem;
   cursor: pointer;
+  box-shadow: var(--shadow-glow);
 }
 
 .send-button:hover:not(:disabled) {
@@ -1467,6 +1574,7 @@ section h2::before {
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card);
 }
 
 .radar-map {
@@ -1560,6 +1668,9 @@ section h2::before {
 
 .outlook-map-wrap {
   position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .outlook-legend {
@@ -1635,10 +1746,12 @@ section h2::before {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 32px 26px;
-  box-shadow: var(--shadow-pop);
+  box-shadow: var(--shadow-pop), inset 0 1px 0 var(--glass-highlight);
+  animation: sw-rise 500ms var(--ease) both;
 }
 
 .auth-logo {
+  position: relative;
   width: 56px;
   height: 56px;
   object-fit: contain;
@@ -1648,9 +1761,10 @@ section h2::before {
 
 .auth-card h1 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 
 .auth-subtitle {
@@ -1675,6 +1789,7 @@ section h2::before {
   font-size: 0.92rem;
   cursor: pointer;
   margin-top: 4px;
+  box-shadow: var(--shadow-glow);
 }
 
 .auth-submit:disabled {

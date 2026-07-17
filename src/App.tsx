@@ -191,6 +191,7 @@ export default function App() {
   }
 
   const isOwner = user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase();
+  const isNight = snapshot ? !snapshot.current.isDay : false;
 
   if (authLoading) {
     return (
@@ -207,7 +208,10 @@ export default function App() {
   }
 
   return (
-    <div className="app-bg" style={{ backgroundImage: `url(${background})` }}>
+    <div
+      className={`app-bg${isNight ? ' app-bg-night' : ''}`}
+      style={{ backgroundImage: `url(${background})` }}
+    >
       <div className="app">
         <header className="app-header">
           <div className="app-title">
