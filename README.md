@@ -16,11 +16,9 @@ the next chance of severe weather, and sending customized alerts to friends.
   and send alerts for whichever one is active.
 - **Real-time updates** — forecast, radar, and outlook data all auto-refresh in the background
   (and whenever you return to the tab).
-- **Minute-by-minute rain nowcast** — a bar-chart card (like Apple Weather's) showing whether
-  rain is imminent, sourced from live radar: it samples the actual pixel under your coordinates
-  across the most recent radar frame and RainViewer's short-term nowcast frames to say "Rain
-  is expected to start in N min" with a ramping intensity chart. Falls back to a smoothed
-  estimate from the hourly forecast if live radar sampling isn't available. Backed by an
+- **Short-term rain nowcast** — a bar-chart card (like Apple Weather's) showing whether rain is
+  imminent, built entirely from the National Weather Service's own hourly forecast rain chance
+  to say "Rain is expected to start in N min" with a ramping intensity chart. Backed by an
   optional push notification (delivered through a service worker so it actually arrives on
   iOS home-screen installs) — every signed-in user gets a one-tap prompt on the Forecast tab to
   turn this on for their own location, no backend needed. A "Test alert" button next to the

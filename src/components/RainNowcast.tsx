@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { HourlyPoint, Location } from '../types';
-import {
-  buildRadarNowcast,
-  buildHourlyNowcast,
-  summarizeNowcast,
-  type NowcastPoint,
-  type NowcastState,
-} from '../utils/nowcast';
+import { buildNwsNowcast, summarizeNowcast, type NowcastPoint, type NowcastState } from '../utils/nowcast';
 
 interface Props {
   location: Location;
@@ -21,32 +15,16 @@ function minuteLabel(minutes: number): string {
 
 export default function RainNowcast({ location, hourly, onSummary }: Props) {
   const [points, setPoints] = useState<NowcastPoint[] | null>(null);
-  const [source, setSource] = useState<'radar' | 'hourly'>('radar');
   const prevLocationId = useRef(location.id);
 
   useEffect(() => {
-    let cancelled = false;
     if (prevLocationId.current !== location.id) {
       prevLocationId.current = location.id;
       setPoints(null);
     }
-    buildRadarNowcast(location)
-      .then((pts) => {
-        if (cancelled) return;
-        setPoints(pts);
-        setSource('radar');
-        onSummary?.(summarizeNowcast(pts), location.id);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        const pts = buildHourlyNowcast(hourly);
-        setPoints(pts);
-        setSource('hourly');
-        onSummary?.(summarizeNowcast(pts), location.id);
-      });
-    return () => {
-      cancelled = true;
-    };
+    const pts = buildNwsNowcast(hourly);
+    setPoints(pts);
+    onSummary?.(summarizeNowcast(pts), location.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.id, hourly]);
 
@@ -87,11 +65,6 @@ export default function RainNowcast({ location, hourly, onSummary }: Props) {
           </div>
         ))}
       </div>
-      {source === 'hourly' && (
-        <p className="nowcast-caption">
-          Live radar wasn't available, so this is estimated from the hourly forecast instead.
-        </p>
-      )}
     </section>
   );
 }
