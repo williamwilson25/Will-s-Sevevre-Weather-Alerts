@@ -31,7 +31,9 @@ the next chance of severe weather, and sending customized alerts to friends.
   risk score derived from forecasted weather codes (thunderstorms, hail), wind gusts, and
   precipitation probability. A banner surfaces the next day severe weather is expected. Tap
   a day to expand it for a tonight summary (low temp, wind speed/direction, gusts).
-- **Live storm radar** — News 9's live radar, embedded right in the app.
+- **Live storm radar** — animated precipitation radar (RainViewer) on our own Leaflet map,
+  centered on your location with play/scrub controls. Rendered as real map tiles rather than
+  an embedded third-party page, so it isn't at the mercy of another site blocking embedding.
 - **Regional storm outlook** — NOAA Storm Prediction Center's Day 1–3 categorical convective
   outlook (Marginal/Slight/Enhanced/Moderate/High risk polygons), continental US.
 - **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert

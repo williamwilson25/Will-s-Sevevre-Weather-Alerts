@@ -23,7 +23,7 @@ import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
-import ExternalRadar from './components/ExternalRadar';
+import RadarMap from './components/RadarMap';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
@@ -350,11 +350,7 @@ export default function App() {
 
               {tab === 'radar' && (
                 <div className="radar-view">
-                  <ExternalRadar
-                    url="https://www.news9.com/nextgen-live-radar"
-                    label="LIVE"
-                    title="Live storm radar"
-                  />
+                  <RadarMap location={snapshot.location} />
                 </div>
               )}
 
