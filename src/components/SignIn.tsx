@@ -104,6 +104,7 @@ export default function SignIn() {
         <div className="auth-card">
           <img src={logo} alt="" className="auth-logo" />
           <h1>Will's Severe Weather Alerts</h1>
+          <p className="app-tagline">Fast. Trusted. Local.</p>
           <p className="auth-subtitle">
             {mode === 'signin' ? 'Sign in to continue' : 'Create an account to continue'}
           </p>

@@ -159,6 +159,15 @@ button:active:not(:disabled) {
   line-height: 1.2;
 }
 
+.app-tagline {
+  margin: 2px 0 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
 .location-search {
   position: relative;
   min-width: 220px;
@@ -1585,6 +1594,13 @@ section h2::before {
   text-align: center;
   font-size: 0.74rem;
   color: var(--text-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-footer p {
+  margin: 0;
 }
 
 /* Loading skeleton */

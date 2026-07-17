@@ -264,7 +264,10 @@ export default function App() {
         <header className="app-header">
           <div className="app-title">
             <img src={logo} alt="" className="app-logo" />
-            <h1>Will's Severe Weather Alerts</h1>
+            <div>
+              <h1>Will's Severe Weather Alerts</h1>
+              <p className="app-tagline">Fast. Trusted. Local.</p>
+            </div>
           </div>
           <LocationSearch onSelect={handleAddLocation} />
         </header>
@@ -392,8 +395,19 @@ export default function App() {
             )}
 
             <footer className="app-footer">
-              Weather data from Open-Meteo. Alerts are sent through your own Messages app — this
-              app never stores your friends' data outside this browser.
+              <p>
+                Forecast: NOAA GFS/HRRR via Open-Meteo · Radar: RainViewer · Outlook: NOAA Storm
+                Prediction Center.
+              </p>
+              <p>
+                Will's Severe Weather Alerts is an independent local project, not an official
+                National Weather Service product — always follow official NWS warnings and local
+                emergency guidance during severe weather.
+              </p>
+              <p>
+                Alerts are sent through your own Messages app; friend data never leaves this
+                browser.
+              </p>
             </footer>
           </>
         )}
