@@ -26,8 +26,11 @@ the next chance of severe weather, and sending customized alerts to friends.
   turn this on for their own location, no backend needed. A "Test alert" button next to the
   current-conditions card lets you confirm notifications work without waiting for real rain.
 - **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,
-  UV index, pressure, visibility, dew point, sunrise, and sunset.
-- **Official Will's Forecast** — the app's primary multi-day forecast, sourced directly from
+  pressure, visibility, dew point, sunrise, and sunset, sourced from the nearest live NWS
+  observation station (not a forecast estimate — an actual reading, updated as often as the
+  station reports). No UV index: NWS doesn't publish one, so rather than show a fake number the
+  app just leaves it out.
+- **Will's Official Forecast** — the app's primary multi-day forecast, sourced directly from
   the National Weather Service office responsible for your location (Norman, OK for this app's
   Great Plains focus) via NWS's own point-forecast API — the same human-written day/night
   forecast periods, icons, temperatures, and full forecast discussion text NWS itself
@@ -74,11 +77,16 @@ Then open the printed local URL. Build for production with `npm run build`.
 
 ## Stack
 
-Vite + React + TypeScript, weather data from [Open-Meteo](https://open-meteo.com/) (free,
-keyless), sourced from NOAA's GFS/HRRR model blend for better short-term US severe-weather
-accuracy than Open-Meteo's default multi-country blend. Firebase Authentication handles
-sign-in, and Cloud Firestore stores one small
-`subscribers/{uid}` record per signed-up user (email, phone, location) so the owner can see
-who's signed up — see `firestore.rules` for the exact access rules (each user can only write
-their own record; only the owner can read everyone's). Everything else (friends list, alert
-history, saved locations, Discord webhook) stays in `localStorage` on the owner's device.
+Vite + React + TypeScript. All weather data — current conditions, hourly and multi-day forecast,
+severe weather risk scoring, active alerts, and the primary forecast text — comes from the
+National Weather Service's public API (api.weather.gov), free and keyless: current conditions
+from the nearest live observation station, forecasts from the NWS office responsible for each
+location (Norman/OUN for this app's Great Plains focus). Live radar is RainViewer, rendered on
+our own Leaflet map. The only non-NWS call is Open-Meteo's free geocoding search, used purely to
+turn a typed city name into coordinates — no weather data comes from it. Sunrise/sunset are
+computed locally (NWS doesn't publish them) via the standard solar-position algorithm, accurate
+to within about a quarter hour. Firebase Authentication handles sign-in, and Cloud Firestore
+stores one small `subscribers/{uid}` record per signed-up user (email, phone, location) so the
+owner can see who's signed up — see `firestore.rules` for the exact access rules (each user can
+only write their own record; only the owner can read everyone's). Everything else (friends list,
+alert history, saved locations, Discord webhook) stays in `localStorage` on the owner's device.

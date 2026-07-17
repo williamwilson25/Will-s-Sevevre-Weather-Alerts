@@ -35,7 +35,7 @@ export default function NwsForecastCard({ location }: Props) {
 
   return (
     <section className="nws-forecast">
-      <h2>Official Will's Forecast</h2>
+      <h2>Will's Official Forecast</h2>
       <p className="nws-forecast-office">National Weather Service — {data.officeName}</p>
       <ul className="nws-forecast-list">
         {data.periods.slice(0, 14).map((period) => {

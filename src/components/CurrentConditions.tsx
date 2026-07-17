@@ -11,7 +11,6 @@ import {
   EyeIcon,
   SunriseIcon,
   SunsetIcon,
-  SunIcon,
   ThermometerIcon,
   BellAlertIcon,
 } from './icons';
@@ -120,11 +119,6 @@ export default function CurrentConditions({
             <WindIcon size={14} className="condition-icon" />
             <span className="condition-label">Gusts</span>
             <span className="condition-value">{Math.round(current.windGusts)} mph</span>
-          </div>
-          <div className="condition-cell">
-            <SunIcon size={14} className="condition-icon" />
-            <span className="condition-label">UV index</span>
-            <span className="condition-value">{Math.round(nowHour?.uvIndex ?? 0)}</span>
           </div>
           <div className="condition-cell">
             <GaugeIcon size={14} className="condition-icon" />

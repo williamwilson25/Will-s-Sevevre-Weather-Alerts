@@ -6,9 +6,11 @@ import type {
   WeatherSnapshot,
 } from '../types';
 import { assessDailyRisk } from '../utils/severity';
+import { mapNwsTextToWeatherCode } from '../utils/nwsWeatherCode';
+import { computeSunTimes } from '../utils/sunTimes';
 
 const GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search';
-const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
+const NWS_HEADERS = { Accept: 'application/geo+json' };
 
 interface GeocodeResult {
   id: number;
@@ -20,6 +22,9 @@ interface GeocodeResult {
   timezone: string;
 }
 
+// Location search has no NWS equivalent (they don't do geocoding) — this stays
+// on Open-Meteo's free keyless geocoding API purely to turn a typed city name
+// into coordinates; no weather data comes from this call.
 export async function searchLocations(query: string): Promise<Location[]> {
   const trimmed = query.trim();
   if (trimmed.length < 2) return [];
@@ -46,111 +51,235 @@ export async function searchLocations(query: string): Promise<Location[]> {
   }));
 }
 
-export async function fetchWeather(location: Location): Promise<WeatherSnapshot> {
-  const url = new URL(FORECAST_URL);
-  url.searchParams.set('latitude', String(location.latitude));
-  url.searchParams.set('longitude', String(location.longitude));
-  url.searchParams.set('timezone', location.timezone || 'auto');
-  url.searchParams.set(
-    'current',
-    [
-      'temperature_2m',
-      'apparent_temperature',
-      'relative_humidity_2m',
-      'wind_speed_10m',
-      'wind_gusts_10m',
-      'wind_direction_10m',
-      'precipitation',
-      'weather_code',
-      'is_day',
-      'surface_pressure',
-    ].join(','),
-  );
-  url.searchParams.set(
-    'hourly',
-    [
-      'temperature_2m',
-      'precipitation_probability',
-      'weather_code',
-      'wind_gusts_10m',
-      'uv_index',
-      'visibility',
-      'dew_point_2m',
-    ].join(','),
-  );
-  url.searchParams.set(
-    'daily',
-    [
-      'weather_code',
-      'temperature_2m_max',
-      'temperature_2m_min',
-      'precipitation_probability_max',
-      'wind_speed_10m_max',
-      'wind_gusts_10m_max',
-      'wind_direction_10m_dominant',
-      'uv_index_max',
-      'sunrise',
-      'sunset',
-    ].join(','),
-  );
-  url.searchParams.set('forecast_days', '7');
-  url.searchParams.set('wind_speed_unit', 'mph');
-  url.searchParams.set('temperature_unit', 'fahrenheit');
-  url.searchParams.set('precipitation_unit', 'inch');
-  // NOAA GFS blended with HRRR (their storm-scale, 3km convective model) instead of
-  // Open-Meteo's default multi-country blend — HRRR is what NWS itself uses for
-  // short-term severe weather over the US, and "seamless" falls back to plain GFS
-  // for the outer forecast days and for locations outside HRRR's coverage.
-  url.searchParams.set('models', 'gfs_seamless');
+function celsiusToFahrenheit(c: number): number {
+  return (c * 9) / 5 + 32;
+}
 
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`Weather fetch failed (${res.status})`);
+function kmhToMph(kmh: number): number {
+  return kmh / 1.60934;
+}
+
+function paToHpa(pa: number): number {
+  return pa / 100;
+}
+
+function parseWindMph(text: string | undefined): number {
+  if (!text) return 0;
+  const matches = text.match(/\d+/g);
+  if (!matches) return 0;
+  return Math.max(...matches.map(Number));
+}
+
+function parseGustMph(detailedForecast: string | undefined): number | null {
+  if (!detailedForecast) return null;
+  const match = detailedForecast.match(/gusts?\s*(?:as high as|up to|to)?\s*(\d+)\s*mph/i);
+  return match ? Number(match[1]) : null;
+}
+
+interface NwsPointMeta {
+  gridId: string;
+  forecast: string;
+  forecastHourly: string;
+  observationStations: string;
+  timezone: string;
+}
+
+async function fetchPointMeta(location: Location): Promise<NwsPointMeta> {
+  const res = await fetch(
+    `https://api.weather.gov/points/${location.latitude},${location.longitude}`,
+    { headers: NWS_HEADERS },
+  );
+  if (!res.ok) throw new Error(`NWS point lookup failed (${res.status})`);
   const data = await res.json();
+  const p = data.properties ?? {};
+  if (!p.forecast || !p.forecastHourly || !p.observationStations) {
+    throw new Error('NWS has no forecast coverage for this location');
+  }
+  return {
+    gridId: p.gridId ?? '',
+    forecast: p.forecast,
+    forecastHourly: p.forecastHourly,
+    observationStations: p.observationStations,
+    timezone: p.timeZone ?? location.timezone,
+  };
+}
+
+interface ObservedExtras {
+  visibilityMeters: number | null;
+  dewPointF: number | null;
+}
+
+async function fetchCurrentConditions(
+  observationStationsUrl: string,
+): Promise<{ current: CurrentConditions; extras: ObservedExtras }> {
+  const stationsRes = await fetch(observationStationsUrl, { headers: NWS_HEADERS });
+  if (!stationsRes.ok) throw new Error(`NWS station lookup failed (${stationsRes.status})`);
+  const stationsData = await stationsRes.json();
+  const stationId: string | undefined = stationsData.features?.[0]?.properties?.stationIdentifier;
+  if (!stationId) throw new Error('No NWS observation station found nearby');
+
+  const obsRes = await fetch(`https://api.weather.gov/stations/${stationId}/observations/latest`, {
+    headers: NWS_HEADERS,
+  });
+  if (!obsRes.ok) throw new Error(`NWS observation fetch failed (${obsRes.status})`);
+  const obsData = await obsRes.json();
+  const p = obsData.properties ?? {};
+
+  const temperatureC: number = p.temperature?.value ?? 0;
+  const heatIndexC: number | null = p.heatIndex?.value ?? null;
+  const windChillC: number | null = p.windChill?.value ?? null;
+  const apparentC = heatIndexC ?? windChillC ?? temperatureC;
+  const pressurePa: number | null = p.barometricPressure?.value ?? p.seaLevelPressure?.value ?? null;
+  const precipMm: number | null = p.precipitationLastHour?.value ?? null;
+  const visibilityM: number | null = p.visibility?.value ?? null;
+  const dewpointC: number | null = p.dewpoint?.value ?? null;
 
   const current: CurrentConditions = {
-    temperature: data.current.temperature_2m,
-    apparentTemperature: data.current.apparent_temperature,
-    humidity: data.current.relative_humidity_2m,
-    windSpeed: data.current.wind_speed_10m,
-    windGusts: data.current.wind_gusts_10m,
-    windDirection: data.current.wind_direction_10m,
-    precipitation: data.current.precipitation,
-    weatherCode: data.current.weather_code,
-    isDay: data.current.is_day === 1,
-    time: data.current.time,
-    pressure: data.current.surface_pressure,
+    temperature: celsiusToFahrenheit(temperatureC),
+    apparentTemperature: celsiusToFahrenheit(apparentC),
+    humidity: p.relativeHumidity?.value ?? 0,
+    windSpeed: p.windSpeed?.value != null ? kmhToMph(p.windSpeed.value) : 0,
+    windGusts: p.windGust?.value != null ? kmhToMph(p.windGust.value) : 0,
+    windDirection: p.windDirection?.value ?? 0,
+    precipitation: precipMm != null ? precipMm / 25.4 : 0,
+    weatherCode: mapNwsTextToWeatherCode(p.textDescription ?? ''),
+    isDay: !String(p.icon ?? '').includes('/night/'),
+    time: p.timestamp ?? new Date().toISOString(),
+    pressure: pressurePa != null ? paToHpa(pressurePa) : 1013,
   };
 
-  const hourly: HourlyPoint[] = data.hourly.time
-    .map((time: string, i: number) => ({
-      time,
-      temperature: data.hourly.temperature_2m[i],
-      precipitationProbability: data.hourly.precipitation_probability[i],
-      weatherCode: data.hourly.weather_code[i],
-      windGusts: data.hourly.wind_gusts_10m[i],
-      uvIndex: data.hourly.uv_index[i],
-      visibility: data.hourly.visibility[i],
-      dewPoint: data.hourly.dew_point_2m[i],
-    }))
-    .filter((point: HourlyPoint) => new Date(point.time).getTime() >= Date.now() - 60 * 60 * 1000)
-    .slice(0, 24);
+  return {
+    current,
+    extras: {
+      visibilityMeters: visibilityM,
+      dewPointF: dewpointC != null ? celsiusToFahrenheit(dewpointC) : null,
+    },
+  };
+}
 
-  const daily: DailyForecast[] = data.daily.time.map((date: string, i: number) => {
-    const base = {
-      date,
-      weatherCode: data.daily.weather_code[i],
-      tempMax: data.daily.temperature_2m_max[i],
-      tempMin: data.daily.temperature_2m_min[i],
-      precipitationProbability: data.daily.precipitation_probability_max[i],
-      windSpeedMax: data.daily.wind_speed_10m_max[i],
-      windGustsMax: data.daily.wind_gusts_10m_max[i],
-      windDirection: data.daily.wind_direction_10m_dominant[i],
-      uvIndexMax: data.daily.uv_index_max[i],
-      sunrise: data.daily.sunrise[i],
-      sunset: data.daily.sunset[i],
+async function fetchHourly(forecastHourlyUrl: string): Promise<HourlyPoint[]> {
+  const res = await fetch(forecastHourlyUrl, { headers: NWS_HEADERS });
+  if (!res.ok) throw new Error(`NWS hourly forecast fetch failed (${res.status})`);
+  const data = await res.json();
+  const periods: unknown[] = data.properties?.periods ?? [];
+
+  return periods
+    .map((raw) => {
+      const p = raw as Record<string, unknown>;
+      const pop = p.probabilityOfPrecipitation as { value?: number } | undefined;
+      const dewpoint = p.dewpoint as { value?: number } | undefined;
+      const point: HourlyPoint = {
+        time: String(p.startTime ?? ''),
+        temperature: Number(p.temperature ?? 0),
+        precipitationProbability: pop?.value ?? 0,
+        weatherCode: mapNwsTextToWeatherCode(String(p.shortForecast ?? '')),
+        windGusts: parseGustMph(String(p.detailedForecast ?? '')) ?? parseWindMph(String(p.windSpeed ?? '')),
+        uvIndex: 0,
+        visibility: 0,
+        dewPoint: dewpoint?.value != null ? celsiusToFahrenheit(dewpoint.value) : 0,
+      };
+      return point;
+    })
+    .filter((point) => point.time)
+    .slice(0, 24);
+}
+
+interface NwsForecastPeriod {
+  startTime: string;
+  isDaytime: boolean;
+  temperature: number;
+  windSpeed: string;
+  windDirection: string;
+  shortForecast: string;
+  detailedForecast: string;
+  probabilityOfPrecipitation: number;
+}
+
+async function fetchDaily(forecastUrl: string, location: Location): Promise<DailyForecast[]> {
+  const res = await fetch(forecastUrl, { headers: NWS_HEADERS });
+  if (!res.ok) throw new Error(`NWS forecast fetch failed (${res.status})`);
+  const data = await res.json();
+  const rawPeriods: unknown[] = data.properties?.periods ?? [];
+
+  const periods: NwsForecastPeriod[] = rawPeriods.map((raw) => {
+    const p = raw as Record<string, unknown>;
+    const pop = p.probabilityOfPrecipitation as { value?: number } | undefined;
+    return {
+      startTime: String(p.startTime ?? ''),
+      isDaytime: Boolean(p.isDaytime),
+      temperature: Number(p.temperature ?? 0),
+      windSpeed: String(p.windSpeed ?? ''),
+      windDirection: String(p.windDirection ?? ''),
+      shortForecast: String(p.shortForecast ?? ''),
+      detailedForecast: String(p.detailedForecast ?? ''),
+      probabilityOfPrecipitation: pop?.value ?? 0,
     };
-    return { ...base, risk: assessDailyRisk(base) };
   });
+
+  const byDate = new Map<string, { day?: NwsForecastPeriod; night?: NwsForecastPeriod }>();
+  for (const period of periods) {
+    const date = period.startTime.slice(0, 10);
+    if (!date) continue;
+    const entry = byDate.get(date) ?? {};
+    if (period.isDaytime) entry.day = period;
+    else entry.night = period;
+    byDate.set(date, entry);
+  }
+
+  const windDirToDeg: Record<string, number> = {
+    N: 0, NNE: 22.5, NE: 45, ENE: 67.5, E: 90, ESE: 112.5, SE: 135, SSE: 157.5,
+    S: 180, SSW: 202.5, SW: 225, WSW: 247.5, W: 270, WNW: 292.5, NW: 315, NNW: 337.5,
+  };
+
+  return Array.from(byDate.entries())
+    .slice(0, 7)
+    .map(([date, { day, night }]) => {
+      const primary = day ?? night;
+      const tempMax = day?.temperature ?? night?.temperature ?? 0;
+      const tempMin = night?.temperature ?? day?.temperature ?? 0;
+      const windSpeedMax = Math.max(parseWindMph(day?.windSpeed), parseWindMph(night?.windSpeed));
+      const gustFromText = parseGustMph(day?.detailedForecast) ?? parseGustMph(night?.detailedForecast);
+      const precipitationProbability = Math.max(
+        day?.probabilityOfPrecipitation ?? 0,
+        night?.probabilityOfPrecipitation ?? 0,
+      );
+      const base = {
+        date,
+        weatherCode: mapNwsTextToWeatherCode(primary?.shortForecast ?? ''),
+        tempMax,
+        tempMin,
+        precipitationProbability,
+        windSpeedMax,
+        windGustsMax: gustFromText ?? windSpeedMax,
+        windDirection: windDirToDeg[day?.windDirection ?? night?.windDirection ?? 'N'] ?? 0,
+        uvIndexMax: 0,
+      };
+      const noon = new Date(`${date}T12:00:00`);
+      const { sunrise, sunset } = computeSunTimes(noon, location.latitude, location.longitude);
+      return {
+        ...base,
+        sunrise: sunrise.toISOString(),
+        sunset: sunset.toISOString(),
+        risk: assessDailyRisk(base),
+      };
+    });
+}
+
+export async function fetchWeather(location: Location): Promise<WeatherSnapshot> {
+  const point = await fetchPointMeta(location);
+
+  const [{ current, extras }, hourly, daily] = await Promise.all([
+    fetchCurrentConditions(point.observationStations),
+    fetchHourly(point.forecastHourly),
+    fetchDaily(point.forecast, location),
+  ]);
+
+  // The hourly forecast doesn't carry visibility/dew point — patch the "now"
+  // entry with the real station observation, which is more accurate anyway.
+  if (hourly[0]) {
+    if (extras.visibilityMeters != null) hourly[0].visibility = extras.visibilityMeters;
+    if (extras.dewPointF != null) hourly[0].dewPoint = extras.dewPointF;
+  }
 
   return { location, current, hourly, daily, fetchedAt: new Date().toISOString() };
 }
