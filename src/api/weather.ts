@@ -63,11 +63,20 @@ export async function fetchWeather(location: Location): Promise<WeatherSnapshot>
       'precipitation',
       'weather_code',
       'is_day',
+      'surface_pressure',
     ].join(','),
   );
   url.searchParams.set(
     'hourly',
-    ['temperature_2m', 'precipitation_probability', 'weather_code', 'wind_gusts_10m'].join(','),
+    [
+      'temperature_2m',
+      'precipitation_probability',
+      'weather_code',
+      'wind_gusts_10m',
+      'uv_index',
+      'visibility',
+      'dew_point_2m',
+    ].join(','),
   );
   url.searchParams.set(
     'daily',
@@ -79,6 +88,8 @@ export async function fetchWeather(location: Location): Promise<WeatherSnapshot>
       'wind_speed_10m_max',
       'wind_gusts_10m_max',
       'uv_index_max',
+      'sunrise',
+      'sunset',
     ].join(','),
   );
   url.searchParams.set('forecast_days', '7');
@@ -101,6 +112,7 @@ export async function fetchWeather(location: Location): Promise<WeatherSnapshot>
     weatherCode: data.current.weather_code,
     isDay: data.current.is_day === 1,
     time: data.current.time,
+    pressure: data.current.surface_pressure,
   };
 
   const hourly: HourlyPoint[] = data.hourly.time
@@ -110,6 +122,9 @@ export async function fetchWeather(location: Location): Promise<WeatherSnapshot>
       precipitationProbability: data.hourly.precipitation_probability[i],
       weatherCode: data.hourly.weather_code[i],
       windGusts: data.hourly.wind_gusts_10m[i],
+      uvIndex: data.hourly.uv_index[i],
+      visibility: data.hourly.visibility[i],
+      dewPoint: data.hourly.dew_point_2m[i],
     }))
     .filter((point: HourlyPoint) => new Date(point.time).getTime() >= Date.now() - 60 * 60 * 1000)
     .slice(0, 24);
@@ -124,6 +139,8 @@ export async function fetchWeather(location: Location): Promise<WeatherSnapshot>
       windSpeedMax: data.daily.wind_speed_10m_max[i],
       windGustsMax: data.daily.wind_gusts_10m_max[i],
       uvIndexMax: data.daily.uv_index_max[i],
+      sunrise: data.daily.sunrise[i],
+      sunset: data.daily.sunset[i],
     };
     return { ...base, risk: assessDailyRisk(base) };
   });

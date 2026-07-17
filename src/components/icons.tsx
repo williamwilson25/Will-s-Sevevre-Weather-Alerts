@@ -200,6 +200,109 @@ export function DropletIcon({ size = 24, className }: IconProps) {
   );
 }
 
+export function WindIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M3 8h11a2.5 2.5 0 1 0-2.5-2.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M3 12h14.5a2.75 2.75 0 1 1-2.75 2.75"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M3 16h9a2 2 0 1 1-2 2"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+export function GaugeIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 16a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" fill="none" />
+      <path d="M12 16l4-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <circle cx="12" cy="16" r="1.3" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function EyeIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.85" />
+    </svg>
+  );
+}
+
+export function SunriseIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 17a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" fill="none" />
+      <path d="M2 17h20" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path
+        d="M9 14.5l3-3 3 3"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <path d="M5.5 10.5l1.3 1.3M18.5 10.5l-1.3 1.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function SunsetIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 17a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" fill="none" />
+      <path d="M2 17h20" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path
+        d="M9 12.5l3 3 3-3"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <path d="M5.5 10.5l1.3 1.3M18.5 10.5l-1.3 1.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function ThermometerIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M12 3.5a2 2 0 0 0-2 2v8.6a3.6 3.6 0 1 0 4 0V5.5a2 2 0 0 0-2-2z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        fill="none"
+      />
+      <circle cx="12" cy="16.8" r="2" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function RefreshIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>

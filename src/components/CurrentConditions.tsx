@@ -3,7 +3,17 @@ import type { WeatherSnapshot } from '../types';
 import { describeWeatherCode } from '../utils/weatherCode';
 import { formatTimeAgo } from '../utils/time';
 import WeatherIcon from './WeatherIcon';
-import { DropletIcon, RefreshIcon } from './icons';
+import {
+  RefreshIcon,
+  DropletIcon,
+  WindIcon,
+  GaugeIcon,
+  EyeIcon,
+  SunriseIcon,
+  SunsetIcon,
+  SunIcon,
+  ThermometerIcon,
+} from './icons';
 
 interface Props {
   snapshot: WeatherSnapshot;
@@ -11,11 +21,20 @@ interface Props {
   onRefresh: () => void;
 }
 
+function formatClockTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
+function metersToMiles(m: number): number {
+  return m / 1609.34;
+}
+
 export default function CurrentConditions({ snapshot, refreshing, onRefresh }: Props) {
   const { current, location, daily, hourly, fetchedAt } = snapshot;
   const { label } = describeWeatherCode(current.weatherCode);
   const today = daily[0];
-  const rainChance = hourly[0]?.precipitationProbability ?? today?.precipitationProbability ?? 0;
+  const nowHour = hourly[0];
+  const rainChance = nowHour?.precipitationProbability ?? today?.precipitationProbability ?? 0;
 
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -24,49 +43,94 @@ export default function CurrentConditions({ snapshot, refreshing, onRefresh }: P
   }, []);
 
   return (
-    <section className="hero">
-      <div className="hero-location">
-        {location.name}
-        {location.admin1 ? `, ${location.admin1}` : ''}
-      </div>
-      <button type="button" className="hero-updated" onClick={onRefresh} disabled={refreshing}>
-        <RefreshIcon size={12} className={refreshing ? 'spin' : ''} />
-        {refreshing ? 'Updating…' : `Updated ${formatTimeAgo(fetchedAt)}`}
-      </button>
-      <div className="hero-icon">
-        <WeatherIcon code={current.weatherCode} isDay={current.isDay} size={88} />
-      </div>
-      <div className="hero-temp">{Math.round(current.temperature)}°</div>
-      <div className="hero-label">{label}</div>
-      {today && (
-        <div className="hero-hilo">
-          H:{Math.round(today.tempMax)}° L:{Math.round(today.tempMin)}°
+    <>
+      <section className="hero">
+        <div className="hero-location">
+          {location.name}
+          {location.admin1 ? `, ${location.admin1}` : ''}
         </div>
-      )}
-      <div className="hero-stats">
-        <div className="hero-stat">
-          <span className="hero-stat-label">
-            <DropletIcon size={11} /> Rain chance
-          </span>
-          <span className="hero-stat-value">{Math.round(rainChance)}%</span>
+        <button type="button" className="hero-updated" onClick={onRefresh} disabled={refreshing}>
+          <RefreshIcon size={12} className={refreshing ? 'spin' : ''} />
+          {refreshing ? 'Updating…' : `Updated ${formatTimeAgo(fetchedAt)}`}
+        </button>
+        <div className="hero-icon">
+          <WeatherIcon code={current.weatherCode} isDay={current.isDay} size={88} />
         </div>
-        <div className="hero-stat">
-          <span className="hero-stat-label">Feels like</span>
-          <span className="hero-stat-value">{Math.round(current.apparentTemperature)}°</span>
+        <div className="hero-temp">{Math.round(current.temperature)}°</div>
+        <div className="hero-label">{label}</div>
+        {today && (
+          <div className="hero-hilo">
+            H:{Math.round(today.tempMax)}° L:{Math.round(today.tempMin)}°
+          </div>
+        )}
+      </section>
+
+      <section className="conditions-card">
+        <h2>Current conditions</h2>
+        <div className="conditions-grid">
+          <div className="condition-cell">
+            <DropletIcon size={18} className="condition-icon" />
+            <span className="condition-label">Rain chance</span>
+            <span className="condition-value">{Math.round(rainChance)}%</span>
+          </div>
+          <div className="condition-cell">
+            <ThermometerIcon size={18} className="condition-icon" />
+            <span className="condition-label">Feels like</span>
+            <span className="condition-value">{Math.round(current.apparentTemperature)}°</span>
+          </div>
+          <div className="condition-cell">
+            <DropletIcon size={18} className="condition-icon" />
+            <span className="condition-label">Humidity</span>
+            <span className="condition-value">{Math.round(current.humidity)}%</span>
+          </div>
+          <div className="condition-cell">
+            <WindIcon size={18} className="condition-icon" />
+            <span className="condition-label">Wind</span>
+            <span className="condition-value">{Math.round(current.windSpeed)} mph</span>
+          </div>
+          <div className="condition-cell">
+            <WindIcon size={18} className="condition-icon" />
+            <span className="condition-label">Gusts</span>
+            <span className="condition-value">{Math.round(current.windGusts)} mph</span>
+          </div>
+          <div className="condition-cell">
+            <SunIcon size={18} className="condition-icon" />
+            <span className="condition-label">UV index</span>
+            <span className="condition-value">{Math.round(nowHour?.uvIndex ?? 0)}</span>
+          </div>
+          <div className="condition-cell">
+            <GaugeIcon size={18} className="condition-icon" />
+            <span className="condition-label">Pressure</span>
+            <span className="condition-value">{Math.round(current.pressure)} hPa</span>
+          </div>
+          <div className="condition-cell">
+            <EyeIcon size={18} className="condition-icon" />
+            <span className="condition-label">Visibility</span>
+            <span className="condition-value">
+              {Math.round(metersToMiles(nowHour?.visibility ?? 0))} mi
+            </span>
+          </div>
+          <div className="condition-cell">
+            <DropletIcon size={18} className="condition-icon" />
+            <span className="condition-label">Dew point</span>
+            <span className="condition-value">{Math.round(nowHour?.dewPoint ?? 0)}°</span>
+          </div>
+          {today && (
+            <>
+              <div className="condition-cell">
+                <SunriseIcon size={18} className="condition-icon" />
+                <span className="condition-label">Sunrise</span>
+                <span className="condition-value">{formatClockTime(today.sunrise)}</span>
+              </div>
+              <div className="condition-cell">
+                <SunsetIcon size={18} className="condition-icon" />
+                <span className="condition-label">Sunset</span>
+                <span className="condition-value">{formatClockTime(today.sunset)}</span>
+              </div>
+            </>
+          )}
         </div>
-        <div className="hero-stat">
-          <span className="hero-stat-label">Humidity</span>
-          <span className="hero-stat-value">{Math.round(current.humidity)}%</span>
-        </div>
-        <div className="hero-stat">
-          <span className="hero-stat-label">Wind</span>
-          <span className="hero-stat-value">{Math.round(current.windSpeed)} mph</span>
-        </div>
-        <div className="hero-stat">
-          <span className="hero-stat-label">Gusts</span>
-          <span className="hero-stat-value">{Math.round(current.windGusts)} mph</span>
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

@@ -19,6 +19,7 @@ export interface CurrentConditions {
   weatherCode: number;
   isDay: boolean;
   time: string;
+  pressure: number;
 }
 
 export interface HourlyPoint {
@@ -27,6 +28,9 @@ export interface HourlyPoint {
   precipitationProbability: number;
   weatherCode: number;
   windGusts: number;
+  uvIndex: number;
+  visibility: number;
+  dewPoint: number;
 }
 
 export interface DailyForecast {
@@ -38,6 +42,8 @@ export interface DailyForecast {
   windSpeedMax: number;
   windGustsMax: number;
   uvIndexMax: number;
+  sunrise: string;
+  sunset: string;
   risk: SevereRisk;
 }
 

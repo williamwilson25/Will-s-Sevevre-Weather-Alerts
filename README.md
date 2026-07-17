@@ -13,7 +13,8 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Real-time updates** — forecast, radar, and outlook data all auto-refresh in the background
   (and whenever you return to the tab), plus a "Rain expected to start soon" banner that fires
   the moment the hourly data shows a jump in rain chance, with an optional browser notification.
-- **Current conditions & 24-hour outlook** — temperature, feels-like, humidity, wind, gusts.
+- **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,
+  UV index, pressure, visibility, dew point, sunrise, and sunset.
 - **7-day forecast with severe weather risk** — each day gets a Low/Moderate/High/Severe
   risk score derived from forecasted weather codes (thunderstorms, hail), wind gusts, and
   precipitation probability. A banner surfaces the next day severe weather is expected.
