@@ -27,19 +27,20 @@ the next chance of severe weather, and sending customized alerts to friends.
   current-conditions card lets you confirm notifications work without waiting for real rain.
 - **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,
   UV index, pressure, visibility, dew point, sunrise, and sunset.
-- **Official NWS forecast** — the actual human-written forecast text from the National Weather
-  Service office responsible for your location (Norman, OK for this app's Great Plains focus),
-  pulled from the NWS's own point-forecast API — day/night periods with official icons,
-  temperatures, and the full forecast discussion text, expandable per period.
+- **Official Will's Forecast** — the app's primary multi-day forecast, sourced directly from
+  the National Weather Service office responsible for your location (Norman, OK for this app's
+  Great Plains focus) via NWS's own point-forecast API — the same human-written day/night
+  forecast periods, icons, temperatures, and full forecast discussion text NWS itself
+  publishes, expandable per period and labeled with the issuing office.
 - **Active NWS alerts** — official Tornado Warnings, Severe Thunderstorm Warnings, Flash Flood
   Warnings, and more, pulled directly from the National Weather Service's own alerts feed for
   your exact location and shown the moment they're issued. Severity-colored, expandable for the
   full instructions (e.g. "TAKE COVER NOW"), and hidden entirely when nothing's active so it
   never adds clutter.
-- **7-day forecast with severe weather risk** — each day gets a Low/Moderate/High/Severe
-  risk score derived from forecasted weather codes (thunderstorms, hail), wind gusts, and
-  precipitation probability. A banner surfaces the next day severe weather is expected. Tap
-  a day to expand it for a tonight summary (low temp, wind speed/direction, gusts).
+- **Severe weather risk scoring** — each day also gets a Low/Moderate/High/Severe risk score
+  derived from forecasted weather codes (thunderstorms, hail), wind gusts, and precipitation
+  probability, surfaced as a banner for the next day severe weather is expected and used to
+  pick which day the one-tap "Alert friends" action targets.
 - **Live storm radar** — animated precipitation radar (RainViewer) on our own Leaflet map,
   centered on your location with play/scrub controls. Rendered as real map tiles rather than
   an embedded third-party page, so it isn't at the mercy of another site blocking embedding.

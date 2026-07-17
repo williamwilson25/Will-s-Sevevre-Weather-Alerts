@@ -11,7 +11,6 @@ import LocationSearch from './components/LocationSearch';
 import LocationChips from './components/LocationChips';
 import CurrentConditions from './components/CurrentConditions';
 import HourlyStrip from './components/HourlyStrip';
-import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainNowcast from './components/RainNowcast';
 import ActiveAlerts from './components/ActiveAlerts';
@@ -395,10 +394,6 @@ export default function App() {
                     onAlertDay={isOwner ? handleAlertDay : undefined}
                   />
                   <HourlyStrip hourly={snapshot.hourly} />
-                  <DailyForecastList
-                    daily={snapshot.daily}
-                    onAlertDay={isOwner ? handleAlertDay : undefined}
-                  />
                   <NwsForecastCard location={snapshot.location} />
                 </div>
               )}
