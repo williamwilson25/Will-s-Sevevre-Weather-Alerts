@@ -2,9 +2,10 @@ interface Props {
   url: string;
   label: string;
   title: string;
+  source: string;
 }
 
-export default function ExternalRadar({ url, label, title }: Props) {
+export default function ExternalRadar({ url, label, title, source }: Props) {
   return (
     <section className="radar-section">
       <div className="radar-header">
@@ -23,7 +24,7 @@ export default function ExternalRadar({ url, label, title }: Props) {
       </div>
 
       <p className="radar-caption">
-        Live radar from News 9. If it doesn't load,{' '}
+        Live radar from {source}. If it doesn't load,{' '}
         <a href={url} target="_blank" rel="noreferrer">
           open it directly
         </a>

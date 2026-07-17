@@ -25,7 +25,7 @@ import AlertComposer from './components/AlertComposer';
 import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
-import RadarMap from './components/RadarMap';
+import ExternalRadar from './components/ExternalRadar';
 import StormOutlookMap from './components/StormOutlookMap';
 import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
 import logo from './assets/logo.png';
@@ -80,7 +80,10 @@ export default function App() {
     typeof Notification !== 'undefined' && Notification.permission === 'denied',
   );
 
-  const [nowcastSummary, setNowcastSummary] = useState<NowcastState | null>(null);
+  const [nowcastSummary, setNowcastSummary] = useState<{
+    summary: NowcastState;
+    locationId: string;
+  } | null>(null);
   const [snapshot, setSnapshot] = useState<WeatherSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -240,24 +243,30 @@ export default function App() {
   useEffect(() => {
     if (!nowcastSummary || !notifyRain) return;
     if (!notifySupported || Notification.permission !== 'granted') return;
+    // Guard against stale data from a just-departed location: RainNowcast's
+    // fetch for the new location is async, so this effect can still fire once
+    // with a summary that belongs to the previous location.id.
+    if (nowcastSummary.locationId !== location.id) return;
 
-    if (nowcastSummary.kind === 'clear') {
+    const { summary } = nowcastSummary;
+
+    if (summary.kind === 'clear') {
       // rain has passed (or never came) — clear so the next rain event notifies again
       if (lastNotifiedKey.startsWith(`${location.id}:`)) setLastNotifiedKey('');
       return;
     }
 
-    const key = `${location.id}:${nowcastSummary.kind}`;
+    const key = `${location.id}:${summary.kind}`;
     if (key === lastNotifiedKey) return;
 
-    if (nowcastSummary.kind === 'raining') {
+    if (summary.kind === 'raining') {
       showNotification('Rain is starting', {
         body: `Rain is happening now in ${location.name}.`,
         icon: logo,
       });
     } else {
       showNotification('Rain expected soon', {
-        body: `Rain is expected to start in about ${nowcastSummary.minutesAway} min in ${location.name}.`,
+        body: `Rain is expected to start in about ${summary.minutesAway} min in ${location.name}.`,
         icon: logo,
       });
     }
@@ -387,7 +396,7 @@ export default function App() {
                   <RainNowcast
                     location={snapshot.location}
                     hourly={snapshot.hourly}
-                    onSummary={setNowcastSummary}
+                    onSummary={(summary, locationId) => setNowcastSummary({ summary, locationId })}
                   />
                   <SevereWeatherBanner
                     daily={snapshot.daily}
@@ -400,7 +409,12 @@ export default function App() {
 
               {tab === 'radar' && (
                 <div className={`radar-view tab-slide-${slideDir}`} key={tab}>
-                  <RadarMap location={snapshot.location} />
+                  <ExternalRadar
+                    url="https://radar.weather.gov/region/conus-large/standard"
+                    title="Live Storm Radar"
+                    label="LIVE"
+                    source="the National Weather Service"
+                  />
                 </div>
               )}
 
@@ -443,8 +457,8 @@ export default function App() {
 
             <footer className="app-footer">
               <p>
-                Forecast: NOAA GFS/HRRR via Open-Meteo · Radar: RainViewer · Outlook: NOAA Storm
-                Prediction Center.
+                Forecast &amp; current conditions: National Weather Service · Radar: NWS · Outlook:
+                NOAA Storm Prediction Center.
               </p>
               <p>
                 Will's Severe Weather Alerts is an independent local project, not an official

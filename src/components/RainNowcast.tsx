@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { HourlyPoint, Location } from '../types';
 import {
   buildRadarNowcast,
@@ -11,7 +11,7 @@ import {
 interface Props {
   location: Location;
   hourly: HourlyPoint[];
-  onSummary?: (summary: NowcastState) => void;
+  onSummary?: (summary: NowcastState, locationId: string) => void;
 }
 
 function minuteLabel(minutes: number): string {
@@ -22,22 +22,27 @@ function minuteLabel(minutes: number): string {
 export default function RainNowcast({ location, hourly, onSummary }: Props) {
   const [points, setPoints] = useState<NowcastPoint[] | null>(null);
   const [source, setSource] = useState<'radar' | 'hourly'>('radar');
+  const prevLocationId = useRef(location.id);
 
   useEffect(() => {
     let cancelled = false;
+    if (prevLocationId.current !== location.id) {
+      prevLocationId.current = location.id;
+      setPoints(null);
+    }
     buildRadarNowcast(location)
       .then((pts) => {
         if (cancelled) return;
         setPoints(pts);
         setSource('radar');
-        onSummary?.(summarizeNowcast(pts));
+        onSummary?.(summarizeNowcast(pts), location.id);
       })
       .catch(() => {
         if (cancelled) return;
         const pts = buildHourlyNowcast(hourly);
         setPoints(pts);
         setSource('hourly');
-        onSummary?.(summarizeNowcast(pts));
+        onSummary?.(summarizeNowcast(pts), location.id);
       });
     return () => {
       cancelled = true;
