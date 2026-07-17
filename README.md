@@ -17,7 +17,9 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Real-time updates** — forecast, radar, and outlook data all auto-refresh in the background
   (and whenever you return to the tab), plus a "Rain expected to start soon" banner that fires
   the moment the hourly data shows a jump in rain chance, with an optional push notification
-  (delivered through a service worker so it actually arrives on iOS home-screen installs). A
+  (delivered through a service worker so it actually arrives on iOS home-screen installs). Every
+  signed-in user gets a one-tap prompt on the Forecast tab to turn this on for their own
+  location — no backend needed, it just runs locally on their device while the app is open. A
   "Test alert" button next to the current-conditions card lets you confirm notifications work
   without waiting for real rain.
 - **Current conditions** — a dedicated card with rain chance, feels-like, humidity, wind, gusts,

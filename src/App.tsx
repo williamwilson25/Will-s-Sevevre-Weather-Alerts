@@ -13,6 +13,7 @@ import HourlyStrip from './components/HourlyStrip';
 import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import RainSoonBanner from './components/RainSoonBanner';
+import EnableNotificationsBanner from './components/EnableNotificationsBanner';
 import { detectRainOnset } from './utils/rainOnset';
 import { showNotification } from './utils/notify';
 import { watchSubscribers } from './api/subscribers';
@@ -59,6 +60,10 @@ export default function App() {
   const [notifyRain, setNotifyRain] = useLocalStorage<boolean>('sw_notify_rain', false);
   const [lastNotifiedKey, setLastNotifiedKey] = useLocalStorage<string>('sw_last_rain_notify', '');
   const [dismissedOnsetKey, setDismissedOnsetKey] = useState<string | null>(null);
+  const [notifyPromptDismissed, setNotifyPromptDismissed] = useLocalStorage<boolean>(
+    'sw_notify_prompt_dismissed',
+    false,
+  );
   const [notifyDenied, setNotifyDenied] = useState(
     typeof Notification !== 'undefined' && Notification.permission === 'denied',
   );
@@ -307,6 +312,16 @@ export default function App() {
             <main>
               {tab === 'forecast' && (
                 <div className="forecast-view">
+                  {!rainOnset &&
+                    notifySupported &&
+                    !notifyDenied &&
+                    !notifyRain &&
+                    !notifyPromptDismissed && (
+                      <EnableNotificationsBanner
+                        onEnable={handleEnableRainNotify}
+                        onDismiss={() => setNotifyPromptDismissed(true)}
+                      />
+                    )}
                   {rainOnset && onsetKey !== dismissedOnsetKey && (
                     <RainSoonBanner
                       onset={rainOnset}
