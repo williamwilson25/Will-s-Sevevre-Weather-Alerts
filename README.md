@@ -44,8 +44,9 @@ the next chance of severe weather, and sending customized alerts to friends.
   derived from forecasted weather codes (thunderstorms, hail), wind gusts, and precipitation
   probability, surfaced as a banner for the next day severe weather is expected and used to
   pick which day the one-tap "Alert friends" action targets.
-- **Live storm radar** — the National Weather Service's own CONUS radar mosaic
-  (radar.weather.gov), embedded directly, with a link to open it full-screen if it doesn't load.
+- **Live storm radar** — the National Weather Service's own radar loop for the Norman, OK
+  station (KTLX, radar.weather.gov), embedded directly, with a link to open it full-screen if
+  it doesn't load.
 - **Regional storm outlook** — NOAA Storm Prediction Center's Day 1–3 categorical convective
   outlook (Marginal/Slight/Enhanced/Moderate/High risk polygons), continental US.
 - **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert
@@ -81,7 +82,8 @@ severe weather risk scoring, active alerts, and the primary forecast text — co
 National Weather Service's public API (api.weather.gov), free and keyless: current conditions
 from the nearest live observation station, forecasts from the NWS office responsible for each
 location (Norman/OUN for this app's Great Plains focus). Live radar is an embed of NWS's own
-radar.weather.gov CONUS mosaic. The only non-NWS call is Open-Meteo's free geocoding search, used purely to
+radar.weather.gov loop for the Norman station (KTLX). The only non-NWS call is Open-Meteo's free
+geocoding search, used purely to
 turn a typed city name into coordinates — no weather data comes from it. Sunrise/sunset are
 computed locally (NWS doesn't publish them) via the standard solar-position algorithm, accurate
 to within about a quarter hour. Firebase Authentication handles sign-in, and Cloud Firestore

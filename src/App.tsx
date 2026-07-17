@@ -410,10 +410,10 @@ export default function App() {
               {tab === 'radar' && (
                 <div className={`radar-view tab-slide-${slideDir}`} key={tab}>
                   <ExternalRadar
-                    url="https://radar.weather.gov/region/conus-large/standard"
+                    url="https://radar.weather.gov/station/KTLX/standard"
                     title="Live Storm Radar"
                     label="LIVE"
-                    source="the National Weather Service"
+                    source="the National Weather Service — Norman, OK (KTLX)"
                   />
                 </div>
               )}
