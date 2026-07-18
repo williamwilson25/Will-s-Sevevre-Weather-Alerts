@@ -42,6 +42,12 @@ the next chance of severe weather, and sending customized alerts to friends.
   derived from forecasted weather codes (thunderstorms, hail), wind gusts, and precipitation
   probability, surfaced as a banner for the next day severe weather is expected and used to
   pick which day the one-tap "Alert friends" action targets.
+- **Storm Risk Meter** — a color-zoned gauge on the Home tab visualizing today's risk score at a
+  glance, needle-driven by the same Low/Moderate/High/Severe scoring above.
+- **Storm Arrival Timer** — when rain is genuinely about to start, a prominent countdown card
+  ("Storms arriving in N MIN, around H:MM") appears above the regular nowcast card.
+- **Saved Locations list** — every saved city shown with its own live temperature and condition
+  icon (fetched independently of whichever location is active), tap any row to switch to it.
 - **Live storm radar** — the National Weather Service's own radar loop for the Norman, OK
   station (KTLX, radar.weather.gov), embedded directly, with a link to open it full-screen if
   it doesn't load.
@@ -66,12 +72,13 @@ the next chance of severe weather, and sending customized alerts to friends.
 
 ## Navigation
 
-Forecast, Radar, Outlook, and Alerts are real swipeable pages, not one long scrolling
-document — a compact status bar (icon, temperature, location) and the tab bar stay pinned at
-the top, and each tab's content scrolls independently underneath. Swipe left/right anywhere
-on a tab to page to the next/previous one, in addition to tapping the tab bar. Swipes starting
-on the hourly-forecast scroll strip or the location search results are ignored so they don't
-fight with those elements' own gestures.
+Forecast (Home), Radar, Outlook, and Alerts are real swipeable pages, not one long scrolling
+document — a compact status bar (icon, temperature, location) stays pinned at the top and a
+bottom tab bar (icon + label per tab, like a native app) stays pinned at the bottom, with each
+tab's content scrolling independently in between. Swipe left/right anywhere on a tab to page to
+the next/previous one, in addition to tapping the tab bar. Swipes starting on the
+hourly-forecast scroll strip or the location search results are ignored so they don't fight
+with those elements' own gestures.
 
 ## Getting started
 

@@ -13,6 +13,9 @@ import CurrentConditions from './components/CurrentConditions';
 import StatusBar from './components/StatusBar';
 import HourlyStrip from './components/HourlyStrip';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
+import StormRiskMeter from './components/StormRiskMeter';
+import StormArrivalTimer from './components/StormArrivalTimer';
+import SavedLocationsList from './components/SavedLocationsList';
 import RainNowcast from './components/RainNowcast';
 import ActiveAlerts from './components/ActiveAlerts';
 import NwsForecastCard from './components/NwsForecastCard';
@@ -27,7 +30,7 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
-import { AlertTriangleIcon, BellAlertIcon } from './components/icons';
+import { AlertTriangleIcon, BellAlertIcon, HomeIcon, RadarIcon, OutlookMapIcon } from './components/icons';
 import logo from './assets/logo.png';
 
 const DEFAULT_LOCATION: Location = {
@@ -349,24 +352,6 @@ export default function App() {
           <>
             <StatusBar snapshot={snapshot} refreshing={refreshing} onRefresh={handleManualRefresh} />
 
-            <nav className="tabs">
-              <button className={tab === 'forecast' ? 'active' : ''} onClick={() => goToTab('forecast')}>
-                Forecast
-              </button>
-              <button className={tab === 'radar' ? 'active' : ''} onClick={() => goToTab('radar')}>
-                Radar
-              </button>
-              <button className={tab === 'outlook' ? 'active' : ''} onClick={() => goToTab('outlook')}>
-                Outlook
-              </button>
-              {isOwner && (
-                <button className={tab === 'alerts' ? 'active' : ''} onClick={() => goToTab('alerts')}>
-                  Alerts
-                  {history.length > 0 && <span className="tab-count">{history.length}</span>}
-                </button>
-              )}
-            </nav>
-
             <div className="tab-pager" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
               <div
                 className="tab-track"
@@ -394,7 +379,13 @@ export default function App() {
                           onEnableNotify={handleEnableRainNotify}
                           onTestNotify={handleTestNotify}
                         />
+                        {snapshot.daily[0] && <StormRiskMeter risk={snapshot.daily[0].risk} />}
                         <ActiveAlerts location={snapshot.location} />
+                        {nowcastSummary &&
+                          nowcastSummary.locationId === location.id &&
+                          nowcastSummary.summary.kind === 'starting' && (
+                            <StormArrivalTimer minutesAway={nowcastSummary.summary.minutesAway} />
+                          )}
                         {notifySupported && !notifyDenied && !notifyRain && !notifyPromptDismissed && (
                           <EnableNotificationsBanner
                             onEnable={handleEnableRainNotify}
@@ -411,6 +402,12 @@ export default function App() {
                           onAlertDay={isOwner ? handleAlertDay : undefined}
                         />
                         <HourlyStrip hourly={snapshot.hourly} />
+                        <SavedLocationsList
+                          locations={locations}
+                          activeId={location.id}
+                          activeConditions={snapshot.current}
+                          onSelect={handleSelectLocation}
+                        />
                         <NwsForecastCard location={snapshot.location} />
                         <footer className="app-footer">
                           <p>
@@ -489,6 +486,33 @@ export default function App() {
                 Alert friends
               </button>
             )}
+
+            <nav className="bottom-nav">
+              <button
+                className={tab === 'forecast' ? 'active' : ''}
+                onClick={() => goToTab('forecast')}
+              >
+                <HomeIcon size={21} />
+                Home
+              </button>
+              <button className={tab === 'radar' ? 'active' : ''} onClick={() => goToTab('radar')}>
+                <RadarIcon size={21} />
+                Radar
+              </button>
+              <button className={tab === 'outlook' ? 'active' : ''} onClick={() => goToTab('outlook')}>
+                <OutlookMapIcon size={21} />
+                Outlook
+              </button>
+              {isOwner && (
+                <button className={tab === 'alerts' ? 'active' : ''} onClick={() => goToTab('alerts')}>
+                  <span className="bottom-nav-icon-wrap">
+                    <BellAlertIcon size={21} />
+                    {history.length > 0 && <span className="tab-count">{history.length}</span>}
+                  </span>
+                  Alerts
+                </button>
+              )}
+            </nav>
           </>
         )}
       </div>

@@ -7,13 +7,13 @@
   --glass-bg-strong: rgba(255, 255, 255, 0.18);
   --glass-border: rgba(255, 255, 255, 0.13);
   --glass-highlight: rgba(255, 255, 255, 0.09);
-  --accent: #7dd3fc;
-  --accent-strong: #38bdf8;
+  --accent: #5b9bff;
+  --accent-strong: #2f6fed;
   --radius: 20px;
   --radius-sm: 12px;
-  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.1), 0 14px 34px -14px rgba(0, 0, 0, 0.6);
-  --shadow-pop: 0 20px 48px -14px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 8px 22px -6px rgba(56, 189, 248, 0.45);
+  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.15), 0 14px 34px -14px rgba(0, 0, 0, 0.75);
+  --shadow-pop: 0 20px 48px -14px rgba(0, 0, 0, 0.75);
+  --shadow-glow: 0 8px 22px -6px rgba(47, 111, 237, 0.5);
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
   --font-display: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
@@ -39,7 +39,7 @@ body,
 
 body {
   margin: 0;
-  background: #0b1220;
+  background: #000000;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -98,17 +98,17 @@ button:active:not(:disabled) {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: #0a0f1c;
-  background-image: radial-gradient(130% 65% at 50% -12%, rgba(56, 189, 248, 0.16) 0%, rgba(10, 15, 28, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(99, 102, 241, 0.12) 0%, rgba(10, 15, 28, 0) 62%),
-    linear-gradient(180deg, #101a30 0%, #0a0f1c 48%, #060a14 100%);
+  background-color: #000000;
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(47, 111, 237, 0.22) 0%, rgba(0, 0, 0, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(47, 111, 237, 0.1) 0%, rgba(0, 0, 0, 0) 62%),
+    linear-gradient(180deg, #060a14 0%, #020408 48%, #000000 100%);
   transition: background-image 600ms var(--ease);
 }
 
 .app-bg-night {
-  background-image: radial-gradient(130% 65% at 50% -12%, rgba(99, 102, 241, 0.14) 0%, rgba(6, 9, 17, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(56, 189, 248, 0.08) 0%, rgba(6, 9, 17, 0) 62%),
-    linear-gradient(180deg, #0a0e1a 0%, #06090f 48%, #04060b 100%);
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(47, 111, 237, 0.14) 0%, rgba(0, 0, 0, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(47, 111, 237, 0.06) 0%, rgba(0, 0, 0, 0) 62%),
+    linear-gradient(180deg, #030509 0%, #000000 48%, #000000 100%);
 }
 
 .app-bg > .app {
@@ -119,8 +119,8 @@ button:active:not(:disabled) {
 .app {
   max-width: 620px;
   margin: 0 auto;
-  padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0
+    max(16px, env(safe-area-inset-left));
   height: 100vh;
   height: 100dvh;
   display: flex;
@@ -533,54 +533,65 @@ button:active:not(:disabled) {
   font-variant-numeric: tabular-nums;
 }
 
-/* Tabs (segmented control) */
-.tabs {
+/* Bottom nav */
+.bottom-nav {
   display: flex;
-  gap: 4px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
+  background: rgba(5, 8, 15, 0.86);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 999px;
-  padding: 4px;
-  margin-bottom: 18px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 22px;
+  padding: 8px 6px max(8px, env(safe-area-inset-bottom));
+  margin-top: 10px;
+  box-shadow: 0 -8px 24px -12px rgba(0, 0, 0, 0.6);
 }
 
-.tabs button {
+.bottom-nav button {
   flex: 1;
   background: none;
   border: none;
-  padding: 9px 14px;
-  border-radius: 999px;
-  font-size: 0.86rem;
+  padding: 6px 4px;
+  border-radius: 14px;
+  font-size: 0.68rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-faint);
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: transform 150ms var(--ease), background 200ms var(--ease), color 200ms var(--ease),
-    box-shadow 200ms var(--ease);
+  gap: 3px;
+  transition: color 200ms var(--ease), background 200ms var(--ease);
 }
 
-.tabs button.active {
-  color: var(--text);
-  background: var(--glass-bg-strong);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+.bottom-nav button.active {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
-.tabs button:hover:not(.active) {
-  color: var(--text);
+.bottom-nav button:hover:not(.active) {
+  color: var(--text-muted);
+}
+
+.bottom-nav-icon-wrap {
+  position: relative;
+  display: inline-flex;
 }
 
 .tab-count {
+  position: absolute;
+  top: -6px;
+  right: -9px;
   background: var(--accent);
-  color: #0b1220;
-  font-size: 0.68rem;
+  color: #04070d;
+  font-size: 0.6rem;
   font-weight: 700;
-  padding: 1px 7px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
   border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .forecast-view,
@@ -948,6 +959,134 @@ section h2::before {
   filter: brightness(1.06);
 }
 
+/* Storm risk meter */
+.risk-meter-card {
+  text-align: center;
+}
+
+.risk-meter-gauge {
+  width: 100%;
+  max-width: 260px;
+  margin: 6px auto -8px;
+  display: block;
+}
+
+.risk-meter-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.risk-meter-level {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.risk-meter-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Storm arrival timer */
+.arrival-timer-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--glass-border));
+  background: color-mix(in srgb, var(--accent) 10%, var(--glass-bg));
+}
+
+.arrival-timer-icon {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+}
+
+.arrival-timer-label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.arrival-timer-value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.arrival-timer-around {
+  font-size: 0.76rem;
+  color: var(--text-faint);
+}
+
+/* Saved locations */
+.saved-locations-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.saved-location-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.saved-location-row.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.saved-location-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.saved-location-row.active .saved-location-name {
+  color: var(--text);
+}
+
+.saved-location-temp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.saved-location-loading {
+  color: var(--text-faint);
+  font-family: inherit;
+}
+
 /* Rain nowcast */
 .nowcast-title {
   margin: 0 0 4px;
@@ -993,7 +1132,7 @@ section h2::before {
 .nowcast-bar {
   width: 60%;
   min-width: 3px;
-  background: linear-gradient(180deg, #7dd3fc, #38bdf8);
+  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
   border-radius: 3px 3px 0 0;
   transition: height 400ms var(--ease);
 }
@@ -1135,7 +1274,7 @@ section h2::before {
   gap: 2px;
   font-size: 0.66rem;
   font-weight: 600;
-  color: #7dd3fc;
+  color: var(--accent);
 }
 
 /* Daily forecast */
@@ -1325,7 +1464,7 @@ section h2::before {
 .fab {
   position: fixed;
   left: 50%;
-  bottom: calc(22px + env(safe-area-inset-bottom));
+  bottom: calc(78px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   display: flex;
   align-items: center;
@@ -2305,9 +2444,5 @@ section h2::before {
   .daily-range-row,
   .daily-detail {
     padding-left: 0;
-  }
-  .tabs button {
-    padding: 9px 6px;
-    font-size: 0.76rem;
   }
 }

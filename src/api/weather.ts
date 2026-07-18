@@ -265,6 +265,14 @@ async function fetchDaily(forecastUrl: string, location: Location): Promise<Dail
     });
 }
 
+// Lightweight fetch for glanceable UI (saved-locations list) — just the current
+// station reading, skipping the hourly/daily forecast fetches fetchWeather does.
+export async function fetchQuickConditions(location: Location): Promise<CurrentConditions> {
+  const point = await fetchPointMeta(location);
+  const { current } = await fetchCurrentConditions(point.observationStations);
+  return current;
+}
+
 export async function fetchWeather(location: Location): Promise<WeatherSnapshot> {
   const point = await fetchPointMeta(location);
 
