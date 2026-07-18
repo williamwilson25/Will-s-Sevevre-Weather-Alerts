@@ -115,17 +115,31 @@ async function fetchCurrentConditions(
   const stationsRes = await fetch(observationStationsUrl, { headers: NWS_HEADERS });
   if (!stationsRes.ok) throw new Error(`NWS station lookup failed (${stationsRes.status})`);
   const stationsData = await stationsRes.json();
-  const stationId: string | undefined = stationsData.features?.[0]?.properties?.stationIdentifier;
-  if (!stationId) throw new Error('No NWS observation station found nearby');
+  const stationIds: string[] = (stationsData.features ?? [])
+    .map((f: { properties?: { stationIdentifier?: string } }) => f.properties?.stationIdentifier)
+    .filter((id: string | undefined): id is string => Boolean(id));
+  if (stationIds.length === 0) throw new Error('No NWS observation station found nearby');
 
-  const obsRes = await fetch(`https://api.weather.gov/stations/${stationId}/observations/latest`, {
-    headers: NWS_HEADERS,
-  });
-  if (!obsRes.ok) throw new Error(`NWS observation fetch failed (${obsRes.status})`);
-  const obsData = await obsRes.json();
-  const p = obsData.properties ?? {};
+  // The nearest station's latest observation sometimes has a null
+  // temperature (sensor outage, reporting gap, etc.) — fall through to the
+  // next-nearest station instead of silently treating that as 0°C.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let p: any = null;
+  for (const stationId of stationIds.slice(0, 5)) {
+    const obsRes = await fetch(`https://api.weather.gov/stations/${stationId}/observations/latest`, {
+      headers: NWS_HEADERS,
+    });
+    if (!obsRes.ok) continue;
+    const obsData = await obsRes.json();
+    const props = obsData.properties ?? {};
+    if (props.temperature?.value != null) {
+      p = props;
+      break;
+    }
+  }
+  if (!p) throw new Error('No nearby station has a current temperature reading');
 
-  const temperatureC: number = p.temperature?.value ?? 0;
+  const temperatureC: number = p.temperature.value;
   const heatIndexC: number | null = p.heatIndex?.value ?? null;
   const windChillC: number | null = p.windChill?.value ?? null;
   const apparentC = heatIndexC ?? windChillC ?? temperatureC;
