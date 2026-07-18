@@ -432,6 +432,68 @@ export function RadarIcon({ size = 24, className }: IconProps) {
   );
 }
 
+export function HailIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M7.5 11a4.1 4.1 0 0 1-.5-8.15A5.4 5.4 0 0 1 17.5 4.1a3.9 3.9 0 0 1-.5 6.9H7.5z"
+        fill="currentColor"
+        opacity="0.9"
+      />
+      <circle cx="8" cy="16" r="1.6" fill="currentColor" />
+      <circle cx="13" cy="19" r="1.6" fill="currentColor" />
+      <circle cx="17" cy="15.5" r="1.6" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function PlugIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M9 2.5v4M15 2.5v4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6.5 6.5h11v4a5.5 5.5 0 0 1-11 0v-4z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <path d="M12 16v3.5M9 21.5h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" opacity="0.85" />
+    </svg>
+  );
+}
+
+export function DotsIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="6" cy="12" r="1.8" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.8" fill="currentColor" />
+      <circle cx="18" cy="12" r="1.8" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function CameraIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M4 8.5a1.5 1.5 0 0 1 1.5-1.5h2l1-1.8h7l1 1.8h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <circle cx="12" cy="13" r="3.4" stroke="currentColor" strokeWidth="1.7" fill="none" />
+    </svg>
+  );
+}
+
 export function ClockIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>

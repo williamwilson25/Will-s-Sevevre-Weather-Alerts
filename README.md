@@ -58,6 +58,12 @@ the next chance of severe weather, and sending customized alerts to friends.
   it doesn't load.
 - **Regional storm outlook** — an embed of NOAA Storm Prediction Center's own Day 1–3 categorical
   convective outlook page, with a link to open it full-screen if it doesn't load.
+- **Storm Reports** — a crowd-sourced Reports tab where any signed-in user can submit what
+  they're seeing (Tornado, Hail, Wind Damage, Flooding, Power Outage, Other) with a location,
+  optional details, and an optional photo. Reports start as pending and only appear in the
+  public "Recent Reports" feed once the owner approves them from a moderation queue on the same
+  tab; rejected/pending reports stay visible only to their author and the owner. Needs one-time
+  setup — see **Setup: enabling Storm Reports** below.
 - **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert
   sent), one-tap quick-alert presets for common warning types (Tornado Warning/Watch, Severe
   T-Storm Warning/Watch, Flash Flood Warning, High Wind Warning) that pre-fill the composer, and
@@ -93,6 +99,20 @@ npm run dev
 ```
 
 Then open the printed local URL. Build for production with `npm run build`.
+
+## Setup: enabling Storm Reports
+
+The Reports tab needs two things published in the Firebase console before it'll actually save
+anything (submissions will silently fail until then — the rest of the app is unaffected):
+
+1. **Firestore rules** — publish the contents of `firestore.rules` (Firestore Database → Rules).
+   It now includes a `stormReports` collection: anyone signed in can create a report (always
+   starting `pending`), approved reports are public, pending/rejected ones are only visible to
+   their author and the owner account, and only the owner can change a report's status.
+2. **Storage rules** — turn on Cloud Storage for the project if it isn't already, then publish
+   the contents of `storage.rules` (Storage → Rules). It caps uploads at 10MB, requires an image
+   content type, and only lets a signed-in user write into their own `storm-reports/{uid}/`
+   folder — anyone can read a photo once they have its URL.
 
 ## Stack
 

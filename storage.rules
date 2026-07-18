@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Photos attached to crowd-sourced storm reports. Any signed-in user can
+// upload to their own folder (path includes their uid); anyone can view a
+// photo once they have its URL (matches the storm report doc it's attached
+// to being publicly readable once approved). 10MB cap, images only.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /storm-reports/{uid}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+        request.auth.uid == uid &&
+        request.resource.size < 10 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*');
+    }
+  }
+}

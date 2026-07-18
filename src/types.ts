@@ -93,3 +93,18 @@ export interface AlertRecord {
   message: string;
   locationName: string;
 }
+
+export type StormReportType = 'tornado' | 'hail' | 'wind' | 'flooding' | 'power_outage' | 'other';
+export type StormReportStatus = 'pending' | 'approved' | 'rejected';
+
+export interface StormReport {
+  id: string;
+  type: StormReportType;
+  locationName: string;
+  description: string;
+  photoUrl: string | null;
+  status: StormReportStatus;
+  submittedByUid: string;
+  submittedByEmail: string;
+  createdAt: string;
+}

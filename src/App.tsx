@@ -33,7 +33,15 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
-import { AlertTriangleIcon, BellAlertIcon, HomeIcon, RadarIcon, OutlookMapIcon } from './components/icons';
+import StormReportsTab from './components/StormReportsTab';
+import {
+  AlertTriangleIcon,
+  BellAlertIcon,
+  HomeIcon,
+  RadarIcon,
+  OutlookMapIcon,
+  CameraIcon,
+} from './components/icons';
 import logo from './assets/logo.png';
 
 const DEFAULT_LOCATION: Location = {
@@ -46,9 +54,9 @@ const DEFAULT_LOCATION: Location = {
   timezone: 'America/Chicago',
 };
 
-type Tab = 'forecast' | 'radar' | 'outlook' | 'alerts';
+type Tab = 'forecast' | 'radar' | 'outlook' | 'reports' | 'alerts';
 
-const TAB_ORDER: Tab[] = ['forecast', 'radar', 'outlook', 'alerts'];
+const TAB_ORDER: Tab[] = ['forecast', 'radar', 'outlook', 'reports', 'alerts'];
 
 // Swipe gestures starting inside these shouldn't switch tabs — they need
 // horizontal touch for their own scrolling/panning/dragging.
@@ -513,6 +521,19 @@ export default function App() {
                       </div>
                     )}
 
+                    {t === 'reports' && user && (
+                      <div className="reports-view">
+                        <StormReportsTab
+                          uid={user.uid}
+                          email={user.email ?? ''}
+                          locationName={`${snapshot.location.name}${
+                            snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
+                          }`}
+                          isOwner={isOwner}
+                        />
+                      </div>
+                    )}
+
                     {t === 'alerts' && isOwner && (
                       <div className="alerts-view">
                         <AlertStats history={history} friends={friends} />
@@ -566,6 +587,10 @@ export default function App() {
               <button className={tab === 'outlook' ? 'active' : ''} onClick={() => goToTab('outlook')}>
                 <OutlookMapIcon size={21} />
                 Outlook
+              </button>
+              <button className={tab === 'reports' ? 'active' : ''} onClick={() => goToTab('reports')}>
+                <CameraIcon size={21} />
+                Reports
               </button>
               {isOwner && (
                 <button className={tab === 'alerts' ? 'active' : ''} onClick={() => goToTab('alerts')}>
