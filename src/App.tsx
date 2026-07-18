@@ -34,6 +34,8 @@ import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
 import StormReportsTab from './components/StormReportsTab';
+import WeatherDeskCard from './components/WeatherDeskCard';
+import StormSafetyCard from './components/StormSafetyCard';
 import {
   AlertTriangleIcon,
   BellAlertIcon,
@@ -479,8 +481,10 @@ export default function App() {
                           activeConditions={snapshot.current}
                           onSelect={handleSelectLocation}
                         />
+                        <WeatherDeskCard isOwner={isOwner} />
                         <AlertNotificationSettings prefs={alertTypePrefs} onChange={handleAlertTypeChange} />
                         <NwsForecastCard location={snapshot.location} />
+                        <StormSafetyCard />
                         <footer className="app-footer">
                           <p>
                             Forecast &amp; current conditions: National Weather Service · Radar: NWS ·

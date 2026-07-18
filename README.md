@@ -64,6 +64,14 @@ the next chance of severe weather, and sending customized alerts to friends.
   public "Recent Reports" feed once the owner approves them from a moderation queue on the same
   tab; rejected/pending reports stay visible only to their author and the owner. Needs one-time
   setup — see **Setup: enabling Storm Reports** below.
+- **Will's Weather Desk** — a personal message card on the Home tab where the owner can post a
+  short note to every user (e.g. "Scattered storms possible this evening — stay weather aware!"),
+  with a timestamp and an inline edit form; the card is hidden entirely if no message has been
+  posted yet. Needs the same Firestore rules setup as Storm Reports — see **Setup: enabling Storm
+  Reports** below.
+- **Storm Safety** — a static, always-available reference card on the Home tab covering Watch vs.
+  Warning, Tornado Safety, Hail Safety, and a Preparedness Checklist, each expandable in place.
+  No sign-in or network dependency beyond the app shell.
 - **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert
   sent), one-tap quick-alert presets for common warning types (Tornado Warning/Watch, Severe
   T-Storm Warning/Watch, Flash Flood Warning, High Wind Warning) that pre-fill the composer, and
@@ -90,6 +98,11 @@ tab's content scrolling independently in between. Swipe left/right anywhere on a
 the next/previous one, in addition to tapping the tab bar. Swipes starting on the
 hourly-forecast scroll strip or the location search results are ignored so they don't fight
 with those elements' own gestures.
+
+There's no separate Settings tab — settings live where they're used instead: per-warning-type
+notification toggles and location management are on the Home tab, friend/Discord management is
+on the Alerts tab, and account sign-out is wherever sign-in happens. A dedicated Settings screen
+would just be a second copy of controls that already exist elsewhere.
 
 ## Getting started
 
