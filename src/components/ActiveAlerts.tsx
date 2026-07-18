@@ -47,6 +47,7 @@ export default function ActiveAlerts({ location }: Props) {
       cancelled = true;
       clearInterval(interval);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.id]);
 
   if (alerts.length === 0) return null;

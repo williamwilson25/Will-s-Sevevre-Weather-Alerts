@@ -18,9 +18,12 @@ import StormArrivalTimer from './components/StormArrivalTimer';
 import SavedLocationsList from './components/SavedLocationsList';
 import RainNowcast from './components/RainNowcast';
 import ActiveAlerts from './components/ActiveAlerts';
+import AlertNotificationSettings from './components/AlertNotificationSettings';
 import NwsForecastCard from './components/NwsForecastCard';
 import EnableNotificationsBanner from './components/EnableNotificationsBanner';
 import type { NowcastState } from './utils/nowcast';
+import { fetchActiveAlerts, type NwsAlert } from './api/nwsAlerts';
+import { DEFAULT_ALERT_TYPE_PREFS, isAlertNotifiable } from './utils/alertTypes';
 import { showNotification } from './utils/notify';
 import { watchSubscribers } from './api/subscribers';
 import FriendsManager from './components/FriendsManager';
@@ -81,6 +84,12 @@ export default function App() {
   const [notifyDenied, setNotifyDenied] = useState(
     typeof Notification !== 'undefined' && Notification.permission === 'denied',
   );
+  const [alertTypePrefs, setAlertTypePrefs] = useLocalStorage<Record<string, boolean>>(
+    'sw_notify_alert_types',
+    DEFAULT_ALERT_TYPE_PREFS,
+  );
+  const [notifiedAlertIds, setNotifiedAlertIds] = useLocalStorage<string[]>('sw_notified_alert_ids', []);
+  const [watchedAlerts, setWatchedAlerts] = useState<{ alert: NwsAlert; locationName: string }[]>([]);
 
   const [nowcastSummary, setNowcastSummary] = useState<{
     summary: NowcastState;
@@ -147,6 +156,35 @@ export default function App() {
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [location.id, user]);
+
+  // Watches every saved location for active NWS alerts, not just the one
+  // currently on screen — so a Tornado Warning for a saved-but-not-active
+  // city still notifies (this is what covers "custom county alerts": add
+  // any county's town via the location search and it's watched here).
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    function poll() {
+      Promise.all(
+        locations.map((loc) =>
+          fetchActiveAlerts(loc)
+            .then((alerts) => alerts.map((alert) => ({ alert, locationName: loc.name })))
+            .catch(() => []),
+        ),
+      ).then((results) => {
+        if (!cancelled) setWatchedAlerts(results.flat());
+      });
+    }
+
+    poll();
+    const interval = setInterval(poll, 2 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locations.map((l) => l.id).join(','), user]);
 
   function handleManualRefresh() {
     setRefreshing(true);
@@ -272,6 +310,31 @@ export default function App() {
     setLastNotifiedKey(key);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nowcastSummary, notifyRain, location.id]);
+
+  useEffect(() => {
+    if (!notifySupported || Notification.permission !== 'granted') return;
+    const fresh = watchedAlerts.filter(
+      ({ alert }) => !notifiedAlertIds.includes(alert.id) && isAlertNotifiable(alert, alertTypePrefs),
+    );
+    if (fresh.length === 0) return;
+
+    fresh.forEach(({ alert, locationName }) => {
+      showNotification(alert.event, {
+        body: `${alert.headline || alert.description.slice(0, 120)} — ${locationName}`,
+        icon: logo,
+      });
+    });
+
+    // Keep the dedup list from growing forever — NWS alert IDs are unique per
+    // issuance, so old ones are safe to drop once expired alerts scroll off.
+    const updated = [...notifiedAlertIds, ...fresh.map(({ alert }) => alert.id)].slice(-200);
+    setNotifiedAlertIds(updated);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedAlerts, alertTypePrefs]);
+
+  function handleAlertTypeChange(key: string, enabled: boolean) {
+    setAlertTypePrefs({ ...alertTypePrefs, [key]: enabled });
+  }
 
   function handleEnableRainNotify() {
     if (!notifySupported) return;
@@ -408,6 +471,7 @@ export default function App() {
                           activeConditions={snapshot.current}
                           onSelect={handleSelectLocation}
                         />
+                        <AlertNotificationSettings prefs={alertTypePrefs} onChange={handleAlertTypeChange} />
                         <NwsForecastCard location={snapshot.location} />
                         <footer className="app-footer">
                           <p>

@@ -38,6 +38,11 @@ the next chance of severe weather, and sending customized alerts to friends.
   your exact location and shown the moment they're issued. Severity-colored, expandable for the
   full instructions (e.g. "TAKE COVER NOW"), and hidden entirely when nothing's active so it
   never adds clutter.
+- **Per-warning-type notifications** — pick exactly which official alert types (Tornado
+  Warnings/Watches, Severe T-Storm Warnings/Watches, Flash Flood Warnings, High Wind Warnings,
+  Winter Weather Alerts) push a notification. Checked across every saved location, not just the
+  one on screen — add more cities from the search bar to get warned about severe weather in
+  places you care about even while looking at somewhere else.
 - **Severe weather risk scoring** — each day also gets a Low/Moderate/High/Severe risk score
   derived from forecasted weather codes (thunderstorms, hail), wind gusts, and precipitation
   probability, surfaced as a banner for the next day severe weather is expected and used to
