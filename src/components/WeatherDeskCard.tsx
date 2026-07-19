@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import { watchWeatherDesk, updateWeatherDesk, type WeatherDeskMessage } from '../api/weatherDesk';
+import { suggestWeatherDeskMessage } from '../utils/weatherDeskSuggestion';
+import type { SevereRisk } from '../types';
 import logo from '../assets/logo.png';
 
 interface Props {
   isOwner: boolean;
+  locationName: string;
+  risk: SevereRisk | null;
 }
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
 
-export default function WeatherDeskCard({ isOwner }: Props) {
+export default function WeatherDeskCard({ isOwner, locationName, risk }: Props) {
   const [msg, setMsg] = useState<WeatherDeskMessage | null>(null);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
@@ -23,6 +27,10 @@ export default function WeatherDeskCard({ isOwner }: Props) {
   function startEdit() {
     setDraft(msg?.message ?? '');
     setEditing(true);
+  }
+
+  function applySuggestion() {
+    if (risk) setDraft(suggestWeatherDeskMessage(locationName, risk));
   }
 
   async function handleSave() {
@@ -60,6 +68,11 @@ export default function WeatherDeskCard({ isOwner }: Props) {
             rows={4}
             placeholder="Good morning! Here's what to expect today…"
           />
+          {risk && (
+            <button type="button" className="weather-desk-suggest" onClick={applySuggestion}>
+              Suggest message for today
+            </button>
+          )}
           <div className="weather-desk-edit-actions">
             <button type="button" onClick={() => setEditing(false)}>
               Cancel

@@ -526,7 +526,13 @@ export default function App() {
                           activeConditions={snapshot.current}
                           onSelect={handleSelectLocation}
                         />
-                        <WeatherDeskCard isOwner={isOwner} />
+                        <WeatherDeskCard
+                          isOwner={isOwner}
+                          locationName={`${snapshot.location.name}${
+                            snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
+                          }`}
+                          risk={snapshot.daily[0]?.risk ?? null}
+                        />
                         <AlertNotificationSettings prefs={alertTypePrefs} onChange={handleAlertTypeChange} />
                         <NwsForecastCard location={snapshot.location} />
                         <StormSafetyCard />

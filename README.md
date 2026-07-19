@@ -71,8 +71,9 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Will's Weather Desk** — a personal message card on the Home tab where the owner can post a
   short note to every user (e.g. "Scattered storms possible this evening — stay weather aware!"),
   with a timestamp and an inline edit form; the card is hidden entirely if no message has been
-  posted yet. Needs the same Firestore rules setup as Storm Reports — see **Setup: enabling Storm
-  Reports** below.
+  posted yet. A "Suggest message for today" button drafts a note from today's actual risk tier
+  (Marginal through High) — still one tap to review and Save, not posted automatically. Needs the
+  same Firestore rules setup as Storm Reports — see **Setup: enabling Storm Reports** below.
 - **Storm Safety** — a static, always-available reference card on the Home tab covering Watch vs.
   Warning, Tornado Safety, Hail Safety, and a Preparedness Checklist, each expandable in place.
   No sign-in or network dependency beyond the app shell.
