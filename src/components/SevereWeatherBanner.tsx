@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function SevereWeatherBanner({ daily, onAlertDay }: Props) {
-  const next = daily.find((d) => d.risk.level === 'high' || d.risk.level === 'severe');
+  const next = daily.find((d) => d.risk.level === 'enhanced' || d.risk.level === 'moderate' || d.risk.level === 'high');
 
   if (!next) {
     return (

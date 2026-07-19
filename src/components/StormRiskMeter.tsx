@@ -6,10 +6,11 @@ interface Props {
 }
 
 const ZONES: { from: number; to: number; level: RiskLevel }[] = [
-  { from: 0, to: 18, level: 'low' },
-  { from: 18, to: 40, level: 'moderate' },
-  { from: 40, to: 65, level: 'high' },
-  { from: 65, to: 100, level: 'severe' },
+  { from: 0, to: 15, level: 'marginal' },
+  { from: 15, to: 30, level: 'slight' },
+  { from: 30, to: 50, level: 'enhanced' },
+  { from: 50, to: 70, level: 'moderate' },
+  { from: 70, to: 100, level: 'high' },
 ];
 
 const CX = 100;
@@ -69,7 +70,7 @@ export default function StormRiskMeter({ risk }: Props) {
           {RISK_LABEL[risk.level].toUpperCase()}
         </span>
         <span className="risk-meter-caption">
-          {risk.level === 'low' ? 'No significant storm risk today.' : 'Stay weather aware.'}
+          {risk.level === 'marginal' ? 'No significant storm risk today.' : 'Stay weather aware.'}
         </span>
       </div>
     </section>

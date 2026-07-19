@@ -14,6 +14,7 @@ import StatusBar from './components/StatusBar';
 import HourlyStrip from './components/HourlyStrip';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import StormRiskMeter from './components/StormRiskMeter';
+import TodaysOutlookRow from './components/TodaysOutlookRow';
 import StormArrivalTimer from './components/StormArrivalTimer';
 import SavedLocationsList from './components/SavedLocationsList';
 import RainNowcast from './components/RainNowcast';
@@ -33,16 +34,21 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
+import LiveRadarMap from './components/LiveRadarMap';
 import StormReportsTab from './components/StormReportsTab';
 import WeatherDeskCard from './components/WeatherDeskCard';
 import StormSafetyCard from './components/StormSafetyCard';
+import MoreScreen from './components/MoreScreen';
+import SettingsScreen from './components/SettingsScreen';
+import SubscriptionsScreen from './components/SubscriptionsScreen';
 import {
   AlertTriangleIcon,
   BellAlertIcon,
   HomeIcon,
   RadarIcon,
-  OutlookMapIcon,
-  CameraIcon,
+  DotsIcon,
+  PlusIcon,
+  ChevronDownIcon,
 } from './components/icons';
 import logo from './assets/logo.png';
 
@@ -56,9 +62,33 @@ const DEFAULT_LOCATION: Location = {
   timezone: 'America/Chicago',
 };
 
-type Tab = 'forecast' | 'radar' | 'outlook' | 'reports' | 'alerts';
+type Tab =
+  | 'forecast'
+  | 'radar'
+  | 'more'
+  | 'outlook'
+  | 'reports'
+  | 'settings'
+  | 'subscriptions'
+  | 'alerts'
+  | 'compose';
 
-const TAB_ORDER: Tab[] = ['forecast', 'radar', 'outlook', 'reports', 'alerts'];
+// Order controls both the swipeable tab-track and left/right swipe gestures.
+// Only forecast/radar/more/alerts get their own bottom-nav button — the rest
+// (outlook, reports, settings, subscriptions, compose) are reached via the
+// More menu or the + button, but stay in this array so they're still real
+// tab-panels with a back header rather than a separate modal/router.
+const TAB_ORDER: Tab[] = [
+  'forecast',
+  'radar',
+  'more',
+  'outlook',
+  'reports',
+  'settings',
+  'subscriptions',
+  'alerts',
+  'compose',
+];
 
 // Swipe gestures starting inside these shouldn't switch tabs — they need
 // horizontal touch for their own scrolling/panning/dragging.
@@ -99,7 +129,10 @@ export default function App() {
     DEFAULT_ALERT_TYPE_PREFS,
   );
   const [notifiedAlertIds, setNotifiedAlertIds] = useLocalStorage<string[]>('sw_notified_alert_ids', []);
-  const [watchedAlerts, setWatchedAlerts] = useState<{ alert: NwsAlert; locationName: string }[]>([]);
+  const [mutedLocationIds, setMutedLocationIds] = useLocalStorage<string[]>('sw_muted_locations', []);
+  const [watchedAlerts, setWatchedAlerts] = useState<
+    { alert: NwsAlert; locationName: string; locationId: string }[]
+  >([]);
 
   const [nowcastSummary, setNowcastSummary] = useState<{
     summary: NowcastState;
@@ -179,7 +212,7 @@ export default function App() {
       Promise.all(
         locations.map((loc) =>
           fetchActiveAlerts(loc)
-            .then((alerts) => alerts.map((alert) => ({ alert, locationName: loc.name })))
+            .then((alerts) => alerts.map((alert) => ({ alert, locationName: loc.name, locationId: loc.id })))
             .catch(() => []),
         ),
       ).then((results) => {
@@ -243,7 +276,7 @@ export default function App() {
     if (id === activeLocationId) setActiveLocationId(next[0].id);
   }
 
-  const visibleTabs = isOwner ? TAB_ORDER : TAB_ORDER.filter((t) => t !== 'alerts');
+  const visibleTabs = isOwner ? TAB_ORDER : TAB_ORDER.filter((t) => t !== 'alerts' && t !== 'compose');
   const activeIndex = visibleTabs.indexOf(tab);
 
   function goToTab(next: Tab) {
@@ -277,7 +310,7 @@ export default function App() {
 
   function handleAlertDay(day: DailyForecast) {
     setAlertDay(day);
-    goToTab('alerts');
+    goToTab('compose');
   }
 
   function handleSent(record: AlertRecord) {
@@ -324,7 +357,10 @@ export default function App() {
   useEffect(() => {
     if (!notifySupported || Notification.permission !== 'granted') return;
     const fresh = watchedAlerts.filter(
-      ({ alert }) => !notifiedAlertIds.includes(alert.id) && isAlertNotifiable(alert, alertTypePrefs),
+      ({ alert, locationId }) =>
+        !notifiedAlertIds.includes(alert.id) &&
+        !mutedLocationIds.includes(locationId) &&
+        isAlertNotifiable(alert, alertTypePrefs),
     );
     if (fresh.length === 0) return;
 
@@ -340,10 +376,14 @@ export default function App() {
     const updated = [...notifiedAlertIds, ...fresh.map(({ alert }) => alert.id)].slice(-200);
     setNotifiedAlertIds(updated);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedAlerts, alertTypePrefs]);
+  }, [watchedAlerts, alertTypePrefs, mutedLocationIds]);
 
   function handleAlertTypeChange(key: string, enabled: boolean) {
     setAlertTypePrefs({ ...alertTypePrefs, [key]: enabled });
+  }
+
+  function handleToggleLocationMuted(id: string, muted: boolean) {
+    setMutedLocationIds(muted ? [...mutedLocationIds, id] : mutedLocationIds.filter((x) => x !== id));
   }
 
   function handleEnableRainNotify() {
@@ -452,6 +492,12 @@ export default function App() {
                           onEnableNotify={handleEnableRainNotify}
                           onTestNotify={handleTestNotify}
                         />
+                        {snapshot.daily[0] && (
+                          <TodaysOutlookRow
+                            risk={snapshot.daily[0].risk}
+                            onViewOutlook={() => goToTab('outlook')}
+                          />
+                        )}
                         {snapshot.daily[0] && <StormRiskMeter risk={snapshot.daily[0].risk} />}
                         <ActiveAlerts location={snapshot.location} />
                         {nowcastSummary &&
@@ -505,17 +551,32 @@ export default function App() {
 
                     {t === 'radar' && (
                       <div className="radar-view">
-                        <ExternalRadar
-                          url="https://radar.weather.gov/station/KTLX/standard"
-                          title="Live Storm Radar"
-                          label="LIVE"
-                          caption="Live radar from the National Weather Service — Norman, OK (KTLX)."
-                        />
+                        <LiveRadarMap />
                       </div>
+                    )}
+
+                    {t === 'more' && (
+                      <MoreScreen
+                        onOpenOutlook={() => goToTab('outlook')}
+                        onOpenReports={() => goToTab('reports')}
+                        onOpenSubscriptions={() => goToTab('subscriptions')}
+                        onOpenSettings={() => goToTab('settings')}
+                      />
                     )}
 
                     {t === 'outlook' && (
                       <div className="outlook-view">
+                        <header className="subscreen-header">
+                          <button
+                            type="button"
+                            className="subscreen-back"
+                            onClick={() => goToTab('more')}
+                            aria-label="Back"
+                          >
+                            <ChevronDownIcon size={18} className="subscreen-back-chevron" />
+                          </button>
+                          <h1>Storm Outlook</h1>
+                        </header>
                         <ExternalRadar
                           url="https://www.spc.noaa.gov/products/outlook/"
                           title="Storm Outlook"
@@ -527,6 +588,17 @@ export default function App() {
 
                     {t === 'reports' && user && (
                       <div className="reports-view">
+                        <header className="subscreen-header">
+                          <button
+                            type="button"
+                            className="subscreen-back"
+                            onClick={() => goToTab('more')}
+                            aria-label="Back"
+                          >
+                            <ChevronDownIcon size={18} className="subscreen-back-chevron" />
+                          </button>
+                          <h1>Storm Reports</h1>
+                        </header>
                         <StormReportsTab
                           uid={user.uid}
                           email={user.email ?? ''}
@@ -538,6 +610,31 @@ export default function App() {
                       </div>
                     )}
 
+                    {t === 'settings' && (
+                      <SettingsScreen
+                        email={user.email ?? ''}
+                        notifyRain={notifyRain}
+                        notifySupported={notifySupported}
+                        onEnableRainNotify={handleEnableRainNotify}
+                        onOpenSubscriptions={() => goToTab('subscriptions')}
+                        onLogout={() => signOut(auth)}
+                        onBack={() => goToTab('more')}
+                      />
+                    )}
+
+                    {t === 'subscriptions' && (
+                      <SubscriptionsScreen
+                        locations={locations}
+                        mutedLocationIds={mutedLocationIds}
+                        onToggleMuted={handleToggleLocationMuted}
+                        onAddLocation={handleAddLocation}
+                        onRemoveLocation={handleRemoveLocation}
+                        alertTypePrefs={alertTypePrefs}
+                        onAlertTypeChange={handleAlertTypeChange}
+                        onBack={() => goToTab('more')}
+                      />
+                    )}
+
                     {t === 'alerts' && isOwner && (
                       <div className="alerts-view">
                         <AlertStats history={history} friends={friends} />
@@ -547,6 +644,21 @@ export default function App() {
                           onViewLocation={handleAddLocation}
                         />
                         <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
+                        <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
+                      </div>
+                    )}
+
+                    {t === 'compose' && isOwner && (
+                      <div className="compose-view">
+                        <header className="subscreen-header compose-header">
+                          <button type="button" className="compose-cancel" onClick={() => goToTab('forecast')}>
+                            Cancel
+                          </button>
+                          <h1>Create Alert</h1>
+                          <a href="#compose-preview" className="compose-preview-link">
+                            Preview
+                          </a>
+                        </header>
                         <AlertComposer
                           locationName={`${snapshot.location.name}${
                             snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
@@ -555,9 +667,11 @@ export default function App() {
                           friends={friends}
                           selectedDate={alertDay?.date ?? null}
                           discordWebhookUrl={discordWebhookUrl}
-                          onSent={handleSent}
+                          onSent={(record) => {
+                            handleSent(record);
+                            goToTab('alerts');
+                          }}
                         />
-                        <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
                       </div>
                     )}
                   </div>
@@ -576,28 +690,19 @@ export default function App() {
               </button>
             )}
 
-            <nav className="bottom-nav">
+            <nav className={`bottom-nav${isOwner ? ' bottom-nav-with-compose' : ''}`}>
               <button
                 className={tab === 'forecast' ? 'active' : ''}
                 onClick={() => goToTab('forecast')}
               >
                 <HomeIcon size={21} />
-                Home
-              </button>
-              <button className={tab === 'radar' ? 'active' : ''} onClick={() => goToTab('radar')}>
-                <RadarIcon size={21} />
-                Radar
-              </button>
-              <button className={tab === 'outlook' ? 'active' : ''} onClick={() => goToTab('outlook')}>
-                <OutlookMapIcon size={21} />
-                Outlook
-              </button>
-              <button className={tab === 'reports' ? 'active' : ''} onClick={() => goToTab('reports')}>
-                <CameraIcon size={21} />
-                Reports
+                Dashboard
               </button>
               {isOwner && (
-                <button className={tab === 'alerts' ? 'active' : ''} onClick={() => goToTab('alerts')}>
+                <button
+                  className={tab === 'alerts' ? 'active' : ''}
+                  onClick={() => goToTab('alerts')}
+                >
                   <span className="bottom-nav-icon-wrap">
                     <BellAlertIcon size={21} />
                     {history.length > 0 && <span className="tab-count">{history.length}</span>}
@@ -605,6 +710,28 @@ export default function App() {
                   Alerts
                 </button>
               )}
+              {isOwner && (
+                <button
+                  className={`bottom-nav-compose${tab === 'compose' ? ' active' : ''}`}
+                  onClick={() => goToTab('compose')}
+                  aria-label="Create alert"
+                >
+                  <span className="bottom-nav-compose-circle">
+                    <PlusIcon size={22} />
+                  </span>
+                </button>
+              )}
+              <button className={tab === 'radar' ? 'active' : ''} onClick={() => goToTab('radar')}>
+                <RadarIcon size={21} />
+                Radar
+              </button>
+              <button
+                className={['more', 'outlook', 'reports', 'settings', 'subscriptions'].includes(tab) ? 'active' : ''}
+                onClick={() => goToTab('more')}
+              >
+                <DotsIcon size={21} />
+                More
+              </button>
             </nav>
           </>
         )}

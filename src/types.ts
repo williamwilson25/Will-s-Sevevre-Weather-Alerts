@@ -48,7 +48,8 @@ export interface DailyForecast {
   risk: SevereRisk;
 }
 
-export type RiskLevel = 'low' | 'moderate' | 'high' | 'severe';
+// Matches NOAA SPC's real 5-tier categorical outlook naming/ordering.
+export type RiskLevel = 'marginal' | 'slight' | 'enhanced' | 'moderate' | 'high';
 
 export interface SevereRisk {
   level: RiskLevel;

@@ -16,11 +16,11 @@ interface Props {
 
 function riskToSeverity(level: DailyForecast['risk']['level']): AlertSeverity {
   switch (level) {
-    case 'severe':
-      return 'emergency';
     case 'high':
-      return 'warning';
+      return 'emergency';
     case 'moderate':
+      return 'warning';
+    case 'enhanced':
       return 'watch';
     default:
       return 'advisory';
@@ -208,7 +208,7 @@ export default function AlertComposer({
         </p>
       )}
 
-      <div className="alert-preview">
+      <div className="alert-preview" id="compose-preview">
         <div className="alert-preview-label">Preview</div>
         <pre>{body}</pre>
       </div>

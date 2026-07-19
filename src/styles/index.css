@@ -7,13 +7,13 @@
   --glass-bg-strong: rgba(255, 255, 255, 0.18);
   --glass-border: rgba(255, 255, 255, 0.13);
   --glass-highlight: rgba(255, 255, 255, 0.09);
-  --accent: #5b9bff;
-  --accent-strong: #2f6fed;
+  --accent: #ff3b30;
+  --accent-strong: #dc2626;
   --radius: 20px;
   --radius-sm: 12px;
   --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.15), 0 14px 34px -14px rgba(0, 0, 0, 0.75);
   --shadow-pop: 0 20px 48px -14px rgba(0, 0, 0, 0.75);
-  --shadow-glow: 0 8px 22px -6px rgba(47, 111, 237, 0.5);
+  --shadow-glow: 0 8px 22px -6px rgba(220, 38, 38, 0.5);
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
   --font-display: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
@@ -99,16 +99,16 @@ button:active:not(:disabled) {
   height: 100dvh;
   overflow: hidden;
   background-color: #000000;
-  background-image: radial-gradient(130% 65% at 50% -12%, rgba(47, 111, 237, 0.22) 0%, rgba(0, 0, 0, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(47, 111, 237, 0.1) 0%, rgba(0, 0, 0, 0) 62%),
-    linear-gradient(180deg, #060a14 0%, #020408 48%, #000000 100%);
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(220, 38, 38, 0.22) 0%, rgba(0, 0, 0, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(220, 38, 38, 0.1) 0%, rgba(0, 0, 0, 0) 62%),
+    linear-gradient(180deg, #140606 0%, #040101 48%, #000000 100%);
   transition: background-image 600ms var(--ease);
 }
 
 .app-bg-night {
-  background-image: radial-gradient(130% 65% at 50% -12%, rgba(47, 111, 237, 0.14) 0%, rgba(0, 0, 0, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(47, 111, 237, 0.06) 0%, rgba(0, 0, 0, 0) 62%),
-    linear-gradient(180deg, #030509 0%, #000000 48%, #000000 100%);
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(220, 38, 38, 0.14) 0%, rgba(0, 0, 0, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(220, 38, 38, 0.06) 0%, rgba(0, 0, 0, 0) 62%),
+    linear-gradient(180deg, #090202 0%, #000000 48%, #000000 100%);
 }
 
 .app-bg > .app {
@@ -582,7 +582,7 @@ button:active:not(:disabled) {
   top: -6px;
   right: -9px;
   background: var(--accent);
-  color: #04070d;
+  color: #fff;
   font-size: 0.6rem;
   font-weight: 700;
   min-width: 15px;
@@ -594,9 +594,41 @@ button:active:not(:disabled) {
   justify-content: center;
 }
 
+.bottom-nav-compose {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-nav-compose-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px -4px rgba(220, 38, 38, 0.65);
+  transform: translateY(-8px);
+  transition: transform 200ms var(--ease), filter 200ms var(--ease);
+}
+
+.bottom-nav-compose:hover .bottom-nav-compose-circle,
+.bottom-nav-compose.active .bottom-nav-compose-circle {
+  transform: translateY(-10px) scale(1.05);
+  filter: brightness(1.08);
+}
+
 .forecast-view,
 .alerts-view,
-.reports-view {
+.reports-view,
+.compose-view {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -1239,22 +1271,27 @@ section h2::before {
   border-color: rgba(134, 239, 172, 0.3);
 }
 
-.severe-banner-moderate {
+.severe-banner-slight {
   border-left: 3px solid #eab308;
 }
 
-.severe-banner-high {
+.severe-banner-enhanced {
   border-left: 3px solid #f97316;
 }
 
-.severe-banner-severe {
+.severe-banner-moderate {
   border-left: 3px solid #ef4444;
   background: rgba(239, 68, 68, 0.14);
 }
 
+.severe-banner-high {
+  border-left: 3px solid #d946ef;
+  background: rgba(217, 70, 239, 0.14);
+}
+
 .severe-banner-button {
   background: var(--accent);
-  color: #04202f;
+  color: #fff;
   border: none;
   padding: 9px 14px;
   border-radius: 10px;
@@ -1298,6 +1335,52 @@ section h2::before {
 .risk-meter-caption {
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+/* Today's Outlook compact row */
+.outlook-row {
+  --risk-color: #94a3c4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--text);
+  cursor: default;
+}
+
+.outlook-row:not(:disabled) {
+  cursor: pointer;
+}
+
+.outlook-row-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.outlook-row-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--risk-color);
+}
+
+.outlook-row-fraction {
+  font-size: 0.85rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--risk-color) 22%, transparent);
+}
+
+.outlook-row-chevron {
+  transform: rotate(-90deg);
+  color: var(--text-faint);
 }
 
 /* Storm arrival timer */
@@ -1874,13 +1957,14 @@ section h2::before {
   transform: translateX(-50%) scale(0.97);
 }
 
-.fab-high,
-.fab-severe {
+.fab-moderate,
+.fab-high {
   background: rgba(220, 38, 38, 0.88);
   border-color: rgba(239, 68, 68, 0.45);
 }
 
-.fab-moderate {
+.fab-slight,
+.fab-enhanced {
   background: rgba(202, 138, 4, 0.88);
   color: #1c1503;
   border-color: rgba(234, 179, 8, 0.45);
@@ -1966,7 +2050,7 @@ section h2::before {
 
 .friend-form button {
   background: var(--accent);
-  color: #04202f;
+  color: #fff;
   border: none;
   border-radius: 10px;
   font-weight: 700;
@@ -2008,7 +2092,7 @@ section h2::before {
 
 .discord-form button {
   background: var(--accent);
-  color: #04202f;
+  color: #fff;
   border: none;
   border-radius: 10px;
   font-weight: 700;
@@ -2239,13 +2323,15 @@ section h2::before {
 
 .send-button {
   width: 100%;
-  padding: 13px;
+  padding: 14px;
   border-radius: 12px;
   border: none;
   background: var(--accent);
-  color: #04202f;
-  font-weight: 700;
+  color: #fff;
+  font-weight: 800;
   font-size: 0.94rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   cursor: pointer;
   box-shadow: var(--shadow-glow);
 }
@@ -2295,13 +2381,71 @@ section h2::before {
 }
 
 .history-item {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  border-left: 3px solid var(--severity-color, var(--glass-border));
+  overflow: hidden;
+}
+
+.history-filter-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+  overflow-x: auto;
+}
+
+.history-filter-tabs button {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.history-filter-tabs button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.history-row {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  width: 100%;
+  background: none;
+  border: none;
   padding: 10px 12px;
-  border-left: 3px solid var(--severity-color, var(--glass-border));
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-chevron {
+  flex-shrink: 0;
+  margin-top: 4px;
+  transform: rotate(-90deg);
+  color: var(--text-faint);
+  transition: transform 200ms var(--ease);
+}
+
+.history-chevron-open {
+  transform: rotate(0deg);
+}
+
+.history-message {
+  margin: 0 12px 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--glass-border);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  line-height: 1.5;
 }
 
 .history-icon {
@@ -2604,6 +2748,72 @@ section h2::before {
   color: var(--accent);
 }
 
+.radar-time-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.radar-now-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.16);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.radar-load-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: rgba(5, 8, 15, 0.7);
+}
+
+.radar-map-wrap {
+  position: relative;
+}
+
+.radar-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+}
+
+.radar-legend-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4ade80 0%, #eab308 35%, #f97316 65%, #ef4444 85%, #d946ef 100%);
+}
+
+.radar-town-label {
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  transform: translate(6px, -6px);
+  pointer-events: none;
+}
+
+.leaflet-container {
+  background: #0b1220;
+  font-family: inherit;
+}
+
 /* Storm outlook */
 .outlook-view {
   display: flex;
@@ -2671,7 +2881,7 @@ section h2::before {
   border-radius: 12px;
   border: none;
   background: var(--accent);
-  color: #04202f;
+  color: #fff;
   font-weight: 700;
   font-size: 0.92rem;
   cursor: pointer;
@@ -2832,4 +3042,209 @@ section h2::before {
   .daily-detail {
     padding-left: 0;
   }
+}
+
+/* Sub-screens (My Subscriptions, Settings) reached from the More menu */
+.subscreen-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 2px 4px;
+}
+
+.subscreen-header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.subscreen-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.subscreen-back-chevron {
+  transform: rotate(90deg);
+}
+
+.compose-header {
+  justify-content: space-between;
+}
+
+.compose-header h1 {
+  font-size: 1rem;
+}
+
+.compose-cancel,
+.compose-preview-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 4px 2px;
+  text-decoration: none;
+}
+
+.subscriptions-view,
+.settings-view,
+.more-view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.my-counties-list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.my-county-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.my-county-row:last-child {
+  border-bottom: none;
+}
+
+.my-county-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.my-county-name svg {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.my-county-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.my-county-remove {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 2px;
+}
+
+.my-county-remove:hover {
+  color: var(--accent);
+}
+
+.my-counties-add .location-search {
+  position: relative;
+}
+
+/* Settings screen */
+.settings-card {
+  padding: 6px 18px;
+}
+
+.settings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: none;
+  background: none;
+  border-bottom: 1px solid var(--glass-border);
+  padding: 14px 0;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-list li:last-child .settings-row {
+  border-bottom: none;
+}
+
+.settings-row-icon {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.settings-row-label {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.settings-row-value {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.settings-row-chevron {
+  transform: rotate(-90deg);
+  color: var(--text-faint);
+  flex-shrink: 0;
+  transition: transform 200ms var(--ease);
+}
+
+.settings-row-chevron-open {
+  transform: rotate(0deg);
+}
+
+.settings-row-static {
+  cursor: default;
+}
+
+.settings-row-danger {
+  color: var(--accent);
+}
+
+.settings-row-danger .settings-row-icon {
+  color: var(--accent);
+}
+
+.settings-about-body {
+  padding: 0 0 16px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.settings-about-body p {
+  margin: 0 0 8px;
+}
+
+.settings-about-body p:last-child {
+  margin-bottom: 0;
 }

@@ -45,26 +45,38 @@ export function assessDailyRisk(input: RiskInput): SevereRisk {
 
   score = Math.min(100, score);
 
-  let level: RiskLevel = 'low';
-  if (score >= 65) level = 'severe';
-  else if (score >= 40) level = 'high';
-  else if (score >= 18) level = 'moderate';
+  let level: RiskLevel = 'marginal';
+  if (score >= 70) level = 'high';
+  else if (score >= 50) level = 'moderate';
+  else if (score >= 30) level = 'enhanced';
+  else if (score >= 15) level = 'slight';
 
   if (reasons.length === 0) reasons.push('No significant severe weather signals');
 
   return { level, score, reasons };
 }
 
+// Ordered 1-5 to match SPC's own categorical outlook numbering.
 export const RISK_LABEL: Record<RiskLevel, string> = {
-  low: 'Low',
+  marginal: 'Marginal',
+  slight: 'Slight',
+  enhanced: 'Enhanced',
   moderate: 'Moderate',
   high: 'High',
-  severe: 'Severe',
+};
+
+export const RISK_NUMBER: Record<RiskLevel, number> = {
+  marginal: 1,
+  slight: 2,
+  enhanced: 3,
+  moderate: 4,
+  high: 5,
 };
 
 export const RISK_COLOR: Record<RiskLevel, string> = {
-  low: '#22c55e',
-  moderate: '#eab308',
-  high: '#f97316',
-  severe: '#ef4444',
+  marginal: '#4ade80',
+  slight: '#eab308',
+  enhanced: '#f97316',
+  moderate: '#ef4444',
+  high: '#d946ef',
 };

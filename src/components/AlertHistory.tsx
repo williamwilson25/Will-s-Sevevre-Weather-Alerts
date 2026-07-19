@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import type { CSSProperties } from 'react';
-import type { AlertRecord, Friend } from '../types';
+import type { AlertRecord, AlertSeverity, Friend } from '../types';
 import { SEVERITY_COLOR, SEVERITY_LABEL } from '../utils/alerts';
-import { AlertTriangleIcon } from './icons';
+import { AlertTriangleIcon, ChevronDownIcon } from './icons';
 
 interface Props {
   history: AlertRecord[];
@@ -9,7 +10,26 @@ interface Props {
   onClear: () => void;
 }
 
+type Filter = 'all' | 'warnings' | 'watches' | 'others';
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'warnings', label: 'Warnings' },
+  { key: 'watches', label: 'Watches' },
+  { key: 'others', label: 'Others' },
+];
+
+function matchesFilter(severity: AlertSeverity, filter: Filter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'warnings') return severity === 'warning' || severity === 'emergency';
+  if (filter === 'watches') return severity === 'watch';
+  return severity === 'advisory';
+}
+
 export default function AlertHistory({ history, friends, onClear }: Props) {
+  const [filter, setFilter] = useState<Filter>('all');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   if (history.length === 0) {
     return (
       <section className="alert-history">
@@ -20,6 +40,8 @@ export default function AlertHistory({ history, friends, onClear }: Props) {
   }
 
   const nameFor = (id: string) => friends.find((f) => f.id === id)?.name ?? 'Removed friend';
+  const sorted = [...history].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const filtered = sorted.filter((r) => matchesFilter(r.severity, filter));
 
   return (
     <section className="alert-history">
@@ -29,35 +51,66 @@ export default function AlertHistory({ history, friends, onClear }: Props) {
           Clear history
         </button>
       </div>
-      <ul className="history-list">
-        {[...history]
-          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-          .map((record) => (
-            <li
-              key={record.id}
-              className="history-item"
-              style={{ '--severity-color': SEVERITY_COLOR[record.severity] } as CSSProperties}
-            >
-              <span className="history-icon" style={{ color: SEVERITY_COLOR[record.severity] }}>
-                <AlertTriangleIcon size={16} />
-              </span>
-              <div className="history-body">
-                <div
-                  className="history-severity"
-                  style={{ color: SEVERITY_COLOR[record.severity] }}
+
+      <div className="history-filter-tabs">
+        {FILTERS.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            className={filter === key ? 'active' : ''}
+            onClick={() => setFilter(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="empty-state">No alerts in this category.</p>
+      ) : (
+        <ul className="history-list">
+          {filtered.map((record) => {
+            const expanded = expandedId === record.id;
+            return (
+              <li
+                key={record.id}
+                className="history-item"
+                style={{ '--severity-color': SEVERITY_COLOR[record.severity] } as CSSProperties}
+              >
+                <button
+                  type="button"
+                  className="history-row"
+                  onClick={() => setExpandedId(expanded ? null : record.id)}
+                  aria-expanded={expanded}
                 >
-                  {SEVERITY_LABEL[record.severity]}
-                </div>
-                <div className="history-headline">{record.headline}</div>
-                <div className="history-meta">
-                  To: {record.recipientIds.map(nameFor).join(', ')} ·{' '}
-                  {new Date(record.createdAt).toLocaleString()}
-                </div>
-              </div>
-              <span className="history-badge">Sent</span>
-            </li>
-          ))}
-      </ul>
+                  <span className="history-icon" style={{ color: SEVERITY_COLOR[record.severity] }}>
+                    <AlertTriangleIcon size={16} />
+                  </span>
+                  <div className="history-body">
+                    <div
+                      className="history-severity"
+                      style={{ color: SEVERITY_COLOR[record.severity] }}
+                    >
+                      {SEVERITY_LABEL[record.severity]}
+                    </div>
+                    <div className="history-headline">{record.headline}</div>
+                    <div className="history-meta">
+                      To: {record.recipientIds.map(nameFor).join(', ')} ·{' '}
+                      {new Date(record.createdAt).toLocaleString()}
+                    </div>
+                  </div>
+                  <span className="history-badge">Sent</span>
+                  <ChevronDownIcon
+                    size={14}
+                    className={`history-chevron${expanded ? ' history-chevron-open' : ''}`}
+                  />
+                </button>
+                {expanded && <p className="history-message">{record.message}</p>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }

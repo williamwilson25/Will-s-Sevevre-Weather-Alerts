@@ -525,3 +525,94 @@ export function OutlookMapIcon({ size = 24, className }: IconProps) {
   );
 }
 
+export function UserIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="8" r="3.6" stroke="currentColor" strokeWidth="1.7" />
+      <path
+        d="M4.5 20c1.4-3.6 4.4-5.5 7.5-5.5s6.1 1.9 7.5 5.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function UsersIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="9" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.7" />
+      <path
+        d="M2.7 19.5c1.2-3.2 3.7-4.9 6.3-4.9s5.1 1.7 6.3 4.9"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M15.5 5.2a3.2 3.2 0 0 1 0 6.2M18.3 14.9c1.7.7 3 2.1 3.7 4.1"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        opacity="0.75"
+      />
+    </svg>
+  );
+}
+
+export function InfoIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M12 11v6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <circle cx="12" cy="7.6" r="1.15" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function PlayIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M6.5 4.5v15l13-7.5-13-7.5z" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function PauseIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="6" y="4.5" width="4" height="15" rx="1" fill="currentColor" />
+      <rect x="14" y="4.5" width="4" height="15" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function PlusIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 4.5v15M4.5 12h15" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function LogoutIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path
+        d="M9.5 4H6a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 6 20h3.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.5 16.5 20 12l-4.5-4.5M20 12H9.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+

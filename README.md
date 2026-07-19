@@ -43,21 +43,27 @@ the next chance of severe weather, and sending customized alerts to friends.
   Winter Weather Alerts) push a notification. Checked across every saved location, not just the
   one on screen — add more cities from the search bar to get warned about severe weather in
   places you care about even while looking at somewhere else.
-- **Severe weather risk scoring** — each day also gets a Low/Moderate/High/Severe risk score
-  derived from forecasted weather codes (thunderstorms, hail), wind gusts, and precipitation
-  probability, surfaced as a banner for the next day severe weather is expected and used to
-  pick which day the one-tap "Alert friends" action targets.
+- **Severe weather risk scoring** — each day gets a 5-tier risk score matching NOAA Storm
+  Prediction Center's own categorical outlook naming and order (Marginal → Slight → Enhanced →
+  Moderate → High, shown as "X/5"), derived from forecasted weather codes (thunderstorms, hail),
+  wind gusts, and precipitation probability. Surfaced as a banner for the next day Enhanced-or-
+  higher risk is expected and used to pick which day the one-tap "Alert friends" action targets.
+- **Today's Outlook row** — a compact "Slight Risk · 2/5" summary on the Home tab; tap it to jump
+  straight to the full Storm Outlook.
 - **Storm Risk Meter** — a color-zoned gauge on the Home tab visualizing today's risk score at a
-  glance, needle-driven by the same Low/Moderate/High/Severe scoring above.
+  glance across all 5 tiers, needle-driven by the same scoring above.
 - **Storm Arrival Timer** — when rain is genuinely about to start, a prominent countdown card
   ("Storms arriving in N MIN, around H:MM") appears above the regular nowcast card.
 - **Saved Locations list** — every saved city shown with its own live temperature and condition
   icon (fetched independently of whichever location is active), tap any row to switch to it.
-- **Live storm radar** — the National Weather Service's own radar loop for the Norman, OK
-  station (KTLX, radar.weather.gov), embedded directly, with a link to open it full-screen if
-  it doesn't load.
+- **Live Radar** — a real animated radar view (RainViewer tiles over an OpenStreetMap/CARTO dark
+  basemap via Leaflet) centered on the OKC metro, with play/pause through the last several radar
+  frames, a timestamp + "Now" indicator, an intensity legend, and labeled towns (Kingfisher,
+  Guthrie, Edmond, El Reno, OKC, Norman, Chickasha, Purcell). A link to NWS's own
+  radar.weather.gov loop for KTLX is included as the official-source fallback.
 - **Regional storm outlook** — an embed of NOAA Storm Prediction Center's own Day 1–3 categorical
-  convective outlook page, with a link to open it full-screen if it doesn't load.
+  convective outlook page, with a link to open it full-screen if it doesn't load. Reached from the
+  More menu.
 - **Storm Reports** — a crowd-sourced Reports tab where any signed-in user can submit what
   they're seeing (Tornado, Hail, Wind Damage, Flooding, Power Outage, Other) with a location,
   optional details, and an optional photo. Reports start as pending and only appear in the
@@ -72,13 +78,20 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Storm Safety** — a static, always-available reference card on the Home tab covering Watch vs.
   Warning, Tornado Safety, Hail Safety, and a Preparedness Checklist, each expandable in place.
   No sign-in or network dependency beyond the app shell.
+- **My Subscriptions** — reached from the More menu, lets any signed-in user mute/unmute alerts
+  per saved location (without removing it) and manage the same per-warning-type notification
+  toggles from one screen, alongside adding new locations.
+- **Settings** — a dedicated screen (More → Settings) covering account email, notification status,
+  quick links into Alert Preferences and Manage Counties, an Invite Friends share action, app
+  theme (dark-only today), an About panel, and Logout.
 - **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert
-  sent), one-tap quick-alert presets for common warning types (Tornado Warning/Watch, Severe
-  T-Storm Warning/Watch, Flash Flood Warning, High Wind Warning) that pre-fill the composer, and
-  a sent-alert history with a status badge. Save friends' phone numbers, compose a custom alert
-  (pick the day, severity, and an optional personal note), preview the message, and send it.
-  Alerts go out through your own Messages app (`sms:` links), and friend data never leaves your
-  browser (stored in `localStorage`). Only visible to the owner's account.
+  sent), a sent-alert history with filter tabs (All/Warnings/Watches/Others) and expandable
+  full-message cards. Only visible to the owner's account.
+- **Create Alert** — reached via the red **+** button in the bottom nav (owner only): quick-alert
+  presets for common warning types (Tornado Warning/Watch, Severe T-Storm Warning/Watch, Flash
+  Flood Warning, High Wind Warning) that pre-fill the composer, pick the day/severity, an optional
+  personal note, preview the exact message, and send it. Alerts go out through your own Messages
+  app (`sms:` links), and friend data never leaves your browser (stored in `localStorage`).
 - **Per-friend delivery choice** — when adding a friend, pick whether they get alerts by text or
   through the shared Discord channel; Discord friends skip the phone number entirely and are
   automatically excluded from the text-recipient list (they're already covered by the Discord
@@ -91,18 +104,19 @@ the next chance of severe weather, and sending customized alerts to friends.
 
 ## Navigation
 
-Forecast (Home), Radar, Outlook, and Alerts are real swipeable pages, not one long scrolling
-document — a compact status bar (icon, temperature, location) stays pinned at the top and a
-bottom tab bar (icon + label per tab, like a native app) stays pinned at the bottom, with each
-tab's content scrolling independently in between. Swipe left/right anywhere on a tab to page to
-the next/previous one, in addition to tapping the tab bar. Swipes starting on the
-hourly-forecast scroll strip or the location search results are ignored so they don't fight
-with those elements' own gestures.
+The bottom nav is Dashboard / Alerts / **+** / Radar / More (owner) or just Dashboard / Radar /
+More (everyone else, since Alerts and the **+** compose button are owner-only broadcast tools).
+Dashboard, Alerts, and Radar are real swipeable pages, not one long scrolling document — a
+compact status bar (icon, temperature, location) stays pinned at the top, with each tab's content
+scrolling independently in between. Swipe left/right anywhere on a tab to page to the
+next/previous one, in addition to tapping the tab bar. Swipes starting on the hourly-forecast
+scroll strip or the location search results are ignored so they don't fight with those elements'
+own gestures.
 
-There's no separate Settings tab — settings live where they're used instead: per-warning-type
-notification toggles and location management are on the Home tab, friend/Discord management is
-on the Alerts tab, and account sign-out is wherever sign-in happens. A dedicated Settings screen
-would just be a second copy of controls that already exist elsewhere.
+The **+** button always opens Create Alert directly, regardless of which tab you're on. Storm
+Outlook, Storm Reports, My Subscriptions, and Settings all live one level down, behind **More** —
+each has its own back arrow rather than its own nav icon, since they're reached far less often
+than Dashboard/Alerts/Radar.
 
 ## Getting started
 
@@ -133,11 +147,13 @@ Vite + React + TypeScript. All weather data — current conditions, hourly and m
 severe weather risk scoring, active alerts, and the primary forecast text — comes from the
 National Weather Service's public API (api.weather.gov), free and keyless: current conditions
 from the nearest live observation station, forecasts from the NWS office responsible for each
-location (Norman/OUN for this app's Great Plains focus). Live radar is an embed of NWS's own
-radar.weather.gov loop for the Norman station (KTLX), and the Outlook tab embeds NOAA's Storm
-Prediction Center outlook page directly. The only non-NWS call is Open-Meteo's free geocoding
-search, used purely to
-turn a typed city name into coordinates — no weather data comes from it. Sunrise/sunset are
+location (Norman/OUN for this app's Great Plains focus). Live Radar renders RainViewer's free
+radar tile API over a Leaflet map (OpenStreetMap/CARTO dark basemap) with a link to NWS's own
+radar.weather.gov loop (KTLX) as the official-source fallback, and the Storm Outlook screen embeds
+NOAA's Storm Prediction Center outlook page directly. The only non-NWS calls are Open-Meteo's free
+geocoding search, used purely to
+turn a typed city name into coordinates — no weather data comes from it — and RainViewer/CARTO for
+radar tiles and basemap imagery. Sunrise/sunset are
 computed locally (NWS doesn't publish them) via the standard solar-position algorithm, accurate
 to within about a quarter hour. Firebase Authentication handles sign-in, and Cloud Firestore
 stores one small `subscribers/{uid}` record per signed-up user (email, phone, location) so the
