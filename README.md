@@ -83,6 +83,10 @@ the next chance of severe weather, and sending customized alerts to friends.
 - **Settings** — a dedicated screen (More → Settings) covering account email, notification status,
   quick links into Alert Preferences and Manage Counties, an Invite Friends share action, app
   theme (dark-only today), an About panel, and Logout.
+- **Always-On Alerts** — a Settings toggle that subscribes the browser to real Web Push, so severe
+  weather alerts for your saved (non-muted) locations can arrive even when the app hasn't been
+  opened in days, instead of only while a tab is sitting open polling NWS. Needs a Cloud Function
+  deployed once — see **Setup: enabling always-on push notifications** below.
 - **Alerts dashboard** — an overview card (alerts sent, sent this week, friend count, last alert
   sent), a sent-alert history with filter tabs (All/Warnings/Watches/Others) and expandable
   full-message cards. Only visible to the owner's account.
@@ -139,6 +143,50 @@ anything (submissions will silently fail until then — the rest of the app is u
    the contents of `storage.rules` (Storage → Rules). It caps uploads at 10MB, requires an image
    content type, and only lets a signed-in user write into their own `storm-reports/{uid}/`
    folder — anyone can read a photo once they have its URL.
+
+## Setup: enabling always-on push notifications
+
+The **Always-On Alerts** toggle in Settings needs a Cloud Function deployed before it does
+anything — flipping it on will subscribe the browser and save the subscription to Firestore, but
+nothing will actually check for new alerts or push to it until this is done. Unlike the two setups
+above, this one needs the Firebase CLI (not just the console) and a paid billing plan, because
+scheduled Cloud Functions require it. None of this can be done from a sandboxed coding session —
+it needs your own Firebase login and billing consent.
+
+1. **Upgrade to the Blaze (pay-as-you-go) plan** — Firebase console → this project → click "Upgrade"
+   next to the plan name. Scheduled functions don't run on the free Spark plan. In practice, a
+   handful of users checking a few saved locations every 5 minutes costs well under $1/month, but
+   it does require a billing account attached.
+2. **Install and log into the Firebase CLI** on your own machine (this repo has no CLI access from
+   here):
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   ```
+3. **Set the VAPID private key as a function secret** — I generated a VAPID key pair for this
+   feature; the public half is already committed in `src/api/pushSubscriptions.ts` (safe to be
+   public) and mirrored in `functions/index.js`. The private half must never be committed — I've
+   only shared it with you directly in chat, not in this repo. Set it once:
+   ```bash
+   firebase functions:secrets:set VAPID_PRIVATE_KEY
+   ```
+   and paste in the private key when prompted.
+4. **Install the function's dependencies and deploy**, from the repo root:
+   ```bash
+   cd functions && npm install && cd ..
+   firebase deploy --only functions,firestore:rules
+   ```
+   (`firestore:rules` is included here since this feature also added a `pushSubscriptions`
+   collection to `firestore.rules` that needs publishing — you can alternatively publish that one
+   rule block by hand in the console the same way as the Storm Reports rules, if you'd rather not
+   deploy rules via CLI.)
+
+Once deployed, `checkSevereWeatherAlerts` runs every 5 minutes, reads every `pushSubscriptions/{uid}`
+doc, checks NWS active alerts for each subscriber's saved (non-muted) locations, filters by their
+alert-type preferences, and sends a real Web Push message for anything new — arriving even if the
+app hasn't been opened in days. If you ever add a new alert-type toggle in the app itself
+(`src/utils/alertTypes.ts`), mirror it in `functions/index.js`'s `ALERT_TYPE_CONFIGS` too, since the
+function is a separate Node package and doesn't share that file with the client bundle.
 
 ## Stack
 

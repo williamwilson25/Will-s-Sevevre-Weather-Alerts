@@ -12,6 +12,26 @@ self.addEventListener('message', (event) => {
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
+// Fires from a real Web Push message sent by the scheduled Cloud Function —
+// this is what lets an alert arrive even when no tab has the app open, since
+// the browser wakes the service worker on its own for this event.
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { title: 'Severe weather alert', body: event.data ? event.data.text() : '' };
+  }
+  const title = payload.title || 'Severe weather alert';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: payload.body || '',
+      icon: payload.icon || './logo-512.png',
+      data: { url: payload.url || './' },
+    }),
+  );
+});
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(

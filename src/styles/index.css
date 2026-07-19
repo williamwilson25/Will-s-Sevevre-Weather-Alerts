@@ -1543,6 +1543,37 @@ section h2::before {
   transform: translateX(18px);
 }
 
+.toggle-switch-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.push-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.push-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.push-toggle-caption {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  max-width: 220px;
+}
+
+.push-toggle-error {
+  flex-basis: 100%;
+  margin: 0;
+}
+
 /* Alert notification type toggles */
 .alert-type-settings-list {
   display: flex;

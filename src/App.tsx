@@ -26,6 +26,7 @@ import type { NowcastState } from './utils/nowcast';
 import { fetchActiveAlerts, type NwsAlert } from './api/nwsAlerts';
 import { DEFAULT_ALERT_TYPE_PREFS, isAlertNotifiable } from './utils/alertTypes';
 import { showNotification } from './utils/notify';
+import { pushSupported, syncPushPrefs } from './api/pushSubscriptions';
 import { watchSubscribers } from './api/subscribers';
 import FriendsManager from './components/FriendsManager';
 import DiscordSettings from './components/DiscordSettings';
@@ -227,6 +228,26 @@ export default function App() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locations.map((l) => l.id).join(','), user]);
+
+  // Keeps the server-side copy of locations/mutes/alert-type prefs current
+  // for the always-on push Cloud Function, but only once this device has
+  // actually opted in — otherwise this would silently create a
+  // pushSubscriptions doc for every signed-in user, subscribed or not.
+  useEffect(() => {
+    if (!user || !pushSupported()) return;
+    let cancelled = false;
+    navigator.serviceWorker.ready
+      .then((reg) => reg.pushManager.getSubscription())
+      .then((sub) => {
+        if (cancelled || !sub) return;
+        return syncPushPrefs(user.uid, { locations, mutedLocationIds, alertTypePrefs });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locations, mutedLocationIds, alertTypePrefs, user]);
 
   function handleManualRefresh() {
     setRefreshing(true);
@@ -622,6 +643,7 @@ export default function App() {
 
                     {t === 'settings' && (
                       <SettingsScreen
+                        uid={user.uid}
                         email={user.email ?? ''}
                         notifyRain={notifyRain}
                         notifySupported={notifySupported}
@@ -629,6 +651,9 @@ export default function App() {
                         onOpenSubscriptions={() => goToTab('subscriptions')}
                         onLogout={() => signOut(auth)}
                         onBack={() => goToTab('more')}
+                        locations={locations}
+                        mutedLocationIds={mutedLocationIds}
+                        alertTypePrefs={alertTypePrefs}
                       />
                     )}
 

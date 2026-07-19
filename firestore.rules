@@ -34,5 +34,13 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.token.email == 'williamwilson25@icloud.com';
     }
+
+    // Always-on Web Push: each user's own subscription, watched locations,
+    // and alert-type prefs, read/written only by that user from the client.
+    // The scheduled Cloud Function reads/writes this collection too, via the
+    // Admin SDK, which bypasses these rules entirely.
+    match /pushSubscriptions/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
   }
 }

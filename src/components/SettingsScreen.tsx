@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import type { Location } from '../types';
+import PushNotificationToggle from './PushNotificationToggle';
 import {
   ChevronDownIcon,
   UserIcon,
@@ -12,6 +14,7 @@ import {
 } from './icons';
 
 interface Props {
+  uid: string;
   email: string;
   notifyRain: boolean;
   notifySupported: boolean;
@@ -19,11 +22,15 @@ interface Props {
   onOpenSubscriptions: () => void;
   onLogout: () => void;
   onBack: () => void;
+  locations: Location[];
+  mutedLocationIds: string[];
+  alertTypePrefs: Record<string, boolean>;
 }
 
 const APP_URL = 'https://williamwilson25.github.io/Will-s-Sevevre-Weather-Alerts/';
 
 export default function SettingsScreen({
+  uid,
   email,
   notifyRain,
   notifySupported,
@@ -31,6 +38,9 @@ export default function SettingsScreen({
   onOpenSubscriptions,
   onLogout,
   onBack,
+  locations,
+  mutedLocationIds,
+  alertTypePrefs,
 }: Props) {
   const [shareStatus, setShareStatus] = useState('');
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -77,12 +87,21 @@ export default function SettingsScreen({
           <li>
             <button type="button" className="settings-row" onClick={onEnableRainNotify}>
               <BellAlertIcon size={18} className="settings-row-icon" />
-              <span className="settings-row-label">Notification Settings</span>
+              <span className="settings-row-label">Rain Start Alerts</span>
               <span className="settings-row-value">
                 {!notifySupported ? 'Unsupported' : notifyRain ? 'On' : 'Off'}
               </span>
               <ChevronDownIcon size={14} className="settings-row-chevron" />
             </button>
+          </li>
+
+          <li>
+            <PushNotificationToggle
+              uid={uid}
+              locations={locations}
+              mutedLocationIds={mutedLocationIds}
+              alertTypePrefs={alertTypePrefs}
+            />
           </li>
 
           <li>
