@@ -34,7 +34,6 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
-import LiveRadarMap from './components/LiveRadarMap';
 import StormReportsTab from './components/StormReportsTab';
 import WeatherDeskCard from './components/WeatherDeskCard';
 import StormSafetyCard from './components/StormSafetyCard';
@@ -551,7 +550,12 @@ export default function App() {
 
                     {t === 'radar' && (
                       <div className="radar-view">
-                        <LiveRadarMap />
+                        <ExternalRadar
+                          url="https://radar.weather.gov/station/KTLX/standard"
+                          title="Live Storm Radar"
+                          label="LIVE"
+                          caption="Live radar from the National Weather Service — Norman, OK (KTLX)."
+                        />
                       </div>
                     )}
 

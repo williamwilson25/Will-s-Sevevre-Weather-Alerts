@@ -56,11 +56,9 @@ the next chance of severe weather, and sending customized alerts to friends.
   ("Storms arriving in N MIN, around H:MM") appears above the regular nowcast card.
 - **Saved Locations list** — every saved city shown with its own live temperature and condition
   icon (fetched independently of whichever location is active), tap any row to switch to it.
-- **Live Radar** — a real animated radar view (RainViewer tiles over an OpenStreetMap/CARTO dark
-  basemap via Leaflet) centered on the OKC metro, with play/pause through the last several radar
-  frames, a timestamp + "Now" indicator, an intensity legend, and labeled towns (Kingfisher,
-  Guthrie, Edmond, El Reno, OKC, Norman, Chickasha, Purcell). A link to NWS's own
-  radar.weather.gov loop for KTLX is included as the official-source fallback.
+- **Live storm radar** — the National Weather Service's own radar loop for the Norman, OK
+  station (KTLX, radar.weather.gov), embedded directly, with a link to open it full-screen if
+  it doesn't load.
 - **Regional storm outlook** — an embed of NOAA Storm Prediction Center's own Day 1–3 categorical
   convective outlook page, with a link to open it full-screen if it doesn't load. Reached from the
   More menu.
@@ -147,13 +145,11 @@ Vite + React + TypeScript. All weather data — current conditions, hourly and m
 severe weather risk scoring, active alerts, and the primary forecast text — comes from the
 National Weather Service's public API (api.weather.gov), free and keyless: current conditions
 from the nearest live observation station, forecasts from the NWS office responsible for each
-location (Norman/OUN for this app's Great Plains focus). Live Radar renders RainViewer's free
-radar tile API over a Leaflet map (OpenStreetMap/CARTO dark basemap) with a link to NWS's own
-radar.weather.gov loop (KTLX) as the official-source fallback, and the Storm Outlook screen embeds
-NOAA's Storm Prediction Center outlook page directly. The only non-NWS calls are Open-Meteo's free
-geocoding search, used purely to
-turn a typed city name into coordinates — no weather data comes from it — and RainViewer/CARTO for
-radar tiles and basemap imagery. Sunrise/sunset are
+location (Norman/OUN for this app's Great Plains focus). Live radar is an embed of NWS's own
+radar.weather.gov loop for the Norman station (KTLX), and the Storm Outlook screen embeds NOAA's
+Storm Prediction Center outlook page directly. The only non-NWS call is Open-Meteo's free geocoding
+search, used purely to
+turn a typed city name into coordinates — no weather data comes from it. Sunrise/sunset are
 computed locally (NWS doesn't publish them) via the standard solar-position algorithm, accurate
 to within about a quarter hour. Firebase Authentication handles sign-in, and Cloud Firestore
 stores one small `subscribers/{uid}` record per signed-up user (email, phone, location) so the
