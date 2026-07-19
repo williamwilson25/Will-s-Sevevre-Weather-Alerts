@@ -1,6 +1,13 @@
 import { ALERT_TYPE_CONFIGS } from '../utils/alertTypes';
 import ToggleSwitch from './ToggleSwitch';
-import { TornadoIcon, CloudLightningIcon, WaveIcon, WindIcon, CloudSnowIcon } from './icons';
+import {
+  TornadoIcon,
+  CloudLightningIcon,
+  WaveIcon,
+  WindIcon,
+  CloudSnowIcon,
+  AlertTriangleIcon,
+} from './icons';
 
 const ICONS: Record<string, typeof TornadoIcon> = {
   tornado_warning: TornadoIcon,
@@ -10,6 +17,7 @@ const ICONS: Record<string, typeof TornadoIcon> = {
   flash_flood_warning: WaveIcon,
   high_wind_warning: WindIcon,
   winter_weather: CloudSnowIcon,
+  other_warnings: AlertTriangleIcon,
 };
 
 interface Props {

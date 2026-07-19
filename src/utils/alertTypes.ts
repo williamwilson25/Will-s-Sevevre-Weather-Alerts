@@ -50,6 +50,17 @@ export const ALERT_TYPE_CONFIGS: AlertTypeConfig[] = [
     defaultEnabled: false,
     match: (event) => /winter|snow|ice|freez|blizzard/i.test(event),
   },
+  {
+    key: 'other_warnings',
+    label: 'Other NWS Warnings',
+    defaultEnabled: true,
+    // Catch-all for every other "Warning"-tier NWS alert (Extreme Wind,
+    // Flood, Excessive Heat, Dust Storm, Severe Weather Statement, etc.) —
+    // "Warning" is NWS's highest-urgency tier ("occurring or imminent"), so
+    // none of them should be silently unnotifiable just for lacking a
+    // dedicated toggle above.
+    match: (event) => /\bwarning$/i.test(event),
+  },
 ];
 
 export const DEFAULT_ALERT_TYPE_PREFS: Record<string, boolean> = Object.fromEntries(
