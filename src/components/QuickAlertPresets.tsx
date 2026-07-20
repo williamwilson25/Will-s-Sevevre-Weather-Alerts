@@ -1,7 +1,14 @@
 import type { CSSProperties } from 'react';
 import type { AlertSeverity } from '../types';
 import { SEVERITY_COLOR } from '../utils/alerts';
-import { TornadoIcon, CloudLightningIcon, WaveIcon, WindIcon, AlertTriangleIcon } from './icons';
+import {
+  TornadoIcon,
+  CloudLightningIcon,
+  WaveIcon,
+  WindIcon,
+  AlertTriangleIcon,
+  ThermometerIcon,
+} from './icons';
 
 export interface AlertPreset {
   label: string;
@@ -9,7 +16,7 @@ export interface AlertPreset {
   note: string;
 }
 
-const PRESETS: (AlertPreset & { icon: typeof TornadoIcon })[] = [
+const PRESETS: (AlertPreset & { icon: typeof TornadoIcon; wide?: boolean })[] = [
   {
     label: 'Tornado Warning',
     severity: 'emergency',
@@ -47,10 +54,17 @@ const PRESETS: (AlertPreset & { icon: typeof TornadoIcon })[] = [
     icon: WindIcon,
   },
   {
+    label: 'Heat Advisory',
+    severity: 'advisory',
+    note: 'Heat Advisory in effect. Limit outdoor activity, stay hydrated, and check on family/neighbors without AC.',
+    icon: ThermometerIcon,
+  },
+  {
     label: '🚨⚠️Stay Weather Aware ⚠️🚨',
     severity: 'advisory',
     note: '',
     icon: AlertTriangleIcon,
+    wide: true,
   },
 ];
 
@@ -69,7 +83,7 @@ export default function QuickAlertPresets({ onSelect }: Props) {
             <button
               key={preset.label}
               type="button"
-              className="quick-alert-button"
+              className={`quick-alert-button${preset.wide ? ' quick-alert-button-wide' : ''}`}
               style={{ '--severity-color': SEVERITY_COLOR[preset.severity] } as CSSProperties}
               onClick={() => onSelect(preset)}
             >

@@ -2555,7 +2555,7 @@ section h2::before {
   gap: 8px;
 }
 
-.quick-alerts-grid > .quick-alert-button:last-child:nth-child(odd) {
+.quick-alert-button-wide {
   grid-column: 1 / -1;
 }
 
