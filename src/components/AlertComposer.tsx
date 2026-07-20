@@ -91,6 +91,7 @@ export default function AlertComposer({
       window.open(buildSmsLink(friend, body), '_blank');
     });
 
+    let appSucceeded = false;
     if (appRecipients.length > 0) {
       try {
         await sendAppNotification(
@@ -100,21 +101,24 @@ export default function AlertComposer({
           body,
           severity,
         );
+        appSucceeded = true;
       } catch {
         errors.push('the app notification failed to send');
       }
     }
 
+    let discordSucceeded = false;
     if (willPostToDiscord) {
       try {
         await postToDiscord(discordWebhookUrl, headline, body, SEVERITY_COLOR[severity]);
+        discordSucceeded = true;
       } catch {
         errors.push('the Discord post failed — check the webhook URL in settings');
       }
     }
 
     if (errors.length > 0) {
-      setSendError(`Some alerts went out, but ${errors.join(', and ')}.`);
+      setSendError(`${errors.length === 1 ? errors[0][0].toUpperCase() + errors[0].slice(1) : errors.join(', and ')}.`);
     }
 
     const record: AlertRecord = {
@@ -128,11 +132,18 @@ export default function AlertComposer({
     };
     onSent(record);
     setSending(false);
-    const parts = [];
-    if (recipients.length > 0) parts.push(`${recipients.length} friend${recipients.length === 1 ? '' : 's'}`);
-    if (willPostToDiscord) parts.push('Discord');
-    setSentFlash(`Alert sent to ${parts.join(' and ')}.`);
-    setTimeout(() => setSentFlash(''), 4000);
+
+    // Text "sends" fire-and-forget (opening Messages), so those still count
+    // as sent — but app notifications only count if they actually succeeded,
+    // otherwise this would falsely claim delivery that didn't happen.
+    const sentCount = textRecipients.length + (appSucceeded ? appRecipients.length : 0);
+    const parts: string[] = [];
+    if (sentCount > 0) parts.push(`${sentCount} friend${sentCount === 1 ? '' : 's'}`);
+    if (discordSucceeded) parts.push('Discord');
+    if (parts.length > 0) {
+      setSentFlash(`Alert sent to ${parts.join(' and ')}.`);
+      setTimeout(() => setSentFlash(''), 4000);
+    }
   }
 
   return (
