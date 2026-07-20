@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { DeliveryMethod, Friend, Location } from '../types';
 import Avatar from './Avatar';
-import { MapPinIcon, DiscordIcon } from './icons';
+import { MapPinIcon, DiscordIcon, BellAlertIcon } from './icons';
 
 interface Props {
   friends: Friend[];
@@ -40,6 +40,10 @@ export default function FriendsManager({ friends, onChange, onViewLocation }: Pr
 
   function removeFriend(id: string) {
     onChange(friends.filter((f) => f.id !== id));
+  }
+
+  function setFriendDelivery(id: string, method: DeliveryMethod) {
+    onChange(friends.map((f) => (f.id === id ? { ...f, deliveryMethod: method } : f)));
   }
 
   return (
@@ -100,23 +104,50 @@ export default function FriendsManager({ friends, onChange, onViewLocation }: Pr
                   {friend.name}
                   {friend.uid && <span className="friend-subscriber-badge">Signed up</span>}
                 </div>
-                <div className="friend-contact">
-                  {friend.deliveryMethod === 'discord' ? (
-                    <span className="friend-delivery-badge">
-                      <DiscordIcon size={12} /> Discord
-                    </span>
-                  ) : (
-                    friend.phone
-                  )}
-                  {friend.location && (
-                    <>
-                      {' · '}
-                      <MapPinIcon size={11} />{' '}
-                      {friend.location.name}
-                      {friend.location.admin1 ? `, ${friend.location.admin1}` : ''}
-                    </>
-                  )}
-                </div>
+                {friend.uid ? (
+                  <div className="friend-delivery-toggle friend-delivery-toggle-inline" role="radiogroup" aria-label={`How ${friend.name} receives alerts`}>
+                    <button
+                      type="button"
+                      className={(friend.deliveryMethod ?? 'text') === 'text' ? 'active' : ''}
+                      onClick={() => setFriendDelivery(friend.id, 'text')}
+                    >
+                      Text
+                    </button>
+                    <button
+                      type="button"
+                      className={friend.deliveryMethod === 'app' ? 'active' : ''}
+                      onClick={() => setFriendDelivery(friend.id, 'app')}
+                    >
+                      <BellAlertIcon size={12} />
+                      App
+                    </button>
+                    <button
+                      type="button"
+                      className={friend.deliveryMethod === 'discord' ? 'active' : ''}
+                      onClick={() => setFriendDelivery(friend.id, 'discord')}
+                    >
+                      <DiscordIcon size={12} />
+                      Discord
+                    </button>
+                  </div>
+                ) : (
+                  <div className="friend-contact">
+                    {friend.deliveryMethod === 'discord' ? (
+                      <span className="friend-delivery-badge">
+                        <DiscordIcon size={12} /> Discord
+                      </span>
+                    ) : (
+                      friend.phone
+                    )}
+                  </div>
+                )}
+                {friend.location && (
+                  <div className="friend-contact">
+                    <MapPinIcon size={11} />{' '}
+                    {friend.location.name}
+                    {friend.location.admin1 ? `, ${friend.location.admin1}` : ''}
+                  </div>
+                )}
               </div>
               {friend.location && onViewLocation && (
                 <button

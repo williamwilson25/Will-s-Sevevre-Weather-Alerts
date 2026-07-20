@@ -1,4 +1,5 @@
 const { onSchedule } = require('firebase-functions/v2/scheduler');
+const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { defineSecret } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
 const admin = require('firebase-admin');
@@ -124,5 +125,52 @@ exports.checkSevereWeatherAlerts = onSchedule(
     }
 
     await Promise.all(writes);
+  },
+);
+
+// Fires the moment the owner sends an alert with "App notification" chosen
+// as the delivery method for one or more friends (see src/api/customAlerts.ts)
+// — pushes it to each recipient's device immediately, same delivery
+// mechanism as the scheduled severe-weather checker above but triggered by
+// a Firestore write instead of a timer.
+exports.sendCustomAlert = onDocumentCreated(
+  { document: 'customAlerts/{alertId}', secrets: [vapidPrivateKey] },
+  async (event) => {
+    const data = event.data?.data();
+    if (!data) return;
+
+    const recipientUids = Array.isArray(data.recipientUids) ? data.recipientUids : [];
+    if (recipientUids.length === 0) return;
+
+    webpush.setVapidDetails(
+      'mailto:williamwilson25@icloud.com',
+      VAPID_PUBLIC_KEY,
+      vapidPrivateKey.value(),
+    );
+
+    const payload = JSON.stringify({
+      title: data.headline || 'New alert',
+      body: data.body || '',
+      url: './',
+    });
+
+    await Promise.all(
+      recipientUids.map(async (uid) => {
+        const subRef = db.collection('pushSubscriptions').doc(uid);
+        const subSnap = await subRef.get();
+        const sub = subSnap.data();
+        if (!sub || !sub.subscription) return;
+
+        try {
+          await webpush.sendNotification(sub.subscription, payload);
+        } catch (err) {
+          if (err.statusCode === 404 || err.statusCode === 410) {
+            await subRef.set({ subscription: admin.firestore.FieldValue.delete() }, { merge: true });
+          } else {
+            logger.warn(`Custom alert push failed for ${uid}`, err);
+          }
+        }
+      }),
+    );
   },
 );

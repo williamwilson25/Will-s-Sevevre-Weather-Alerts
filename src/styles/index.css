@@ -2063,6 +2063,16 @@ section h2::before {
   color: var(--text);
 }
 
+.friend-delivery-toggle-inline {
+  margin-top: 4px;
+}
+
+.friend-delivery-toggle-inline button {
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  border-radius: 999px;
+}
+
 .friend-discord-hint {
   margin: 0;
   font-size: 0.76rem;
@@ -2337,6 +2347,17 @@ section h2::before {
   text-transform: none;
   letter-spacing: normal;
   color: var(--text);
+}
+
+.recipient-app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent);
 }
 
 .alert-preview {

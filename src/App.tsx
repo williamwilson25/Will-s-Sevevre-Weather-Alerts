@@ -747,6 +747,7 @@ export default function App() {
                           </a>
                         </header>
                         <AlertComposer
+                          ownerUid={user.uid}
                           locationName={`${homeLocation.name}${
                             homeLocation.admin1 ? `, ${homeLocation.admin1}` : ''
                           }`}

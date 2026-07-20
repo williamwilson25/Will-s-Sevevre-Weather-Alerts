@@ -2,10 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import type { AlertRecord, AlertSeverity, DailyForecast, Friend } from '../types';
 import { buildAlertMessage, buildSmsLink, SEVERITY_COLOR, SEVERITY_LABEL } from '../utils/alerts';
 import { postToDiscord } from '../utils/discord';
+import { sendAppNotification } from '../api/customAlerts';
 import Avatar from './Avatar';
 import QuickAlertPresets, { type AlertPreset } from './QuickAlertPresets';
+import { BellAlertIcon } from './icons';
 
 interface Props {
+  ownerUid: string;
   locationName: string;
   daily: DailyForecast[];
   friends: Friend[];
@@ -28,6 +31,7 @@ function riskToSeverity(level: DailyForecast['risk']['level']): AlertSeverity {
 }
 
 export default function AlertComposer({
+  ownerUid,
   locationName,
   daily,
   friends,
@@ -59,9 +63,11 @@ export default function AlertComposer({
   if (!day) return null;
 
   const { headline, body } = buildAlertMessage(day, severity, note, typeLabel);
-  const textFriends = friends.filter((f) => f.deliveryMethod !== 'discord');
+  const directFriends = friends.filter((f) => f.deliveryMethod !== 'discord');
   const discordFriends = friends.filter((f) => f.deliveryMethod === 'discord');
-  const recipients = textFriends.filter((f) => recipientIds.includes(f.id));
+  const recipients = directFriends.filter((f) => recipientIds.includes(f.id));
+  const appRecipients = recipients.filter((f) => f.deliveryMethod === 'app' && f.uid);
+  const textRecipients = recipients.filter((f) => f.deliveryMethod !== 'app');
 
   function toggleRecipient(id: string) {
     setRecipientIds((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
@@ -79,17 +85,36 @@ export default function AlertComposer({
     if (recipients.length === 0 && !willPostToDiscord) return;
     setSending(true);
     setSendError('');
+    const errors: string[] = [];
 
-    recipients.forEach((friend) => {
+    textRecipients.forEach((friend) => {
       window.open(buildSmsLink(friend, body), '_blank');
     });
+
+    if (appRecipients.length > 0) {
+      try {
+        await sendAppNotification(
+          ownerUid,
+          appRecipients.map((f) => f.uid!),
+          headline,
+          body,
+          severity,
+        );
+      } catch {
+        errors.push('the app notification failed to send');
+      }
+    }
 
     if (willPostToDiscord) {
       try {
         await postToDiscord(discordWebhookUrl, headline, body, SEVERITY_COLOR[severity]);
       } catch {
-        setSendError("Texts were sent, but the Discord post failed — check the webhook URL in settings.");
+        errors.push('the Discord post failed — check the webhook URL in settings');
       }
+    }
+
+    if (errors.length > 0) {
+      setSendError(`Some alerts went out, but ${errors.join(', and ')}.`);
     }
 
     const record: AlertRecord = {
@@ -165,11 +190,11 @@ export default function AlertComposer({
         <legend>Send to</legend>
         {friends.length === 0 ? (
           <p className="empty-state">Add friends first to select recipients.</p>
-        ) : textFriends.length === 0 ? (
-          <p className="empty-state">All your friends get alerts via Discord — nothing to text.</p>
+        ) : directFriends.length === 0 ? (
+          <p className="empty-state">All your friends get alerts via Discord — nothing to send here.</p>
         ) : (
           <div className="recipient-grid">
-            {textFriends.map((friend) => (
+            {directFriends.map((friend) => (
               <label key={friend.id} className="recipient-checkbox">
                 <input
                   type="checkbox"
@@ -178,6 +203,11 @@ export default function AlertComposer({
                 />
                 <Avatar name={friend.name} size={20} />
                 {friend.name}
+                {friend.deliveryMethod === 'app' && friend.uid && (
+                  <span className="recipient-app-badge">
+                    <BellAlertIcon size={11} /> App
+                  </span>
+                )}
               </label>
             ))}
           </div>

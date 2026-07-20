@@ -65,7 +65,7 @@ export interface WeatherSnapshot {
   fetchedAt: string;
 }
 
-export type DeliveryMethod = 'text' | 'discord';
+export type DeliveryMethod = 'text' | 'discord' | 'app';
 
 export interface Friend {
   id: string;
