@@ -15,7 +15,6 @@ export const SEVERITY_COLOR: Record<AlertSeverity, string> = {
 };
 
 export function buildAlertMessage(
-  locationName: string,
   day: DailyForecast,
   severity: AlertSeverity,
   customNote: string,
@@ -27,7 +26,7 @@ export function buildAlertMessage(
     day: 'numeric',
   });
 
-  const headline = `${typeLabel || SEVERITY_LABEL[severity]} for ${locationName} — ${dateLabel}`;
+  const headline = `${typeLabel || SEVERITY_LABEL[severity]} for your current location — ${dateLabel}`;
 
   const lines = [headline];
 

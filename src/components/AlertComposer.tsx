@@ -58,7 +58,7 @@ export default function AlertComposer({
 
   if (!day) return null;
 
-  const { headline, body } = buildAlertMessage(locationName, day, severity, note, typeLabel);
+  const { headline, body } = buildAlertMessage(day, severity, note, typeLabel);
   const textFriends = friends.filter((f) => f.deliveryMethod !== 'discord');
   const discordFriends = friends.filter((f) => f.deliveryMethod === 'discord');
   const recipients = textFriends.filter((f) => recipientIds.includes(f.id));
