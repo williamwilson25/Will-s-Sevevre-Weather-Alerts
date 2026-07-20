@@ -60,6 +60,12 @@ const PRESETS: (AlertPreset & { icon: typeof TornadoIcon })[] = [
     icon: ThermometerIcon,
   },
   {
+    label: 'Extreme Heat Warning',
+    severity: 'warning',
+    note: 'Extreme Heat Warning issued. Avoid outdoor activity during peak hours, stay hydrated, and never leave kids or pets in a car.',
+    icon: ThermometerIcon,
+  },
+  {
     label: '🚨⚠️Stay Weather Aware ⚠️🚨',
     severity: 'advisory',
     note: '',
