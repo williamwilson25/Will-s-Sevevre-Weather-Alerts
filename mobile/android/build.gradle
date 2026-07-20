@@ -1,3 +1,18 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Requires android/app/google-services.json, downloaded from Firebase
+        // console after registering the Android app there — see mobile/README.md.
+        // Building without that file present will fail with a clear error
+        // naming the missing file, which is preferable to a silent runtime
+        // failure to initialize Firebase.
+        classpath("com.google.gms:google-services:4.4.2")
+    }
+}
+
 allprojects {
     repositories {
         google()
