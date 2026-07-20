@@ -147,6 +147,12 @@ export default function App() {
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const location = locations.find((l) => l.id === activeLocationId) ?? locations[0] ?? DEFAULT_LOCATION;
+  // Your own home location — always the first saved location — independent
+  // of whichever town you're currently browsing (e.g. after tapping "view
+  // location" on a friend). Alerts you send should always be about your own
+  // forecast, not whatever town happens to be on screen.
+  const homeLocation = locations[0] ?? DEFAULT_LOCATION;
+  const [homeSnapshot, setHomeSnapshot] = useState<WeatherSnapshot | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -199,6 +205,43 @@ export default function App() {
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [location.id, user]);
+
+  // Keeps a snapshot of the home location around for composing alerts, even
+  // while browsing a different saved town. Reuses the dashboard's snapshot
+  // when home is the active location (the common case) instead of double-
+  // fetching the same forecast.
+  useEffect(() => {
+    if (!user) return;
+    if (homeLocation.id === location.id) {
+      setHomeSnapshot(snapshot);
+      return;
+    }
+    let cancelled = false;
+    fetchWeather(homeLocation)
+      .then((data) => {
+        if (!cancelled) setHomeSnapshot(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [homeLocation.id, location.id, snapshot, user]);
+
+  useEffect(() => {
+    if (!user || homeLocation.id === location.id) return;
+    let cancelled = false;
+    const interval = setInterval(() => {
+      fetchWeather(homeLocation)
+        .then((data) => {
+          if (!cancelled) setHomeSnapshot(data);
+        })
+        .catch(() => {});
+    }, 5 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [homeLocation.id, location.id, user]);
 
   // Watches every saved location for active NWS alerts, not just the one
   // currently on screen — so a Tornado Warning for a saved-but-not-active
@@ -329,7 +372,13 @@ export default function App() {
   }
 
   function handleAlertDay(day: DailyForecast) {
-    setAlertDay(day);
+    // day may belong to whatever town is currently on screen — alerts are
+    // always about your home location, so swap in the matching date from
+    // the home snapshot instead of using it directly.
+    if (!homeSnapshot) return;
+    const homeDay = homeSnapshot.daily.find((d) => d.date === day.date) ?? homeSnapshot.daily[0];
+    if (!homeDay) return;
+    setAlertDay(homeDay);
     goToTab('compose');
   }
 
@@ -337,7 +386,7 @@ export default function App() {
     setHistory([record, ...history]);
   }
 
-  const worstRisk = getWorstRiskDay(snapshot);
+  const homeWorstRisk = getWorstRiskDay(homeSnapshot);
   const notifySupported = typeof window !== 'undefined' && 'Notification' in window;
 
   useEffect(() => {
@@ -426,7 +475,10 @@ export default function App() {
   }
 
   function handleQuickAlert() {
-    if (worstRisk) handleAlertDay(worstRisk);
+    if (homeWorstRisk) {
+      setAlertDay(homeWorstRisk);
+      goToTab('compose');
+    }
   }
 
   const isNight = snapshot ? !snapshot.current.isDay : false;
@@ -683,7 +735,7 @@ export default function App() {
                       </div>
                     )}
 
-                    {t === 'compose' && isOwner && (
+                    {t === 'compose' && isOwner && homeSnapshot && (
                       <div className="compose-view">
                         <header className="subscreen-header compose-header">
                           <button type="button" className="compose-cancel" onClick={() => goToTab('forecast')}>
@@ -695,10 +747,10 @@ export default function App() {
                           </a>
                         </header>
                         <AlertComposer
-                          locationName={`${snapshot.location.name}${
-                            snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
+                          locationName={`${homeLocation.name}${
+                            homeLocation.admin1 ? `, ${homeLocation.admin1}` : ''
                           }`}
-                          daily={snapshot.daily}
+                          daily={homeSnapshot.daily}
                           friends={friends}
                           selectedDate={alertDay?.date ?? null}
                           discordWebhookUrl={discordWebhookUrl}
@@ -714,10 +766,10 @@ export default function App() {
               </div>
             </div>
 
-            {tab === 'forecast' && isOwner && worstRisk && (
+            {tab === 'forecast' && isOwner && homeWorstRisk && (
               <button
                 type="button"
-                className={`fab fab-${worstRisk.risk.level}`}
+                className={`fab fab-${homeWorstRisk.risk.level}`}
                 onClick={handleQuickAlert}
               >
                 <BellAlertIcon size={17} />
