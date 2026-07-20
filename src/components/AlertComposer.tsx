@@ -94,11 +94,17 @@ export default function AlertComposer({
     let appSucceeded = false;
     if (appRecipients.length > 0) {
       try {
+        // The push banner gets its own, shorter text — the full SMS/Discord
+        // message's "for your current location — <date>" and "Sent via..."
+        // signature are redundant in a notification (the app icon already
+        // identifies the source, and banners truncate long text anyway).
+        const notificationTitle = typeLabel || SEVERITY_LABEL[severity];
+        const notificationBody = note.trim() || `${SEVERITY_LABEL[severity]} for your current location.`;
         await sendAppNotification(
           ownerUid,
           appRecipients.map((f) => f.uid!),
-          headline,
-          body,
+          notificationTitle,
+          notificationBody,
           severity,
         );
         appSucceeded = true;
