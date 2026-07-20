@@ -2555,10 +2555,6 @@ section h2::before {
   gap: 8px;
 }
 
-.quick-alert-button-wide {
-  grid-column: 1 / -1;
-}
-
 .quick-alert-button {
   display: flex;
   align-items: center;

@@ -16,7 +16,7 @@ export interface AlertPreset {
   note: string;
 }
 
-const PRESETS: (AlertPreset & { icon: typeof TornadoIcon; wide?: boolean })[] = [
+const PRESETS: (AlertPreset & { icon: typeof TornadoIcon })[] = [
   {
     label: 'Tornado Warning',
     severity: 'emergency',
@@ -64,7 +64,6 @@ const PRESETS: (AlertPreset & { icon: typeof TornadoIcon; wide?: boolean })[] = 
     severity: 'advisory',
     note: '',
     icon: AlertTriangleIcon,
-    wide: true,
   },
 ];
 
@@ -83,7 +82,7 @@ export default function QuickAlertPresets({ onSelect }: Props) {
             <button
               key={preset.label}
               type="button"
-              className={`quick-alert-button${preset.wide ? ' quick-alert-button-wide' : ''}`}
+              className="quick-alert-button"
               style={{ '--severity-color': SEVERITY_COLOR[preset.severity] } as CSSProperties}
               onClick={() => onSelect(preset)}
             >
