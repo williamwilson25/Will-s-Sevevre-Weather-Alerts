@@ -96,11 +96,6 @@ function isSwipeExempt(target: EventTarget | null): boolean {
   return target instanceof Element && !!target.closest(SWIPE_EXEMPT_SELECTOR);
 }
 
-function getWorstRiskDay(snapshot: WeatherSnapshot | null): DailyForecast | null {
-  if (!snapshot || snapshot.daily.length === 0) return null;
-  return snapshot.daily.reduce((worst, day) => (day.risk.score > worst.risk.score ? day : worst));
-}
-
 export default function App() {
   const { user, loading: authLoading } = useAuth();
   const isOwner = user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase();
@@ -383,7 +378,6 @@ export default function App() {
     setHistory([record, ...history]);
   }
 
-  const homeWorstRisk = getWorstRiskDay(homeSnapshot);
   const notifySupported = typeof window !== 'undefined' && 'Notification' in window;
 
   useEffect(() => {
@@ -469,13 +463,6 @@ export default function App() {
       body: `This is what a rain alert will look like for ${location.name}.`,
       icon: logo,
     });
-  }
-
-  function handleQuickAlert() {
-    if (homeWorstRisk) {
-      setAlertDay(homeWorstRisk);
-      goToTab('compose');
-    }
   }
 
   const isNight = snapshot ? !snapshot.current.isDay : false;
@@ -739,16 +726,6 @@ export default function App() {
               </div>
             </div>
 
-            {tab === 'forecast' && isOwner && homeWorstRisk && (
-              <button
-                type="button"
-                className={`fab fab-${homeWorstRisk.risk.level}`}
-                onClick={handleQuickAlert}
-              >
-                <BellAlertIcon size={17} />
-                Alert friends
-              </button>
-            )}
 
             <nav className={`bottom-nav${isOwner ? ' bottom-nav-with-compose' : ''}`}>
               <button
