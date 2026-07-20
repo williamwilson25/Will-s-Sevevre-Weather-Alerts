@@ -1,15 +1,13 @@
-import { OutlookMapIcon, CameraIcon, MapPinIcon, UserIcon, ChevronDownIcon } from './icons';
+import { OutlookMapIcon, MapPinIcon, UserIcon, ChevronDownIcon } from './icons';
 
 interface Props {
   onOpenOutlook: () => void;
-  onOpenReports: () => void;
   onOpenSubscriptions: () => void;
   onOpenSettings: () => void;
 }
 
 export default function MoreScreen({
   onOpenOutlook,
-  onOpenReports,
   onOpenSubscriptions,
   onOpenSettings,
 }: Props) {
@@ -24,13 +22,6 @@ export default function MoreScreen({
             <button type="button" className="settings-row" onClick={onOpenOutlook}>
               <OutlookMapIcon size={18} className="settings-row-icon" />
               <span className="settings-row-label">Storm Outlook</span>
-              <ChevronDownIcon size={14} className="settings-row-chevron" />
-            </button>
-          </li>
-          <li>
-            <button type="button" className="settings-row" onClick={onOpenReports}>
-              <CameraIcon size={18} className="settings-row-icon" />
-              <span className="settings-row-label">Storm Reports</span>
               <ChevronDownIcon size={14} className="settings-row-chevron" />
             </button>
           </li>

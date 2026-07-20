@@ -35,7 +35,6 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
-import StormReportsTab from './components/StormReportsTab';
 import WeatherDeskCard from './components/WeatherDeskCard';
 import StormSafetyCard from './components/StormSafetyCard';
 import MoreScreen from './components/MoreScreen';
@@ -67,7 +66,6 @@ type Tab =
   | 'radar'
   | 'more'
   | 'outlook'
-  | 'reports'
   | 'settings'
   | 'subscriptions'
   | 'alerts'
@@ -75,7 +73,7 @@ type Tab =
 
 // Order controls both the swipeable tab-track and left/right swipe gestures.
 // Only forecast/radar/more/alerts get their own bottom-nav button — the rest
-// (outlook, reports, settings, subscriptions, compose) are reached via the
+// (outlook, settings, subscriptions, compose) are reached via the
 // More menu or the + button, but stay in this array so they're still real
 // tab-panels with a back header rather than a separate modal/router.
 const TAB_ORDER: Tab[] = [
@@ -83,7 +81,6 @@ const TAB_ORDER: Tab[] = [
   'radar',
   'more',
   'outlook',
-  'reports',
   'settings',
   'subscriptions',
   'alerts',
@@ -641,7 +638,6 @@ export default function App() {
                     {t === 'more' && (
                       <MoreScreen
                         onOpenOutlook={() => goToTab('outlook')}
-                        onOpenReports={() => goToTab('reports')}
                         onOpenSubscriptions={() => goToTab('subscriptions')}
                         onOpenSettings={() => goToTab('settings')}
                       />
@@ -665,30 +661,6 @@ export default function App() {
                           title="Storm Outlook"
                           label="SPC"
                           caption="Day 1–3 convective outlooks from NOAA's Storm Prediction Center."
-                        />
-                      </div>
-                    )}
-
-                    {t === 'reports' && user && (
-                      <div className="reports-view">
-                        <header className="subscreen-header">
-                          <button
-                            type="button"
-                            className="subscreen-back"
-                            onClick={() => goToTab('more')}
-                            aria-label="Back"
-                          >
-                            <ChevronDownIcon size={18} className="subscreen-back-chevron" />
-                          </button>
-                          <h1>Storm Reports</h1>
-                        </header>
-                        <StormReportsTab
-                          uid={user.uid}
-                          email={user.email ?? ''}
-                          locationName={`${snapshot.location.name}${
-                            snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
-                          }`}
-                          isOwner={isOwner}
                         />
                       </div>
                     )}
@@ -814,7 +786,7 @@ export default function App() {
                 Radar
               </button>
               <button
-                className={['more', 'outlook', 'reports', 'settings', 'subscriptions'].includes(tab) ? 'active' : ''}
+                className={['more', 'outlook', 'settings', 'subscriptions'].includes(tab) ? 'active' : ''}
                 onClick={() => goToTab('more')}
               >
                 <DotsIcon size={21} />
