@@ -657,10 +657,10 @@ export default function App() {
                           <h1>Storm Outlook</h1>
                         </header>
                         <ExternalRadar
-                          url="https://www.spc.noaa.gov/products/outlook/"
+                          url="https://www.wpc.ncep.noaa.gov/national_forecast/natfcst.php"
                           title="Storm Outlook"
-                          label="SPC"
-                          caption="Day 1–3 convective outlooks from NOAA's Storm Prediction Center."
+                          label="WPC"
+                          caption="National forecast chart from NOAA's Weather Prediction Center — fronts, precipitation, and forecast highs/lows for the next few days."
                         />
                       </div>
                     )}
