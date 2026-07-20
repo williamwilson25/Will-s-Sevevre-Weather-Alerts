@@ -55,7 +55,7 @@ async function fetchActiveAlerts(latitude, longitude) {
 // this is the piece that makes alerts "always on" rather than only firing
 // while a browser tab is polling NWS itself.
 exports.checkSevereWeatherAlerts = onSchedule(
-  { schedule: 'every 5 minutes', secrets: [vapidPrivateKey], timeoutSeconds: 120 },
+  { schedule: 'every 5 minutes', region: 'us-central1', secrets: [vapidPrivateKey], timeoutSeconds: 120 },
   async () => {
     webpush.setVapidDetails(
       'mailto:williamwilson25@icloud.com',
@@ -134,7 +134,11 @@ exports.checkSevereWeatherAlerts = onSchedule(
 // mechanism as the scheduled severe-weather checker above but triggered by
 // a Firestore write instead of a timer.
 exports.sendCustomAlert = onDocumentCreated(
-  { document: 'customAlerts/{alertId}', secrets: [vapidPrivateKey] },
+  // Pinned to match checkSevereWeatherAlerts above — without an explicit
+  // region, this Firestore-triggered (Eventarc) function was auto-assigned
+  // us-south1 by the deploy tooling, which is restricted for this project
+  // and failed to deploy.
+  { document: 'customAlerts/{alertId}', region: 'us-central1', secrets: [vapidPrivateKey] },
   async (event) => {
     const data = event.data?.data();
     if (!data) return;
