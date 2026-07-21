@@ -1,6 +1,5 @@
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
-const { onRequest } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
 const admin = require('firebase-admin');
@@ -8,11 +7,6 @@ const webpush = require('web-push');
 
 admin.initializeApp();
 const db = admin.firestore();
-
-// Free account at signup.xweather.com — set both with
-// `firebase functions:secrets:set XWEATHER_CLIENT_ID` / `XWEATHER_CLIENT_SECRET`.
-const xweatherClientId = defineSecret('XWEATHER_CLIENT_ID');
-const xweatherClientSecret = defineSecret('XWEATHER_CLIENT_SECRET');
 
 // Safe to hardcode — this is the public half of the VAPID key pair, the
 // same one baked into the client at src/api/pushSubscriptions.ts. The
@@ -211,110 +205,3 @@ exports.sendCustomAlert = onDocumentCreated(
   },
 );
 
-const EARTH_RADIUS_MI = 3958.8;
-
-function haversineMiles(lat1, lon1, lat2, lon2) {
-  const toRad = (deg) => (deg * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return EARTH_RADIUS_MI * 2 * Math.asin(Math.sqrt(a));
-}
-
-function bearingCompass(deg) {
-  if (typeof deg !== 'number' || Number.isNaN(deg)) return null;
-  const points = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-  return points[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
-}
-
-// Normalizes an Xweather /stormcells/closest cell into just what the
-// StormTrackerCard needs. Xweather's exact field names weren't verifiable
-// against a live response while building this (no API key yet) — several
-// candidate paths are checked per field so this degrades gracefully rather
-// than throwing if the real shape differs slightly; revisit once a real key
-// is live and we can see an actual payload.
-function normalizeStormCell(cell, pointLat, pointLon) {
-  const cellLat = cell.loc?.lat ?? cell.lat ?? null;
-  const cellLon = cell.loc?.long ?? cell.loc?.lon ?? cell.long ?? cell.lon ?? null;
-  const distanceMi =
-    typeof cellLat === 'number' && typeof cellLon === 'number'
-      ? haversineMiles(pointLat, pointLon, cellLat, cellLon)
-      : null;
-
-  const details = cell.details || {};
-  const speedMph = details.speedMPH ?? details.speedMph ?? details.speed ?? null;
-  const bearingDeg = details.bearingDEG ?? details.bearingDeg ?? null;
-  const bearing = details.bearingENG ?? bearingCompass(bearingDeg);
-
-  const etaMinutes =
-    distanceMi != null && typeof speedMph === 'number' && speedMph > 2
-      ? Math.round((distanceMi / speedMph) * 60)
-      : null;
-
-  const traits = cell.traits || {};
-  const hailProbability = traits.hailProbability ?? traits.hail?.probability ?? null;
-  const hailSizeIn = traits.maxHailSizeIN ?? traits.maxHailSizeIn ?? traits.hail?.maxSizeIn ?? null;
-  const rotation = Boolean(traits.rotation ?? traits.rotationDetected ?? traits.tvs ?? false);
-
-  return {
-    id: cell.id || `${cellLat},${cellLon}`,
-    distanceMi: distanceMi != null ? Math.round(distanceMi) : null,
-    bearing: bearing || null,
-    speedMph: typeof speedMph === 'number' ? Math.round(speedMph) : null,
-    etaMinutes,
-    hailProbability: typeof hailProbability === 'number' ? Math.round(hailProbability) : null,
-    hailSizeIn: typeof hailSizeIn === 'number' ? hailSizeIn : null,
-    rotation,
-  };
-}
-
-const STORM_CELLS_CACHE_TTL_MS = 3 * 60 * 1000;
-
-// Public, read-only, non-sensitive weather lookup by lat/lon — no auth
-// required, same trust model as the free NWS/Open-Meteo calls the client
-// already makes directly. Cached per rounded coordinate for a few minutes
-// so nearby users (and repeated dashboard refreshes) share one upstream
-// call rather than each burning into the free 15k/month Xweather quota.
-exports.getStormCells = onRequest(
-  { region: 'us-central1', secrets: [xweatherClientId, xweatherClientSecret], cors: true },
-  async (req, res) => {
-    const lat = Number(req.query.lat);
-    const lon = Number(req.query.lon);
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-      res.status(400).json({ error: 'lat and lon query params are required' });
-      return;
-    }
-
-    const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)}`;
-    const cacheRef = db.collection('stormCellsCache').doc(cacheKey);
-
-    try {
-      const cached = await cacheRef.get();
-      if (cached.exists) {
-        const data = cached.data();
-        if (Date.now() - (data.fetchedAt?.toMillis?.() ?? 0) < STORM_CELLS_CACHE_TTL_MS) {
-          res.json({ cells: data.cells || [] });
-          return;
-        }
-      }
-
-      const url =
-        `https://data.api.xweather.com/stormcells/closest?p=${lat},${lon}&radius=75miles&limit=8` +
-        `&client_id=${xweatherClientId.value()}&client_secret=${xweatherClientSecret.value()}`;
-      const upstream = await fetch(url);
-      const body = await upstream.json();
-      if (!upstream.ok || body.success === false) {
-        throw new Error(body.error?.description || `Xweather request failed (${upstream.status})`);
-      }
-
-      const cells = (body.response || []).map((cell) => normalizeStormCell(cell, lat, lon));
-      await cacheRef.set({ cells, fetchedAt: admin.firestore.FieldValue.serverTimestamp() });
-      res.json({ cells });
-    } catch (err) {
-      logger.warn('getStormCells failed', err);
-      res.status(502).json({ error: 'Unable to fetch storm cells right now.' });
-    }
-  },
-);

@@ -188,36 +188,6 @@ app hasn't been opened in days. If you ever add a new alert-type toggle in the a
 (`src/utils/alertTypes.ts`), mirror it in `functions/index.js`'s `ALERT_TYPE_CONFIGS` too, since the
 function is a separate Node package and doesn't share that file with the client bundle.
 
-## Setup: nearby storm cell tracking (Storm Tracker card)
-
-The dashboard's "Nearby Storm Cells" card (rotation/hail signatures + ETA to your location) is
-powered by [Xweather](https://www.xweather.com/)'s storm cells API via the `getStormCells` Cloud
-Function. It's free — a personal account gets 15,000 API calls/month with no credit card — but it
-needs your own key, so this can't be finished from a sandboxed coding session either.
-
-1. **Create a free account** at [signup.xweather.com](https://signup.xweather.com/) and copy your
-   app's Client ID and Client Secret.
-2. **Set them as function secrets**, same pattern as the VAPID key above:
-   ```bash
-   firebase functions:secrets:set XWEATHER_CLIENT_ID
-   firebase functions:secrets:set XWEATHER_CLIENT_SECRET
-   ```
-3. **Deploy the function**:
-   ```bash
-   firebase deploy --only functions:getStormCells
-   ```
-
-Once deployed, the card fetches storm cells within 75 miles of whatever location is on screen,
-caching each lookup for 3 minutes in Firestore (`stormCellsCache`) so repeated dashboard refreshes
-share one upstream call instead of each burning into the free quota. It hides itself entirely when
-there's nothing nearby, same as the storm arrival timer.
-
-Xweather's exact response field names for the stormcells endpoint weren't verifiable against a live
-payload while this was built (no API key to test against yet) — `normalizeStormCell` in
-`functions/index.js` checks a few plausible field-name variants per value, but once your key is live,
-check the Cloud Function logs for a real response shape and adjust that function if any field
-(hail size, rotation flag, movement speed) comes through as `null` when it shouldn't.
-
 ## Stack
 
 Vite + React + TypeScript. All weather data — current conditions, hourly and multi-day forecast,

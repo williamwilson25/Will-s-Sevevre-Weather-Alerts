@@ -65,17 +65,18 @@ export default function StormTrackerCard({ location }: Props) {
                   <TornadoIcon size={13} /> Rotation
                 </span>
               )}
-              {cell.hailProbability != null && cell.hailProbability >= 40 && (
+              {cell.hailSizeIn != null && (
                 <span className="storm-cell-badge storm-cell-badge-hail">
-                  <HailIcon size={13} />
-                  {cell.hailSizeIn ? `${cell.hailSizeIn}" hail` : `${cell.hailProbability}% hail`}
+                  <HailIcon size={13} /> {cell.hailSizeIn}" hail
                 </span>
               )}
             </div>
           </li>
         ))}
       </ul>
-      <p className="storm-cell-caption">Live NEXRAD-derived storm cell tracking via Xweather.</p>
+      <p className="storm-cell-caption">
+        From active NWS Tornado &amp; Severe Thunderstorm Warnings near you.
+      </p>
     </section>
   );
 }
