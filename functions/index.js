@@ -47,8 +47,28 @@ async function fetchActiveAlerts(latitude, longitude) {
       event: f.properties?.event || 'Weather Alert',
       headline: f.properties?.headline || f.properties?.event || '',
       description: f.properties?.description || '',
+      expires: f.properties?.expires || null,
     }))
     .filter((alert) => alert.id);
+}
+
+// Matches the wording of iOS's own Weather app NWS notifications — e.g.
+// "Extreme Heat Warning / Near your location / These conditions are
+// expected by 12:00 PM, Jul 21. (National Weather Service)" — so ours read
+// the same way instead of a raw NWS headline dump.
+function formatAlertBody(alert, locationLabel, timeZone) {
+  if (alert.expires) {
+    try {
+      const date = new Date(alert.expires);
+      const time = new Intl.DateTimeFormat('en-US', { timeZone, hour: 'numeric', minute: '2-digit' }).format(date);
+      const day = new Intl.DateTimeFormat('en-US', { timeZone, month: 'short', day: 'numeric' }).format(date);
+      return `${locationLabel}. These conditions are expected by ${time}, ${day}. (National Weather Service)`;
+    } catch {
+      // Fall through to the headline-based body below.
+    }
+  }
+  const summary = alert.headline || alert.description.slice(0, 120);
+  return `${locationLabel}. ${summary} (National Weather Service)`;
 }
 
 // Runs every 5 minutes regardless of whether anyone has the app open —
@@ -79,7 +99,7 @@ exports.checkSevereWeatherAlerts = onSchedule(
       const freshIds = [];
       let subscriptionGone = false;
 
-      for (const loc of locations) {
+      for (const [locIndex, loc] of locations.entries()) {
         if (mutedLocationIds.includes(loc.id)) continue;
 
         let alerts;
@@ -90,6 +110,12 @@ exports.checkSevereWeatherAlerts = onSchedule(
           continue;
         }
 
+        // The first saved location is "home" (mirrors src/App.tsx's
+        // homeLocation), so it reads as "Near your location" the way iOS's
+        // own Weather app does for your primary location; any other saved
+        // town is named explicitly, also matching that pattern.
+        const locationLabel = locIndex === 0 ? 'Near your location' : loc.name;
+
         for (const alert of alerts) {
           if (notifiedAlertIds.has(alert.id)) continue;
           const key = alertTypeKeyFor(alert.event);
@@ -97,7 +123,7 @@ exports.checkSevereWeatherAlerts = onSchedule(
 
           const payload = JSON.stringify({
             title: alert.event,
-            body: `${alert.headline || alert.description.slice(0, 120)} — ${loc.name}`,
+            body: formatAlertBody(alert, locationLabel, loc.timezone),
             url: './',
           });
 
