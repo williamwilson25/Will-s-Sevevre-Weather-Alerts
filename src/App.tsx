@@ -12,6 +12,7 @@ import LocationChips from './components/LocationChips';
 import CurrentConditions from './components/CurrentConditions';
 import StatusBar from './components/StatusBar';
 import HourlyStrip from './components/HourlyStrip';
+import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import StormRiskMeter from './components/StormRiskMeter';
 import TodaysOutlookRow from './components/TodaysOutlookRow';
@@ -548,6 +549,7 @@ export default function App() {
                           onEnableNotify={handleEnableRainNotify}
                           onTestNotify={handleTestNotify}
                         />
+                        <ActiveAlerts location={snapshot.location} />
                         {snapshot.daily[0] && (
                           <TodaysOutlookRow
                             risk={snapshot.daily[0].risk}
@@ -555,7 +557,6 @@ export default function App() {
                           />
                         )}
                         {snapshot.daily[0] && <StormRiskMeter risk={snapshot.daily[0].risk} />}
-                        <ActiveAlerts location={snapshot.location} />
                         {nowcastSummary &&
                           nowcastSummary.locationId === location.id &&
                           nowcastSummary.summary.kind === 'starting' && (
@@ -577,6 +578,10 @@ export default function App() {
                           onAlertDay={isOwner ? handleAlertDay : undefined}
                         />
                         <HourlyStrip hourly={snapshot.hourly} />
+                        <DailyForecastList
+                          daily={snapshot.daily}
+                          onAlertDay={isOwner ? handleAlertDay : undefined}
+                        />
                         <SavedLocationsList
                           locations={locations}
                           activeId={location.id}

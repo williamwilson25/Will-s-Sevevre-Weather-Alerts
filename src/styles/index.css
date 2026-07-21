@@ -897,8 +897,8 @@ section h2::before {
 
 .nws-alert-item {
   border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--nws-color) 45%, var(--glass-border));
-  background: color-mix(in srgb, var(--nws-color) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--nws-color) 55%, var(--glass-border));
+  background: color-mix(in srgb, var(--nws-color) 30%, transparent);
   overflow: hidden;
 }
 
