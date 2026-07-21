@@ -1277,6 +1277,83 @@ section h2::before {
   color: var(--text-faint);
 }
 
+/* Storm tracker (nearby storm cells) */
+.storm-cell-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.storm-cell-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--glass-bg-soft, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--glass-border);
+}
+
+.storm-cell-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.storm-cell-distance {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.storm-cell-eta {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.storm-cell-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.storm-cell-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.storm-cell-badge-speed {
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--text-muted) 16%, transparent);
+}
+
+.storm-cell-badge-rotation {
+  color: #ef4444;
+  background: color-mix(in srgb, #ef4444 20%, transparent);
+}
+
+.storm-cell-badge-hail {
+  color: #f97316;
+  background: color-mix(in srgb, #f97316 20%, transparent);
+}
+
+.storm-cell-caption {
+  margin: 10px 0 0;
+  font-size: 0.74rem;
+  color: var(--text-faint);
+}
+
 /* Saved locations */
 .saved-locations-list {
   list-style: none;

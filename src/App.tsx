@@ -15,6 +15,7 @@ import HourlyStrip from './components/HourlyStrip';
 import DailyForecastList from './components/DailyForecastList';
 import SevereWeatherBanner from './components/SevereWeatherBanner';
 import StormRiskMeter from './components/StormRiskMeter';
+import StormTrackerCard from './components/StormTrackerCard';
 import TodaysOutlookRow from './components/TodaysOutlookRow';
 import StormArrivalTimer from './components/StormArrivalTimer';
 import SavedLocationsList from './components/SavedLocationsList';
@@ -557,6 +558,7 @@ export default function App() {
                           />
                         )}
                         {snapshot.daily[0] && <StormRiskMeter risk={snapshot.daily[0].risk} />}
+                        <StormTrackerCard location={snapshot.location} />
                         {nowcastSummary &&
                           nowcastSummary.locationId === location.id &&
                           nowcastSummary.summary.kind === 'starting' && (
