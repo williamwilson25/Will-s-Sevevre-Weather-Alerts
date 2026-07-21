@@ -825,8 +825,7 @@ button:active:not(:disabled) {
 .forecast-view > *,
 .alerts-view > *,
 .radar-view > *,
-.outlook-view > *,
-.live-view > * {
+.outlook-view > * {
   animation: sw-rise 480ms var(--ease) both;
 }
 
@@ -2613,12 +2612,6 @@ section h2::before {
 
 /* Storm outlook */
 .outlook-view {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Live storm coverage */
-.live-view {
   display: flex;
   flex-direction: column;
 }

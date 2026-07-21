@@ -67,7 +67,6 @@ type Tab =
   | 'radar'
   | 'more'
   | 'outlook'
-  | 'live'
   | 'settings'
   | 'subscriptions'
   | 'alerts'
@@ -75,7 +74,7 @@ type Tab =
 
 // Order controls both the swipeable tab-track and left/right swipe gestures.
 // Only forecast/radar/more/alerts get their own bottom-nav button — the rest
-// (outlook, live, settings, subscriptions, compose) are reached via the
+// (outlook, settings, subscriptions, compose) are reached via the
 // More menu or the + button, but stay in this array so they're still real
 // tab-panels with a back header rather than a separate modal/router.
 const TAB_ORDER: Tab[] = [
@@ -83,7 +82,6 @@ const TAB_ORDER: Tab[] = [
   'radar',
   'more',
   'outlook',
-  'live',
   'settings',
   'subscriptions',
   'alerts',
@@ -632,7 +630,6 @@ export default function App() {
                     {t === 'more' && (
                       <MoreScreen
                         onOpenOutlook={() => goToTab('outlook')}
-                        onOpenLive={() => goToTab('live')}
                         onOpenSubscriptions={() => goToTab('subscriptions')}
                         onOpenSettings={() => goToTab('settings')}
                       />
@@ -656,28 +653,6 @@ export default function App() {
                           title="Storm Outlook"
                           label="WPC"
                           caption="National forecast chart from NOAA's Weather Prediction Center — fronts, precipitation, and forecast highs/lows for the next few days."
-                        />
-                      </div>
-                    )}
-
-                    {t === 'live' && (
-                      <div className="live-view">
-                        <header className="subscreen-header">
-                          <button
-                            type="button"
-                            className="subscreen-back"
-                            onClick={() => goToTab('more')}
-                            aria-label="Back"
-                          >
-                            <ChevronDownIcon size={18} className="subscreen-back-chevron" />
-                          </button>
-                          <h1>Live Storm Coverage</h1>
-                        </header>
-                        <ExternalRadar
-                          url="https://www.youtube.com/embed/live_stream?channel=UCBtR7ynKM9odz-PW_7uyzDw"
-                          title="Live Storm Coverage"
-                          label="LIVE"
-                          caption="Live storm-chasing coverage from Severe Studios — free to watch, streams go live during active severe weather and show as offline otherwise."
                         />
                       </div>
                     )}
@@ -793,7 +768,7 @@ export default function App() {
                 Radar
               </button>
               <button
-                className={['more', 'outlook', 'live', 'settings', 'subscriptions'].includes(tab) ? 'active' : ''}
+                className={['more', 'outlook', 'settings', 'subscriptions'].includes(tab) ? 'active' : ''}
                 onClick={() => goToTab('more')}
               >
                 <DotsIcon size={21} />
