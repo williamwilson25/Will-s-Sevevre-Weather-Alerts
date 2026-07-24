@@ -101,6 +101,7 @@ export default function SettingsScreen({
               locations={locations}
               mutedLocationIds={mutedLocationIds}
               alertTypePrefs={alertTypePrefs}
+              notifyRain={notifyRain}
             />
           </li>
 

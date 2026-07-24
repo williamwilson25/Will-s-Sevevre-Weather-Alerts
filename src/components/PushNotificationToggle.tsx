@@ -8,6 +8,7 @@ interface Props {
   locations: Location[];
   mutedLocationIds: string[];
   alertTypePrefs: Record<string, boolean>;
+  notifyRain: boolean;
 }
 
 export default function PushNotificationToggle({
@@ -15,6 +16,7 @@ export default function PushNotificationToggle({
   locations,
   mutedLocationIds,
   alertTypePrefs,
+  notifyRain,
 }: Props) {
   const [subscribed, setSubscribed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -41,7 +43,7 @@ export default function PushNotificationToggle({
             return;
           }
         }
-        await subscribeToPush(uid, { locations, mutedLocationIds, alertTypePrefs });
+        await subscribeToPush(uid, { locations, mutedLocationIds, alertTypePrefs, notifyRain });
         setSubscribed(true);
       } else {
         await unsubscribeFromPush(uid);
@@ -68,7 +70,7 @@ export default function PushNotificationToggle({
       <div className="push-toggle-text">
         <span className="settings-row-label">Always-On Alerts</span>
         <span className="push-toggle-caption">
-          Get severe weather alerts even when the app is closed.
+          Get severe weather and rain alerts even when the app is closed.
         </span>
       </div>
       <ToggleSwitch

@@ -276,14 +276,14 @@ export default function App() {
       .then((reg) => reg.pushManager.getSubscription())
       .then((sub) => {
         if (cancelled || !sub) return;
-        return syncPushPrefs(user.uid, { locations, mutedLocationIds, alertTypePrefs });
+        return syncPushPrefs(user.uid, { locations, mutedLocationIds, alertTypePrefs, notifyRain });
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locations, mutedLocationIds, alertTypePrefs, user]);
+  }, [locations, mutedLocationIds, alertTypePrefs, notifyRain, user]);
 
   function handleManualRefresh() {
     setRefreshing(true);

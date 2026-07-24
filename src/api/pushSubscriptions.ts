@@ -25,6 +25,7 @@ interface PushPrefs {
   locations: Location[];
   mutedLocationIds: string[];
   alertTypePrefs: Record<string, boolean>;
+  notifyRain: boolean;
 }
 
 // Subscribes this browser to Web Push and writes the subscription (plus the

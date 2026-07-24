@@ -36,6 +36,113 @@ function alertTypeKeyFor(event) {
   return config ? config.key : null;
 }
 
+// Mirrors src/utils/nwsWeatherCode.ts + src/utils/weatherCategory.ts (just
+// enough to answer "is this text describing active rain/storm right now?")
+// — kept as plain code here rather than a shared module since this function
+// is a separate Node package from the Vite client bundle.
+const PRECIP_TEXT_RULES = [
+  [/tornado/i, true],
+  [/severe\s+thunderstorm|thunderstorm.*hail|hail.*thunderstorm/i, true],
+  [/thunderstorm|tstorm/i, true],
+  [/blizzard|heavy snow|snow showers|light snow|snow/i, false],
+  [/freezing rain|ice storm|sleet/i, true],
+  [/freezing drizzle/i, true],
+  [/heavy rain/i, true],
+  [/rain showers|showers/i, true],
+  [/light rain|chance rain|slight chance/i, true],
+  [/rain|shower/i, true],
+  [/drizzle/i, true],
+];
+
+function isPrecipitatingText(text) {
+  for (const [pattern, isPrecip] of PRECIP_TEXT_RULES) {
+    if (pattern.test(text)) return isPrecip;
+  }
+  return false;
+}
+
+// Mirrors src/utils/nowcast.ts's ONSET_INTENSITY — see that file for why 40.
+const RAIN_ONSET_INTENSITY = 40;
+
+async function fetchPointMeta(latitude, longitude) {
+  const res = await fetch(`https://api.weather.gov/points/${latitude},${longitude}`, {
+    headers: { Accept: 'application/geo+json' },
+  });
+  if (!res.ok) throw new Error(`NWS point lookup failed (${res.status})`);
+  const data = await res.json();
+  const p = data.properties || {};
+  if (!p.forecastHourly || !p.observationStations) throw new Error('No NWS coverage for this location');
+  return { forecastHourly: p.forecastHourly, observationStations: p.observationStations };
+}
+
+async function fetchHourlyPop(forecastHourlyUrl) {
+  const res = await fetch(forecastHourlyUrl, { headers: { Accept: 'application/geo+json' } });
+  if (!res.ok) throw new Error(`NWS hourly forecast fetch failed (${res.status})`);
+  const data = await res.json();
+  const periods = data.properties?.periods || [];
+  const a = periods[0]?.probabilityOfPrecipitation?.value ?? 0;
+  const b = periods[1]?.probabilityOfPrecipitation?.value ?? a;
+  return { a, b };
+}
+
+async function fetchCurrentlyPrecipitating(observationStationsUrl) {
+  const stationsRes = await fetch(observationStationsUrl, { headers: { Accept: 'application/geo+json' } });
+  if (!stationsRes.ok) throw new Error(`NWS station lookup failed (${stationsRes.status})`);
+  const stationsData = await stationsRes.json();
+  const stationId = stationsData.features?.[0]?.properties?.stationIdentifier;
+  if (!stationId) return false;
+  const obsRes = await fetch(`https://api.weather.gov/stations/${stationId}/observations/latest`, {
+    headers: { Accept: 'application/geo+json' },
+  });
+  if (!obsRes.ok) return false;
+  const obsData = await obsRes.json();
+  return isPrecipitatingText(obsData.properties?.textDescription || '');
+}
+
+// Mirrors src/utils/nowcast.ts's buildNwsNowcast + summarizeNowcast combined
+// into one step, since the server only needs the resulting state (not a
+// chart to render) — same 6-point/10-minute interpolation and threshold.
+function computeRainState(a, b, currentlyPrecipitating) {
+  if (currentlyPrecipitating || a >= RAIN_ONSET_INTENSITY) {
+    return { kind: 'raining' };
+  }
+  for (let i = 1; i < 6; i += 1) {
+    const value = a + (b - a) * (i / 5);
+    if (value >= RAIN_ONSET_INTENSITY) {
+      return { kind: 'starting', minutesAway: i * 10 };
+    }
+  }
+  return { kind: 'clear' };
+}
+
+async function fetchRainState(latitude, longitude) {
+  const { forecastHourly, observationStations } = await fetchPointMeta(latitude, longitude);
+  const [{ a, b }, currentlyPrecipitating] = await Promise.all([
+    fetchHourlyPop(forecastHourly),
+    fetchCurrentlyPrecipitating(observationStations),
+  ]);
+  return computeRainState(a, b, currentlyPrecipitating);
+}
+
+// Matches the wording just added to the client's own "Rain expected soon"
+// notification (src/App.tsx) — an actual clock time instead of "in N min".
+function formatRainBody(locationLabel, state, timeZone) {
+  if (state.kind === 'raining') {
+    return `Rain is happening now in ${locationLabel}.`;
+  }
+  const startsAt = new Date(Date.now() + state.minutesAway * 60000);
+  const timeLabel = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  }).format(startsAt);
+  return `${locationLabel}: Intermittent rain and thunderstorms will begin around ${timeLabel}.`;
+}
+
 async function fetchActiveAlerts(latitude, longitude) {
   const url = `https://api.weather.gov/alerts/active?point=${latitude},${longitude}&status=actual&message_type=alert,update`;
   const res = await fetch(url, { headers: { Accept: 'application/geo+json' } });
@@ -96,6 +203,9 @@ exports.checkSevereWeatherAlerts = onSchedule(
       const notifiedAlertIds = new Set(
         Array.isArray(data.notifiedAlertIds) ? data.notifiedAlertIds : [],
       );
+      const priorRainState = data.rainState || {};
+      const rainState = { ...priorRainState };
+      let rainStateChanged = false;
       const freshIds = [];
       let subscriptionGone = false;
 
@@ -140,13 +250,54 @@ exports.checkSevereWeatherAlerts = onSchedule(
             }
           }
         }
+
+        // Mirrors the client's "Rain expected soon"/"Rain is starting"
+        // local notification (src/App.tsx), but server-side so it still
+        // arrives with the app closed — gated on the same notifyRain
+        // preference, synced into this doc by PushNotificationToggle.
+        if (data.notifyRain && !subscriptionGone) {
+          try {
+            const state = await fetchRainState(loc.latitude, loc.longitude);
+            const priorKind = priorRainState[loc.id];
+            if ((state.kind === 'raining' || state.kind === 'starting') && priorKind !== state.kind) {
+              const payload = JSON.stringify({
+                title: state.kind === 'raining' ? 'Rain is starting' : 'Rain expected soon',
+                body: formatRainBody(locationLabel, state, loc.timezone),
+                url: './',
+              });
+              try {
+                await webpush.sendNotification(data.subscription, payload);
+              } catch (err) {
+                if (err.statusCode === 404 || err.statusCode === 410) {
+                  subscriptionGone = true;
+                } else {
+                  logger.warn(`Rain push failed for ${docSnap.id}`, err);
+                }
+              }
+            }
+            if (rainState[loc.id] !== state.kind) {
+              rainState[loc.id] = state.kind;
+              rainStateChanged = true;
+            }
+          } catch (err) {
+            logger.warn(`Rain check failed for ${loc.name}`, err);
+          }
+        }
       }
 
       if (subscriptionGone) {
         writes.push(docSnap.ref.set({ subscription: admin.firestore.FieldValue.delete() }, { merge: true }));
-      } else if (freshIds.length > 0) {
-        const updated = [...notifiedAlertIds, ...freshIds].slice(-200);
-        writes.push(docSnap.ref.set({ notifiedAlertIds: updated }, { merge: true }));
+      } else {
+        const update = {};
+        if (freshIds.length > 0) {
+          update.notifiedAlertIds = [...notifiedAlertIds, ...freshIds].slice(-200);
+        }
+        if (rainStateChanged) {
+          update.rainState = rainState;
+        }
+        if (Object.keys(update).length > 0) {
+          writes.push(docSnap.ref.set(update, { merge: true }));
+        }
       }
     }
 
