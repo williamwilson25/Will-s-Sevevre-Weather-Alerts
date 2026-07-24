@@ -36,7 +36,7 @@ export default function DailyForecastList({ daily, onAlertDay }: Props) {
 
   return (
     <section className="daily-forecast">
-      <h2>7-day forecast</h2>
+      <h2>Will's 7-Day Forecast</h2>
       <ul className="daily-list">
         {daily.map((day, i) => {
           const { label } = describeWeatherCode(day.weatherCode);
