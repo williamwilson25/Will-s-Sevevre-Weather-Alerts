@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Location } from '../types';
-import { pushSupported, subscribeToPush, unsubscribeFromPush } from '../api/pushSubscriptions';
+import { pushSupported, sendTestPush, subscribeToPush, unsubscribeFromPush } from '../api/pushSubscriptions';
 import ToggleSwitch from './ToggleSwitch';
 
 interface Props {
@@ -21,6 +21,8 @@ export default function PushNotificationToggle({
   const [subscribed, setSubscribed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [testBusy, setTestBusy] = useState(false);
+  const [testStatus, setTestStatus] = useState('');
 
   useEffect(() => {
     if (!pushSupported()) return;
@@ -56,6 +58,19 @@ export default function PushNotificationToggle({
     }
   }
 
+  async function handleTestPush() {
+    setTestStatus('');
+    setTestBusy(true);
+    try {
+      await sendTestPush();
+      setTestStatus('Sent! It should arrive any second — even if you close the app now.');
+    } catch (err) {
+      setTestStatus(err instanceof Error ? err.message : 'Test push failed — try again in a moment.');
+    } finally {
+      setTestBusy(false);
+    }
+  }
+
   if (!pushSupported()) {
     return (
       <div className="settings-row settings-row-static">
@@ -80,6 +95,14 @@ export default function PushNotificationToggle({
         disabled={busy}
       />
       {error && <p className="form-error push-toggle-error">{error}</p>}
+      {subscribed && (
+        <div className="push-toggle-test">
+          <button type="button" className="push-toggle-test-btn" onClick={handleTestPush} disabled={testBusy}>
+            {testBusy ? 'Sending…' : 'Send test push'}
+          </button>
+          {testStatus && <p className="push-toggle-test-status">{testStatus}</p>}
+        </div>
+      )}
     </div>
   );
 }

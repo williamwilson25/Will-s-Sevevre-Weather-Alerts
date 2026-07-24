@@ -1,5 +1,6 @@
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
 const admin = require('firebase-admin');
@@ -356,3 +357,54 @@ exports.sendCustomAlert = onDocumentCreated(
   },
 );
 
+
+// Round-trips the caller's own subscription through the real Web Push
+// pipeline on demand — lets the app prove alerts will actually arrive with
+// it closed, rather than only exercising the local Notification API the
+// way the existing client-side "Test alert" button does. onCall (not
+// onRequest) so Firebase verifies the caller's ID token for us and hands
+// back a trustworthy request.auth.uid — no risk of test-pushing to someone
+// else's device.
+exports.sendTestPush = onCall(
+  { region: 'us-central1', secrets: [vapidPrivateKey] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'Sign in required.');
+    }
+
+    const subRef = db.collection('pushSubscriptions').doc(request.auth.uid);
+    const subSnap = await subRef.get();
+    const sub = subSnap.data();
+    if (!sub || !sub.subscription) {
+      throw new HttpsError('failed-precondition', 'Turn on Always-On Alerts first.');
+    }
+
+    webpush.setVapidDetails(
+      'mailto:williamwilson25@icloud.com',
+      VAPID_PUBLIC_KEY,
+      vapidPrivateKey.value(),
+    );
+
+    const payload = JSON.stringify({
+      title: 'Rain expected soon',
+      body: 'Test push — this is what a real rain alert looks like, delivered even with the app closed.',
+      url: './',
+    });
+
+    try {
+      await webpush.sendNotification(sub.subscription, payload);
+    } catch (err) {
+      if (err.statusCode === 404 || err.statusCode === 410) {
+        await subRef.set({ subscription: admin.firestore.FieldValue.delete() }, { merge: true });
+        throw new HttpsError(
+          'failed-precondition',
+          'Your push subscription expired — toggle Always-On Alerts off and back on.',
+        );
+      }
+      logger.warn('Test push failed', err);
+      throw new HttpsError('internal', 'Push failed to send.');
+    }
+
+    return { ok: true };
+  },
+);

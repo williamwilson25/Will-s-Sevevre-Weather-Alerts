@@ -1,5 +1,6 @@
 import { doc, setDoc, deleteField, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../firebase';
 import type { Location } from '../types';
 
 // Safe to embed client-side — this is the whole point of the VAPID public
@@ -73,4 +74,15 @@ export async function syncPushPrefs(uid: string, prefs: PushPrefs): Promise<void
     { ...prefs, updatedAt: serverTimestamp() },
     { merge: true },
   );
+}
+
+// Round-trips through the real Web Push pipeline (Cloud Function ->
+// webpush.sendNotification -> the browser's push service), unlike the
+// existing local "Test alert" button which only exercises the Notification
+// API directly and would still "work" even if the server-side push were
+// completely broken. This is what actually proves alerts will arrive with
+// the app closed.
+export async function sendTestPush(): Promise<void> {
+  const call = httpsCallable(functions, 'sendTestPush');
+  await call();
 }
