@@ -185,7 +185,7 @@ export default function App() {
         });
     }
 
-    const interval = setInterval(refresh, 5 * 60 * 1000);
+    const interval = setInterval(refresh, 2 * 60 * 1000);
 
     function handleVisibility() {
       if (document.visibilityState === 'visible') refresh();
@@ -229,7 +229,7 @@ export default function App() {
           if (!cancelled) setHomeSnapshot(data);
         })
         .catch(() => {});
-    }, 5 * 60 * 1000);
+    }, 2 * 60 * 1000);
     return () => {
       cancelled = true;
       clearInterval(interval);
