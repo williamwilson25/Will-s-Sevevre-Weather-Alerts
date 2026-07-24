@@ -16,20 +16,41 @@ export type NowcastState =
 // forecast noise (e.g. 0% now, 20% next hour) reads as "rain starting soon"
 // even when nothing meaningful is actually expected. 40 roughly matches NWS's
 // own "likely" wording threshold.
-const ONSET_INTENSITY = 40;
+export const ONSET_INTENSITY = 40;
 
-/** Short-term precipitation timeline built from the NWS hourly forecast's rain chance. */
-export function buildNwsNowcast(hourly: HourlyPoint[]): NowcastPoint[] {
+/**
+ * Short-term precipitation timeline built from the NWS hourly forecast's
+ * rain chance. If the live station observation says it's actively
+ * precipitating right now, the "Now" bar is floored at ONSET_INTENSITY so
+ * the chart doesn't show a flat/empty bar directly under a "Rain Expected"
+ * headline — see summarizeNowcast for why the two can otherwise disagree.
+ */
+export function buildNwsNowcast(hourly: HourlyPoint[], currentlyPrecipitating = false): NowcastPoint[] {
   const a = hourly[0]?.precipitationProbability ?? 0;
   const b = hourly[1]?.precipitationProbability ?? a;
   const steps = 6;
   return Array.from({ length: steps }, (_, i) => {
     const t = steps > 1 ? i / (steps - 1) : 0;
-    return { minutesFromNow: i * 10, intensity: Math.round(a + (b - a) * t) };
+    let intensity = Math.round(a + (b - a) * t);
+    if (i === 0 && currentlyPrecipitating) {
+      intensity = Math.max(intensity, ONSET_INTENSITY);
+    }
+    return { minutesFromNow: i * 10, intensity };
   });
 }
 
-export function summarizeNowcast(points: NowcastPoint[]): NowcastState {
+// The hourly forecast's precipitation chance is generated on NWS's normal
+// forecast cycle and can lag reality by an hour or more — a pop-up shower
+// or thunderstorm can be actively happening at the nearest observation
+// station while the forecast still shows a low chance for the current hour
+// bucket. `currentlyPrecipitating` (read off that live station observation,
+// not the forecast) overrides the forecast-based read so the two don't
+// contradict each other the way "thunderstorm" in Current Conditions vs.
+// "No rain expected" here used to.
+export function summarizeNowcast(points: NowcastPoint[], currentlyPrecipitating = false): NowcastState {
+  if (currentlyPrecipitating) {
+    return { kind: 'raining' };
+  }
   const sorted = [...points].sort((a, b) => a.minutesFromNow - b.minutesFromNow);
   const current = sorted.find((p) => p.minutesFromNow >= 0) ?? sorted[0];
   if (current && current.intensity >= ONSET_INTENSITY) {

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import type { HourlyPoint, Location } from '../types';
+import type { CurrentConditions, HourlyPoint, Location } from '../types';
 import { buildNwsNowcast, summarizeNowcast, type NowcastPoint, type NowcastState } from '../utils/nowcast';
+import { categorizeWeather } from '../utils/weatherCategory';
 
 interface Props {
   location: Location;
+  current: CurrentConditions;
   hourly: HourlyPoint[];
   onSummary?: (summary: NowcastState, locationId: string) => void;
 }
@@ -13,20 +15,22 @@ function minuteLabel(minutes: number): string {
   return `${minutes}m`;
 }
 
-export default function RainNowcast({ location, hourly, onSummary }: Props) {
+export default function RainNowcast({ location, current, hourly, onSummary }: Props) {
   const [points, setPoints] = useState<NowcastPoint[] | null>(null);
   const prevLocationId = useRef(location.id);
+
+  const currentlyPrecipitating = ['rain', 'storm'].includes(categorizeWeather(current.weatherCode));
 
   useEffect(() => {
     if (prevLocationId.current !== location.id) {
       prevLocationId.current = location.id;
       setPoints(null);
     }
-    const pts = buildNwsNowcast(hourly);
+    const pts = buildNwsNowcast(hourly, currentlyPrecipitating);
     setPoints(pts);
-    onSummary?.(summarizeNowcast(pts), location.id);
+    onSummary?.(summarizeNowcast(pts, currentlyPrecipitating), location.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.id, hourly]);
+  }, [location.id, hourly, currentlyPrecipitating]);
 
   if (!points) {
     return (
@@ -36,7 +40,7 @@ export default function RainNowcast({ location, hourly, onSummary }: Props) {
     );
   }
 
-  const summary = summarizeNowcast(points);
+  const summary = summarizeNowcast(points, currentlyPrecipitating);
   const title =
     summary.kind === 'raining' ? 'Rain Expected' : summary.kind === 'starting' ? 'Rain Forecasted' : 'No Rain Expected';
   const detail =

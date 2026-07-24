@@ -572,6 +572,7 @@ export default function App() {
                         )}
                         <RainNowcast
                           location={snapshot.location}
+                          current={snapshot.current}
                           hourly={snapshot.hourly}
                           onSummary={(summary, locationId) => setNowcastSummary({ summary, locationId })}
                         />
