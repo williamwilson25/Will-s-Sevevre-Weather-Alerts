@@ -22,7 +22,6 @@ import SavedLocationsList from './components/SavedLocationsList';
 import RainNowcast from './components/RainNowcast';
 import ActiveAlerts from './components/ActiveAlerts';
 import AlertNotificationSettings from './components/AlertNotificationSettings';
-import NwsForecastCard from './components/NwsForecastCard';
 import EnableNotificationsBanner from './components/EnableNotificationsBanner';
 import type { NowcastState } from './utils/nowcast';
 import { fetchActiveAlerts, type NwsAlert } from './api/nwsAlerts';
@@ -609,7 +608,6 @@ export default function App() {
                           risk={snapshot.daily[0]?.risk ?? null}
                         />
                         <AlertNotificationSettings prefs={alertTypePrefs} onChange={handleAlertTypeChange} />
-                        <NwsForecastCard location={snapshot.location} />
                         <StormSafetyCard />
                         <footer className="app-footer">
                           <p>
