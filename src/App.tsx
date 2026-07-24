@@ -622,10 +622,10 @@ export default function App() {
                     {t === 'radar' && (
                       <div className="radar-view">
                         <ExternalRadar
-                          url="https://radar.weather.gov/station/KTLX/standard"
+                          url="https://www.mesonet.org/weather/radar/KTLX?ref=1330"
                           title="Live Storm Radar"
                           label="LIVE"
-                          caption="Live radar from the National Weather Service — Norman, OK (KTLX)."
+                          caption="Live radar from the Oklahoma Mesonet — Norman, OK (KTLX)."
                         />
                       </div>
                     )}
