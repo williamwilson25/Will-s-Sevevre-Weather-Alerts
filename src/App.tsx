@@ -407,8 +407,18 @@ export default function App() {
         icon: logo,
       });
     } else {
+      const startsAt = new Date(Date.now() + summary.minutesAway * 60000);
+      const timeLabel = new Intl.DateTimeFormat('en-US', {
+        timeZone: location.timezone,
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZoneName: 'short',
+      }).format(startsAt);
       showNotification('Rain expected soon', {
-        body: `Rain is expected to start in about ${summary.minutesAway} min in ${location.name}.`,
+        body: `${location.name}: Intermittent rain and thunderstorms will begin around ${timeLabel}.`,
         icon: logo,
       });
     }
@@ -622,10 +632,10 @@ export default function App() {
                     {t === 'radar' && (
                       <div className="radar-view">
                         <ExternalRadar
-                          url="https://www.mesonet.org/weather/radar/KTLX?ref=1330"
+                          url="https://radar.weather.gov/station/KTLX/standard"
                           title="Live Storm Radar"
                           label="LIVE"
-                          caption="Live radar from the Oklahoma Mesonet — Norman, OK (KTLX)."
+                          caption="Live radar from the National Weather Service — Norman, OK (KTLX)."
                         />
                       </div>
                     )}
