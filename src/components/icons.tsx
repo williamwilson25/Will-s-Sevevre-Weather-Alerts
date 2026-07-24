@@ -616,3 +616,17 @@ export function LogoutIcon({ size = 24, className }: IconProps) {
   );
 }
 
+
+export function LocateIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
