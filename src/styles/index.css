@@ -3005,10 +3005,10 @@ section h2::before {
   display: block;
 }
 
-.sky-view-close {
+.sky-view-close,
+.sky-view-sound {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 16px);
-  right: 16px;
   width: 38px;
   height: 38px;
   display: flex;
@@ -3019,6 +3019,14 @@ section h2::before {
   background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(12px);
   color: #fff;
+}
+
+.sky-view-close {
+  right: 16px;
+}
+
+.sky-view-sound {
+  left: 16px;
 }
 
 .sky-view-info {

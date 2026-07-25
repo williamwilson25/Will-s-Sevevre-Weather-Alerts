@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { categorizeWeather } from '../utils/weatherCategory';
-import { CloseIcon } from './icons';
+import { SkySoundscape } from '../utils/skySoundscape';
+import { CloseIcon, SpeakerIcon, SpeakerMuteIcon } from './icons';
 
 interface Props {
   weatherCode: number;
@@ -62,6 +63,29 @@ export default function SkyView({
   onClose,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const category = categorizeWeather(weatherCode);
+
+  const soundRef = useRef<SkySoundscape | null>(null);
+  const [soundOn, setSoundOn] = useState(false);
+
+  useEffect(() => {
+    soundRef.current = new SkySoundscape();
+    return () => {
+      soundRef.current?.stop();
+      soundRef.current = null;
+    };
+  }, []);
+
+  function toggleSound() {
+    const next = !soundOn;
+    setSoundOn(next);
+    if (next) {
+      soundRef.current?.ensureStarted(category, windSpeed);
+      soundRef.current?.setMuted(false);
+    } else {
+      soundRef.current?.setMuted(true);
+    }
+  }
 
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
@@ -84,7 +108,6 @@ export default function SkyView({
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    const category = categorizeWeather(weatherCode);
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -265,6 +288,7 @@ export default function SkyView({
         flashUntil = t + 140;
         nextLightning = t + 2500 + Math.random() * 5000;
         drawLightningBolt();
+        soundRef.current?.triggerThunder();
       }
       if (t < flashUntil) {
         ctx!.save();
@@ -362,6 +386,18 @@ export default function SkyView({
   return createPortal(
     <div className="sky-view" role="dialog" aria-modal="true" aria-label="Live sky view" onClick={onClose}>
       <canvas ref={canvasRef} className="sky-view-canvas" />
+      <button
+        type="button"
+        className="sky-view-sound"
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleSound();
+        }}
+        aria-label={soundOn ? 'Mute sky sounds' : 'Play live sky sounds'}
+        title={soundOn ? 'Mute' : 'Hear it'}
+      >
+        {soundOn ? <SpeakerIcon size={18} /> : <SpeakerMuteIcon size={18} />}
+      </button>
       <button type="button" className="sky-view-close" onClick={onClose} aria-label="Close sky view">
         <CloseIcon size={20} />
       </button>
