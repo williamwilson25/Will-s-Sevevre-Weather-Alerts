@@ -36,7 +36,6 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
-import WeatherDeskCard from './components/WeatherDeskCard';
 import StormSafetyCard from './components/StormSafetyCard';
 import MoreScreen from './components/MoreScreen';
 import SettingsScreen from './components/SettingsScreen';
@@ -599,13 +598,6 @@ export default function App() {
                           activeId={location.id}
                           activeConditions={snapshot.current}
                           onSelect={handleSelectLocation}
-                        />
-                        <WeatherDeskCard
-                          isOwner={isOwner}
-                          locationName={`${snapshot.location.name}${
-                            snapshot.location.admin1 ? `, ${snapshot.location.admin1}` : ''
-                          }`}
-                          risk={snapshot.daily[0]?.risk ?? null}
                         />
                         <AlertNotificationSettings prefs={alertTypePrefs} onChange={handleAlertTypeChange} />
                         <StormSafetyCard />

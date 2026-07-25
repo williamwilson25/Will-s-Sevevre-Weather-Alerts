@@ -12,14 +12,6 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // "Will's Weather Desk" — a single owner-editable message shown to
-    // everyone on the Home tab. Any signed-in user can read it; only the
-    // owner can write it.
-    match /siteContent/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.email == 'williamwilson25@icloud.com';
-    }
-
     // Always-on Web Push: each user's own subscription, watched locations,
     // and alert-type prefs, read/written only by that user from the client.
     // The scheduled Cloud Function reads/writes this collection too, via the
