@@ -3,6 +3,7 @@ import type { WeatherSnapshot } from '../types';
 import { describeWeatherCode } from '../utils/weatherCode';
 import { formatTimeAgo } from '../utils/time';
 import WeatherIcon from './WeatherIcon';
+import SkyView from './SkyView';
 import {
   RefreshIcon,
   DropletIcon,
@@ -56,6 +57,8 @@ export default function CurrentConditions({
     return () => clearInterval(interval);
   }, []);
 
+  const [skyViewOpen, setSkyViewOpen] = useState(false);
+
   return (
     <>
       <section className="hero">
@@ -80,9 +83,15 @@ export default function CurrentConditions({
             </button>
           )}
         </div>
-        <div className="hero-icon">
+        <button
+          type="button"
+          className="hero-icon hero-icon-btn"
+          onClick={() => setSkyViewOpen(true)}
+          aria-label="Open live sky view"
+          title="Tap for a live view of the sky"
+        >
           <WeatherIcon code={current.weatherCode} isDay={current.isDay} size={88} />
-        </div>
+        </button>
         <div className="hero-temp">{Math.round(current.temperature)}°</div>
         <div className="hero-label">{label}</div>
         {today && (
@@ -91,6 +100,19 @@ export default function CurrentConditions({
           </div>
         )}
       </section>
+
+      {skyViewOpen && (
+        <SkyView
+          weatherCode={current.weatherCode}
+          isDay={current.isDay}
+          windSpeed={current.windSpeed}
+          windDirection={current.windDirection}
+          temperature={current.temperature}
+          label={label}
+          locationName={`${location.name}${location.admin1 ? `, ${location.admin1}` : ''}`}
+          onClose={() => setSkyViewOpen(false)}
+        />
+      )}
 
       <section className="conditions-card">
         <h2>Current conditions</h2>
