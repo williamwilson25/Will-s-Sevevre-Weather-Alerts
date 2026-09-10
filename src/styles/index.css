@@ -1,19 +1,19 @@
 :root {
   color-scheme: dark;
-  --text: #f8fafc;
-  --text-muted: rgba(248, 250, 252, 0.72);
-  --text-faint: rgba(248, 250, 252, 0.5);
-  --glass-bg: rgba(255, 255, 255, 0.09);
-  --glass-bg-strong: rgba(255, 255, 255, 0.18);
-  --glass-border: rgba(255, 255, 255, 0.13);
-  --glass-highlight: rgba(255, 255, 255, 0.09);
-  --accent: #ff3b30;
-  --accent-strong: #dc2626;
+  --text: #f4f8fc;
+  --text-muted: rgba(244, 248, 252, 0.72);
+  --text-faint: rgba(244, 248, 252, 0.5);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-strong: rgba(255, 255, 255, 0.17);
+  --glass-border: rgba(148, 197, 255, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
+  --accent: #22d3ee;
+  --accent-strong: #0891b2;
   --radius: 20px;
   --radius-sm: 12px;
-  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.15), 0 14px 34px -14px rgba(0, 0, 0, 0.75);
-  --shadow-pop: 0 20px 48px -14px rgba(0, 0, 0, 0.75);
-  --shadow-glow: 0 8px 22px -6px rgba(220, 38, 38, 0.5);
+  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.2), 0 14px 34px -14px rgba(0, 4, 16, 0.85);
+  --shadow-pop: 0 20px 48px -14px rgba(0, 4, 16, 0.85);
+  --shadow-glow: 0 8px 22px -6px rgba(34, 211, 238, 0.45);
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
   --font-display: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
@@ -39,7 +39,7 @@ body,
 
 body {
   margin: 0;
-  background: #000000;
+  background: #04070d;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -98,17 +98,17 @@ button:active:not(:disabled) {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: #000000;
-  background-image: radial-gradient(130% 65% at 50% -12%, rgba(220, 38, 38, 0.22) 0%, rgba(0, 0, 0, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(220, 38, 38, 0.1) 0%, rgba(0, 0, 0, 0) 62%),
-    linear-gradient(180deg, #140606 0%, #040101 48%, #000000 100%);
+  background-color: #04070d;
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(34, 211, 238, 0.2) 0%, rgba(4, 7, 13, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(79, 70, 229, 0.14) 0%, rgba(4, 7, 13, 0) 62%),
+    linear-gradient(180deg, #0a1220 0%, #050810 48%, #04070d 100%);
   transition: background-image 600ms var(--ease);
 }
 
 .app-bg-night {
-  background-image: radial-gradient(130% 65% at 50% -12%, rgba(220, 38, 38, 0.14) 0%, rgba(0, 0, 0, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(220, 38, 38, 0.06) 0%, rgba(0, 0, 0, 0) 62%),
-    linear-gradient(180deg, #090202 0%, #000000 48%, #000000 100%);
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(34, 211, 238, 0.12) 0%, rgba(4, 7, 13, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(79, 70, 229, 0.08) 0%, rgba(4, 7, 13, 0) 62%),
+    linear-gradient(180deg, #05080f 0%, #04070d 48%, #04070d 100%);
 }
 
 .app-bg > .app {
