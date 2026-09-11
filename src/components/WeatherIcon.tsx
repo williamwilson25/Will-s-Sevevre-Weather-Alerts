@@ -21,27 +21,36 @@ interface Props {
 
 export default function WeatherIcon({ code, isDay = true, size = 24, className }: Props) {
   const category = categorizeWeather(code);
+  const glyphSize = Math.round(size * 0.62);
 
-  switch (category) {
-    case 'storm':
-      return <CloudLightningIcon size={size} className={className} />;
-    case 'snow':
-      return <CloudSnowIcon size={size} className={className} />;
-    case 'rain':
-      return <CloudRainIcon size={size} className={className} />;
-    case 'fog':
-      return <CloudFogIcon size={size} className={className} />;
-    case 'overcast':
-      return <CloudsIcon size={size} className={className} />;
-    case 'cloudy':
-      return <CloudIcon size={size} className={className} />;
-    case 'mostlyClear':
-      return isDay ? (
-        <CloudSunIcon size={size} className={className} />
-      ) : (
-        <CloudMoonIcon size={size} className={className} />
-      );
-    default:
-      return isDay ? <SunIcon size={size} className={className} /> : <MoonIcon size={size} className={className} />;
-  }
+  const glyph = (() => {
+    switch (category) {
+      case 'storm':
+        return <CloudLightningIcon size={glyphSize} />;
+      case 'snow':
+        return <CloudSnowIcon size={glyphSize} />;
+      case 'rain':
+        return <CloudRainIcon size={glyphSize} />;
+      case 'fog':
+        return <CloudFogIcon size={glyphSize} />;
+      case 'overcast':
+        return <CloudsIcon size={glyphSize} />;
+      case 'cloudy':
+        return <CloudIcon size={glyphSize} />;
+      case 'mostlyClear':
+        return isDay ? <CloudSunIcon size={glyphSize} /> : <CloudMoonIcon size={glyphSize} />;
+      default:
+        return isDay ? <SunIcon size={glyphSize} /> : <MoonIcon size={glyphSize} />;
+    }
+  })();
+
+  return (
+    <span
+      className={`weather-icon-bezel${className ? ` ${className}` : ''}`}
+      style={{ width: size, height: size }}
+      aria-hidden="true"
+    >
+      {glyph}
+    </span>
+  );
 }

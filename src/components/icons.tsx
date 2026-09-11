@@ -60,9 +60,9 @@ export function ChevronDownIcon({ size = 24, className }: IconProps) {
 export function SunIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
-      <circle cx="12" cy="12" r="4.6" fill="currentColor" />
-      <g stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.85">
-        <path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7" />
+      <circle cx="12" cy="12" r="4.4" fill="none" stroke="currentColor" strokeWidth="1.7" />
+      <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+        <path d="M12 2.6v2.6M12 18.8v2.6M4.6 4.6l1.85 1.85M17.55 17.55l1.85 1.85M2.6 12h2.6M18.8 12h2.6M4.6 19.4l1.85-1.85M17.55 6.45l1.85-1.85" />
       </g>
     </svg>
   );
@@ -72,8 +72,11 @@ export function MoonIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
       <path
-        d="M20 14.2A8.2 8.2 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2z"
-        fill="currentColor"
+        d="M19 14.5A8 8 0 1 1 9.5 5a6.4 6.4 0 0 0 9.5 9.5z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -82,8 +85,12 @@ export function MoonIcon({ size = 24, className }: IconProps) {
 function CloudBase({ opacity = 1 }: { opacity?: number }) {
   return (
     <path
-      d="M7.5 18.5a4.3 4.3 0 0 1-.6-8.55 5.6 5.6 0 0 1 10.8-2.1A4.05 4.05 0 0 1 17 15.5H7.5z"
-      fill="currentColor"
+      d="M7 17a4 4 0 0 1-.7-7.94A5.3 5.3 0 0 1 16.7 7.4 3.9 3.9 0 0 1 16.2 17H7z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinejoin="round"
+      strokeLinecap="round"
       opacity={opacity}
     />
   );
@@ -100,14 +107,11 @@ export function CloudIcon({ size = 24, className }: IconProps) {
 export function CloudSunIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
-      <circle cx="8.2" cy="7.8" r="3.4" fill="currentColor" opacity="0.85" />
-      <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.6">
-        <path d="M8.2 2.4v1.4M3.4 7.8h1.4M4.6 3.8l1 1M13 4.4l-1 1" />
+      <circle cx="8" cy="7.6" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.85" />
+      <g stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.6">
+        <path d="M8 2.6v1.6M2.6 7.6h1.6M4.2 4.2l1.1 1.1M12.8 4.2l-1.1 1.1" />
       </g>
-      <path
-        d="M8 18.5a4.1 4.1 0 0 1-.5-8.15A5.4 5.4 0 0 1 18 11.6 3.9 3.9 0 0 1 17.5 19H8z"
-        fill="currentColor"
-      />
+      <CloudBase />
     </svg>
   );
 }
@@ -115,11 +119,15 @@ export function CloudSunIcon({ size = 24, className }: IconProps) {
 export function CloudMoonIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
-      <path d="M13.4 8.1a4.7 4.7 0 0 1-5.4-6A6.6 6.6 0 1 0 13.4 8.1z" fill="currentColor" opacity="0.8" />
       <path
-        d="M8 18.5a4.1 4.1 0 0 1-.5-8.15A5.4 5.4 0 0 1 18 11.6 3.9 3.9 0 0 1 17.5 19H8z"
-        fill="currentColor"
+        d="M13 7.6a4.3 4.3 0 0 1-4.8-5.4A6 6 0 1 0 13 7.6z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+        opacity="0.8"
       />
+      <CloudBase />
     </svg>
   );
 }
@@ -128,14 +136,14 @@ export function CloudsIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
       <path
-        d="M4.3 15.2a3.4 3.4 0 0 1 .6-6.75A4.5 4.5 0 0 1 13.5 7a3.2 3.2 0 0 1 2.2 5.7 3 3 0 0 1-.7 5.3H5.4a2.9 2.9 0 0 1-1.1-2.8z"
-        fill="currentColor"
-        opacity="0.55"
+        d="M4 13.6a3.1 3.1 0 0 1 .5-6.15A4.1 4.1 0 0 1 12.5 6a2.9 2.9 0 0 1 2 5.2 2.7 2.7 0 0 1-.6 4.8H5a2.6 2.6 0 0 1-1-2.4z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+        opacity="0.65"
       />
-      <path
-        d="M8.5 19a4.1 4.1 0 0 1-.5-8.15A5.4 5.4 0 0 1 18.5 12.1a3.9 3.9 0 0 1-.5 6.9H8.5z"
-        fill="currentColor"
-      />
+      <CloudBase />
     </svg>
   );
 }
@@ -143,12 +151,9 @@ export function CloudsIcon({ size = 24, className }: IconProps) {
 export function CloudRainIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
-      <path
-        d="M7.5 15.5a4.1 4.1 0 0 1-.5-8.15A5.4 5.4 0 0 1 17.5 8.6a3.9 3.9 0 0 1-.5 6.9H7.5z"
-        fill="currentColor"
-      />
-      <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.75">
-        <path d="M8.5 18v2.6M12.5 18v2.6M16.5 18v2.6" />
+      <CloudBase />
+      <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M8.3 18.3l-1.1 2.2M12.5 18.3l-1.1 2.2M16.7 18.3l-1.1 2.2" />
       </g>
     </svg>
   );
@@ -157,11 +162,14 @@ export function CloudRainIcon({ size = 24, className }: IconProps) {
 export function CloudLightningIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
+      <CloudBase />
       <path
-        d="M7.5 14.5a4.1 4.1 0 0 1-.5-8.15A5.4 5.4 0 0 1 17.5 7.6a3.9 3.9 0 0 1-.5 6.9H7.5z"
-        fill="currentColor"
+        d="M13 14.5 10 19h2.5l-1.3 4.4 4.8-6h-2.6l1.3-2.8z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
       />
-      <path d="M13 14.5 10 19h2.6l-1.4 4.5 5-6.2h-2.7l1.4-2.8z" fill="currentColor" />
     </svg>
   );
 }
@@ -169,12 +177,9 @@ export function CloudLightningIcon({ size = 24, className }: IconProps) {
 export function CloudSnowIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
-      <path
-        d="M7.5 15.5a4.1 4.1 0 0 1-.5-8.15A5.4 5.4 0 0 1 17.5 8.6a3.9 3.9 0 0 1-.5 6.9H7.5z"
-        fill="currentColor"
-      />
-      <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.75">
-        <path d="M8.5 18.3v3M7.1 19.8h2.8M12.5 18.3v3M11.1 19.8h2.8M16.5 18.3v3M15.1 19.8h2.8" />
+      <CloudBase />
+      <g stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+        <path d="M8.3 18v3M6.9 19.5h2.8M12.5 18v3M11.1 19.5h2.8M16.7 18v3M15.3 19.5h2.8" />
       </g>
     </svg>
   );
@@ -184,12 +189,16 @@ export function CloudFogIcon({ size = 24, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
       <path
-        d="M7.5 13.8a4.1 4.1 0 0 1-.4-8.1A5.4 5.4 0 0 1 17.3 6.8a3.9 3.9 0 0 1-.5 6.9H7.5z"
-        fill="currentColor"
+        d="M7 13.6a3.6 3.6 0 0 1-.4-7.14A4.8 4.8 0 0 1 16 7.4a3.5 3.5 0 0 1-.45 6.2H7z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        strokeLinecap="round"
         opacity="0.85"
       />
-      <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.7">
-        <path d="M5 17.5h14M6.5 20.5h11" />
+      <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <path d="M4.5 17.2h15M6 20.2h12" />
       </g>
     </svg>
   );
