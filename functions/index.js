@@ -17,6 +17,21 @@ const VAPID_PUBLIC_KEY =
   'BAmTKqAEs5Ld7uMrKu7Gob6iVWP7iZpBUppUrnXpfAraG2iFNyLkUmBcz8HyqNtYPVIzTLRk03eQW0ezcsupccw';
 const vapidPrivateKey = defineSecret('VAPID_PRIVATE_KEY');
 
+// web-push validates the key pair synchronously and throws if the private
+// key secret is missing, empty, or malformed — every push pathway below
+// calls this first, so a bad secret previously surfaced as an opaque
+// "internal" error with no indication *why*. Logging here means the real
+// cause (missing/invalid VAPID_PRIVATE_KEY secret) shows up in Cloud
+// Functions logs instead of just crashing silently.
+function configureVapid() {
+  try {
+    webpush.setVapidDetails('mailto:williamwilson25@icloud.com', VAPID_PUBLIC_KEY, vapidPrivateKey.value());
+  } catch (err) {
+    logger.error('VAPID key setup failed — check the VAPID_PRIVATE_KEY secret (firebase functions:secrets:set VAPID_PRIVATE_KEY)', err);
+    throw err;
+  }
+}
+
 // Mirrors src/utils/alertTypes.ts — kept as a plain array here rather than a
 // shared module since this function is a separate Node package from the
 // Vite client bundle. If you add a new alert-type toggle in the app, mirror
@@ -185,11 +200,13 @@ function formatAlertBody(alert, locationLabel, timeZone) {
 exports.checkSevereWeatherAlerts = onSchedule(
   { schedule: 'every 5 minutes', region: 'us-central1', secrets: [vapidPrivateKey], timeoutSeconds: 120 },
   async () => {
-    webpush.setVapidDetails(
-      'mailto:williamwilson25@icloud.com',
-      VAPID_PUBLIC_KEY,
-      vapidPrivateKey.value(),
-    );
+    try {
+      configureVapid();
+    } catch {
+      // Nothing downstream can succeed without a valid VAPID key — bail
+      // out instead of running the whole subscriber loop for no reason.
+      return;
+    }
 
     const snapshot = await db.collection('pushSubscriptions').get();
     const writes = [];
@@ -324,11 +341,11 @@ exports.sendCustomAlert = onDocumentCreated(
     const recipientUids = Array.isArray(data.recipientUids) ? data.recipientUids : [];
     if (recipientUids.length === 0) return;
 
-    webpush.setVapidDetails(
-      'mailto:williamwilson25@icloud.com',
-      VAPID_PUBLIC_KEY,
-      vapidPrivateKey.value(),
-    );
+    try {
+      configureVapid();
+    } catch {
+      return;
+    }
 
     const payload = JSON.stringify({
       title: data.headline || 'New alert',
@@ -379,11 +396,14 @@ exports.sendTestPush = onCall(
       throw new HttpsError('failed-precondition', 'Turn on Always-On Alerts first.');
     }
 
-    webpush.setVapidDetails(
-      'mailto:williamwilson25@icloud.com',
-      VAPID_PUBLIC_KEY,
-      vapidPrivateKey.value(),
-    );
+    try {
+      configureVapid();
+    } catch {
+      throw new HttpsError(
+        'internal',
+        'Push is misconfigured on the server (VAPID key) — check Cloud Functions logs for "VAPID key setup failed".',
+      );
+    }
 
     const payload = JSON.stringify({
       title: 'Rain expected soon',
