@@ -1,23 +1,24 @@
 :root {
   color-scheme: dark;
-  --text: #e8f0f5;
-  --text-muted: rgba(232, 240, 245, 0.7);
-  --text-faint: rgba(232, 240, 245, 0.48);
-  --glass-bg: rgba(9, 14, 20, 0.72);
-  --glass-bg-strong: #101823;
-  --glass-border: rgba(57, 230, 57, 0.22);
-  --glass-highlight: rgba(255, 255, 255, 0.03);
-  --accent: #39e639;
-  --accent-strong: #1fae2e;
-  --radius: 8px;
-  --radius-sm: 6px;
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 10px 24px -12px rgba(0, 0, 0, 0.8);
-  --shadow-pop: 0 16px 36px -12px rgba(0, 0, 0, 0.85);
-  --shadow-glow: 0 8px 22px -6px rgba(57, 230, 57, 0.35);
+  --text: #f6f3ee;
+  --text-muted: rgba(246, 243, 238, 0.7);
+  --text-faint: rgba(246, 243, 238, 0.48);
+  --glass-bg: #17140f;
+  --glass-bg-strong: #201b14;
+  --glass-border: rgba(245, 158, 11, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.04);
+  --accent: #f59e0b;
+  --accent-strong: #c2620a;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 24px -12px rgba(0, 0, 0, 0.7);
+  --shadow-pop: 0 16px 36px -12px rgba(0, 0, 0, 0.75);
+  --shadow-glow: 0 8px 22px -6px rgba(245, 158, 11, 0.4);
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
-  --font-display: 'Chakra Petch', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+  --font-display: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
     sans-serif;
 }
 
@@ -38,7 +39,7 @@ body,
 
 body {
   margin: 0;
-  background: #070b12;
+  background: #0d0b08;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -97,23 +98,17 @@ button:active:not(:disabled) {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: #070b12;
-  background-image: linear-gradient(rgba(57, 230, 57, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(57, 230, 57, 0.05) 1px, transparent 1px),
-    radial-gradient(130% 65% at 50% -12%, rgba(57, 230, 57, 0.1) 0%, rgba(7, 11, 18, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(31, 174, 46, 0.08) 0%, rgba(7, 11, 18, 0) 62%),
-    linear-gradient(180deg, #0b1119 0%, #080d15 48%, #070b12 100%);
-  background-size: 18px 18px, 18px 18px, auto, auto, auto;
+  background-color: #0d0b08;
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(245, 158, 11, 0.16) 0%, rgba(13, 11, 8, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(194, 98, 10, 0.1) 0%, rgba(13, 11, 8, 0) 62%),
+    linear-gradient(180deg, #17130d 0%, #0f0d0a 48%, #0d0b08 100%);
   transition: background-image 600ms var(--ease);
 }
 
 .app-bg-night {
-  background-image: linear-gradient(rgba(57, 230, 57, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(57, 230, 57, 0.035) 1px, transparent 1px),
-    radial-gradient(130% 65% at 50% -12%, rgba(57, 230, 57, 0.05) 0%, rgba(7, 11, 18, 0) 58%),
-    radial-gradient(90% 55% at 100% 105%, rgba(31, 174, 46, 0.04) 0%, rgba(7, 11, 18, 0) 62%),
-    linear-gradient(180deg, #070a10 0%, #070b12 48%, #070b12 100%);
-  background-size: 18px 18px, 18px 18px, auto, auto, auto;
+  background-image: radial-gradient(130% 65% at 50% -12%, rgba(245, 158, 11, 0.07) 0%, rgba(13, 11, 8, 0) 58%),
+    radial-gradient(90% 55% at 100% 105%, rgba(194, 98, 10, 0.05) 0%, rgba(13, 11, 8, 0) 62%),
+    linear-gradient(180deg, #0c0a07 0%, #0d0b08 48%, #0d0b08 100%);
 }
 
 .app-bg > .app {
