@@ -422,7 +422,11 @@ exports.sendTestPush = onCall(
         );
       }
       logger.warn('Test push failed', err);
-      throw new HttpsError('internal', 'Push failed to send.');
+      // Surface the actual web-push failure reason in the client-visible
+      // message — mobile Cloud Console log-diving is painful, and there's
+      // nothing secret in a push send error (status code + provider body).
+      const detail = err.statusCode ? `HTTP ${err.statusCode}${err.body ? `: ${String(err.body).slice(0, 200)}` : ''}` : err.message || 'unknown error';
+      throw new HttpsError('internal', `Push failed to send (${detail}).`);
     }
 
     return { ok: true };
