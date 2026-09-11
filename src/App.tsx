@@ -36,6 +36,7 @@ import AlertHistory from './components/AlertHistory';
 import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
+import { buildWindyRadarUrl } from './utils/windy';
 import StormSafetyCard from './components/StormSafetyCard';
 import MoreScreen from './components/MoreScreen';
 import SettingsScreen from './components/SettingsScreen';
@@ -622,10 +623,10 @@ export default function App() {
                     {t === 'radar' && (
                       <div className="radar-view">
                         <ExternalRadar
-                          url="https://www.news9.com/nextgen-live-radar"
+                          url={buildWindyRadarUrl(location.latitude, location.longitude)}
                           title="Live Storm Radar"
                           label="LIVE"
-                          caption="Live radar from News 9 — Oklahoma's NextGen radar."
+                          caption={`Live radar centered on ${location.name}, via Windy.`}
                         />
                       </div>
                     )}
