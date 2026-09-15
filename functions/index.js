@@ -45,6 +45,7 @@ const ALERT_TYPE_CONFIGS = [
   { key: 'high_wind_warning', match: (event) => event === 'High Wind Warning' },
   { key: 'winter_weather', match: (event) => /winter|snow|ice|freez|blizzard/i.test(event) },
   { key: 'other_warnings', match: (event) => /\bwarning$/i.test(event) },
+  { key: 'advisories', match: (event) => /\badvisory$/i.test(event) },
 ];
 
 function alertTypeKeyFor(event) {

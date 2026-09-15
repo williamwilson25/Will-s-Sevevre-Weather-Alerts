@@ -61,6 +61,15 @@ export const ALERT_TYPE_CONFIGS: AlertTypeConfig[] = [
     // dedicated toggle above.
     match: (event) => /\bwarning$/i.test(event),
   },
+  {
+    key: 'advisories',
+    label: 'Advisories (Heat, Wind, Frost, etc.)',
+    defaultEnabled: true,
+    // NWS's lower-urgency tier below Warning — Heat Advisory, Wind Advisory,
+    // Frost Advisory, and so on. Previously had no toggle at all, so these
+    // showed up in Active Alerts on the dashboard but could never push.
+    match: (event) => /\badvisory$/i.test(event),
+  },
 ];
 
 export const DEFAULT_ALERT_TYPE_PREFS: Record<string, boolean> = Object.fromEntries(

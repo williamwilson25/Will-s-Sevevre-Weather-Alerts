@@ -121,6 +121,23 @@ export default function App() {
     'sw_notify_alert_types',
     DEFAULT_ALERT_TYPE_PREFS,
   );
+  // useLocalStorage only falls back to DEFAULT_ALERT_TYPE_PREFS when nothing
+  // is stored yet — an existing user's saved prefs object predates any alert
+  // type added since they first opened Settings, so it's missing that key
+  // entirely. AlertNotificationSettings' toggle *looks* on for a missing key
+  // (via `prefs[key] ?? config.defaultEnabled`), but the underlying prefs
+  // object — and what actually gets synced to the push Cloud Function — has
+  // no such fallback, so it silently never notifies until this backfills
+  // the real value once.
+  useEffect(() => {
+    const missingDefaults = Object.keys(DEFAULT_ALERT_TYPE_PREFS).filter((key) => !(key in alertTypePrefs));
+    if (missingDefaults.length === 0) return;
+    setAlertTypePrefs({
+      ...Object.fromEntries(missingDefaults.map((key) => [key, DEFAULT_ALERT_TYPE_PREFS[key]])),
+      ...alertTypePrefs,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [notifiedAlertIds, setNotifiedAlertIds] = useLocalStorage<string[]>('sw_notified_alert_ids', []);
   const [mutedLocationIds, setMutedLocationIds] = useLocalStorage<string[]>('sw_muted_locations', []);
   const [watchedAlerts, setWatchedAlerts] = useState<

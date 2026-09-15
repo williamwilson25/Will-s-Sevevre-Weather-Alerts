@@ -18,6 +18,7 @@ const ICONS: Record<string, typeof TornadoIcon> = {
   high_wind_warning: WindIcon,
   winter_weather: CloudSnowIcon,
   other_warnings: AlertTriangleIcon,
+  advisories: AlertTriangleIcon,
 };
 
 interface Props {
