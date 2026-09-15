@@ -64,33 +64,3 @@ export interface WeatherSnapshot {
   daily: DailyForecast[];
   fetchedAt: string;
 }
-
-export type DeliveryMethod = 'text' | 'discord' | 'app';
-
-export interface Friend {
-  id: string;
-  name: string;
-  phone: string;
-  deliveryMethod?: DeliveryMethod;
-  location?: Location;
-  uid?: string;
-}
-
-export interface Subscriber {
-  uid: string;
-  email: string;
-  phone: string;
-  location: Location;
-}
-
-export type AlertSeverity = 'advisory' | 'watch' | 'warning' | 'emergency';
-
-export interface AlertRecord {
-  id: string;
-  createdAt: string;
-  recipientIds: string[];
-  severity: AlertSeverity;
-  headline: string;
-  message: string;
-  locationName: string;
-}

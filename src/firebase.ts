@@ -20,6 +20,4 @@ export const db = getFirestore(firebaseApp);
 // it correct if that ever changes.
 export const functions = getFunctions(firebaseApp, 'us-central1');
 
-export const OWNER_EMAIL = 'williamwilson25@icloud.com';
-
 export const DISCORD_INVITE_URL = 'https://discord.gg/gYeuhd38y';

@@ -2,32 +2,12 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Each signed-in user can create/update only their own subscriber record
-    // (their uid must match the document id). The app owner can read every
-    // subscriber's record so they can see who signed up and where; everyone
-    // else can only read their own.
-    match /subscribers/{uid} {
-      allow read: if request.auth != null &&
-        (request.auth.uid == uid || request.auth.token.email == 'williamwilson25@icloud.com');
-      allow write: if request.auth != null && request.auth.uid == uid;
-    }
-
     // Always-on Web Push: each user's own subscription, watched locations,
     // and alert-type prefs, read/written only by that user from the client.
     // The scheduled Cloud Function reads/writes this collection too, via the
     // Admin SDK, which bypasses these rules entirely.
     match /pushSubscriptions/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-
-    // In-app notification alerts sent from the Create Alert composer. Only
-    // the owner can create one (and only tagged as themselves) — the
-    // sendCustomAlert Cloud Function reads them via the Admin SDK, which
-    // bypasses these rules, so no client read/update/delete rule is needed.
-    match /customAlerts/{alertId} {
-      allow create: if request.auth != null &&
-        request.auth.token.email == 'williamwilson25@icloud.com' &&
-        request.resource.data.createdBy == request.auth.uid;
     }
   }
 }

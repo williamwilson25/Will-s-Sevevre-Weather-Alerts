@@ -9,7 +9,6 @@ import { ChevronDownIcon, DropletIcon } from './icons';
 
 interface Props {
   daily: DailyForecast[];
-  onAlertDay?: (day: DailyForecast) => void;
 }
 
 const RANGE_GRADIENT = 'linear-gradient(90deg, #60a5fa, #fbbf24, #f87171)';
@@ -28,7 +27,7 @@ function rangeBarStyle(day: DailyForecast, weekMin: number, weekSpan: number): C
   };
 }
 
-export default function DailyForecastList({ daily, onAlertDay }: Props) {
+export default function DailyForecastList({ daily }: Props) {
   const [expandedDate, setExpandedDate] = useState<string | null>(daily[0]?.date ?? null);
   const weekMin = Math.min(...daily.map((d) => d.tempMin));
   const weekMax = Math.max(...daily.map((d) => d.tempMax));
@@ -86,16 +85,6 @@ export default function DailyForecastList({ daily, onAlertDay }: Props) {
                     {degreesToCompass(day.windDirection)} at {Math.round(day.windSpeedMax)} mph with
                     gusts up to {Math.round(day.windGustsMax)} mph.
                   </p>
-                  {onAlertDay && (
-                    <button
-                      type="button"
-                      className="daily-alert-button"
-                      onClick={() => onAlertDay(day)}
-                      title="Draft an alert for this day"
-                    >
-                      Alert friends
-                    </button>
-                  )}
                 </div>
               )}
             </li>

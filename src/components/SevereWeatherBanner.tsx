@@ -5,10 +5,9 @@ import { AlertTriangleIcon, CheckCircleIcon } from './icons';
 
 interface Props {
   daily: DailyForecast[];
-  onAlertDay?: (day: DailyForecast) => void;
 }
 
-export default function SevereWeatherBanner({ daily, onAlertDay }: Props) {
+export default function SevereWeatherBanner({ daily }: Props) {
   const next = daily.find((d) => d.risk.level === 'enhanced' || d.risk.level === 'moderate' || d.risk.level === 'high');
 
   if (!next) {
@@ -43,11 +42,6 @@ export default function SevereWeatherBanner({ daily, onAlertDay }: Props) {
         <p>{next.risk.reasons.join('; ')}</p>
         <RiskBadge level={next.risk.level} score={next.risk.score} />
       </div>
-      {onAlertDay && (
-        <button type="button" className="severe-banner-button" onClick={() => onAlertDay(next)}>
-          Alert my friends
-        </button>
-      )}
     </div>
   );
 }

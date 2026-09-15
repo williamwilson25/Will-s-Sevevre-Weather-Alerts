@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import type { TouchEvent } from 'react';
 import { signOut } from 'firebase/auth';
-import type { AlertRecord, DailyForecast, Friend, Location, WeatherSnapshot } from './types';
+import type { Location, WeatherSnapshot } from './types';
 import { fetchWeather } from './api/weather';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useAuth } from './hooks/useAuth';
-import { auth, OWNER_EMAIL } from './firebase';
+import { auth } from './firebase';
 import SignIn from './components/SignIn';
 import LocationSearch from './components/LocationSearch';
 import LocationChips from './components/LocationChips';
@@ -28,12 +28,6 @@ import { fetchActiveAlerts, type NwsAlert } from './api/nwsAlerts';
 import { DEFAULT_ALERT_TYPE_PREFS, isAlertNotifiable } from './utils/alertTypes';
 import { showNotification } from './utils/notify';
 import { pushSupported, syncPushPrefs } from './api/pushSubscriptions';
-import { watchSubscribers } from './api/subscribers';
-import FriendsManager from './components/FriendsManager';
-import DiscordSettings from './components/DiscordSettings';
-import AlertComposer from './components/AlertComposer';
-import AlertHistory from './components/AlertHistory';
-import AlertStats from './components/AlertStats';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ExternalRadar from './components/ExternalRadar';
 import { buildWindyRadarUrl } from './utils/windy';
@@ -41,15 +35,7 @@ import StormSafetyCard from './components/StormSafetyCard';
 import MoreScreen from './components/MoreScreen';
 import SettingsScreen from './components/SettingsScreen';
 import SubscriptionsScreen from './components/SubscriptionsScreen';
-import {
-  AlertTriangleIcon,
-  BellAlertIcon,
-  HomeIcon,
-  RadarIcon,
-  DotsIcon,
-  PlusIcon,
-  ChevronDownIcon,
-} from './components/icons';
+import { AlertTriangleIcon, HomeIcon, RadarIcon, DotsIcon, ChevronDownIcon } from './components/icons';
 import logo from './assets/logo.png';
 
 const DEFAULT_LOCATION: Location = {
@@ -62,31 +48,14 @@ const DEFAULT_LOCATION: Location = {
   timezone: 'America/Chicago',
 };
 
-type Tab =
-  | 'forecast'
-  | 'radar'
-  | 'more'
-  | 'outlook'
-  | 'settings'
-  | 'subscriptions'
-  | 'alerts'
-  | 'compose';
+type Tab = 'forecast' | 'radar' | 'more' | 'outlook' | 'settings' | 'subscriptions';
 
 // Order controls both the swipeable tab-track and left/right swipe gestures.
-// Only forecast/radar/more/alerts get their own bottom-nav button — the rest
-// (outlook, settings, subscriptions, compose) are reached via the
-// More menu or the + button, but stay in this array so they're still real
-// tab-panels with a back header rather than a separate modal/router.
-const TAB_ORDER: Tab[] = [
-  'forecast',
-  'radar',
-  'more',
-  'outlook',
-  'settings',
-  'subscriptions',
-  'alerts',
-  'compose',
-];
+// Only forecast/radar/more get their own bottom-nav button — outlook,
+// settings, and subscriptions are reached via the More menu, but stay in
+// this array so they're still real tab-panels with a back header rather
+// than a separate modal/router.
+const TAB_ORDER: Tab[] = ['forecast', 'radar', 'more', 'outlook', 'settings', 'subscriptions'];
 
 // Swipe gestures starting inside these shouldn't switch tabs — they need
 // horizontal touch for their own scrolling/panning/dragging.
@@ -99,15 +68,11 @@ function isSwipeExempt(target: EventTarget | null): boolean {
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
-  const isOwner = user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase();
   const [locations, setLocations] = useLocalStorage<Location[]>('sw_locations', [DEFAULT_LOCATION]);
   const [activeLocationId, setActiveLocationId] = useLocalStorage<string>(
     'sw_active_location',
     DEFAULT_LOCATION.id,
   );
-  const [friends, setFriends] = useLocalStorage<Friend[]>('sw_friends', []);
-  const [history, setHistory] = useLocalStorage<AlertRecord[]>('sw_alert_history', []);
-  const [discordWebhookUrl, setDiscordWebhookUrl] = useLocalStorage<string>('sw_discord_webhook', '');
   const [notifyRain, setNotifyRain] = useLocalStorage<boolean>('sw_notify_rain', false);
   const [lastNotifiedKey, setLastNotifiedKey] = useLocalStorage<string>('sw_last_rain_notify', '');
   const [notifyPromptDismissed, setNotifyPromptDismissed] = useLocalStorage<boolean>(
@@ -153,16 +118,9 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<Tab>('forecast');
-  const [alertDay, setAlertDay] = useState<DailyForecast | null>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const location = locations.find((l) => l.id === activeLocationId) ?? locations[0] ?? DEFAULT_LOCATION;
-  // Your own home location — always the first saved location — independent
-  // of whichever town you're currently browsing (e.g. after tapping "view
-  // location" on a friend). Alerts you send should always be about your own
-  // forecast, not whatever town happens to be on screen.
-  const homeLocation = locations[0] ?? DEFAULT_LOCATION;
-  const [homeSnapshot, setHomeSnapshot] = useState<WeatherSnapshot | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -215,43 +173,6 @@ export default function App() {
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [location.id, user]);
-
-  // Keeps a snapshot of the home location around for composing alerts, even
-  // while browsing a different saved town. Reuses the dashboard's snapshot
-  // when home is the active location (the common case) instead of double-
-  // fetching the same forecast.
-  useEffect(() => {
-    if (!user) return;
-    if (homeLocation.id === location.id) {
-      setHomeSnapshot(snapshot);
-      return;
-    }
-    let cancelled = false;
-    fetchWeather(homeLocation)
-      .then((data) => {
-        if (!cancelled) setHomeSnapshot(data);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [homeLocation.id, location.id, snapshot, user]);
-
-  useEffect(() => {
-    if (!user || homeLocation.id === location.id) return;
-    let cancelled = false;
-    const interval = setInterval(() => {
-      fetchWeather(homeLocation)
-        .then((data) => {
-          if (!cancelled) setHomeSnapshot(data);
-        })
-        .catch(() => {});
-    }, 2 * 60 * 1000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [homeLocation.id, location.id, user]);
 
   // Watches every saved location for active NWS alerts, not just the one
   // currently on screen — so a Tornado Warning for a saved-but-not-active
@@ -310,27 +231,6 @@ export default function App() {
       .finally(() => setRefreshing(false));
   }
 
-  useEffect(() => {
-    if (!isOwner) return;
-    const unsubscribe = watchSubscribers((subscribers) => {
-      setFriends((prev) => {
-        const knownUids = new Set(prev.map((f) => f.uid).filter(Boolean));
-        const additions: Friend[] = subscribers
-          .filter((s) => !knownUids.has(s.uid))
-          .map((s) => ({
-            id: crypto.randomUUID(),
-            uid: s.uid,
-            name: s.email.split('@')[0],
-            phone: s.phone,
-            location: s.location,
-          }));
-        return additions.length > 0 ? [...prev, ...additions] : prev;
-      });
-    });
-    return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOwner]);
-
   function handleAddLocation(loc: Location) {
     if (!locations.some((l) => l.id === loc.id)) {
       setLocations([...locations, loc]);
@@ -349,7 +249,7 @@ export default function App() {
     if (id === activeLocationId) setActiveLocationId(next[0].id);
   }
 
-  const visibleTabs = isOwner ? TAB_ORDER : TAB_ORDER.filter((t) => t !== 'alerts' && t !== 'compose');
+  const visibleTabs = TAB_ORDER;
   const activeIndex = visibleTabs.indexOf(tab);
 
   function goToTab(next: Tab) {
@@ -379,21 +279,6 @@ export default function App() {
     } else if (dx > 0 && currentIndex > 0) {
       goToTab(visibleTabs[currentIndex - 1]);
     }
-  }
-
-  function handleAlertDay(day: DailyForecast) {
-    // day may belong to whatever town is currently on screen — alerts are
-    // always about your home location, so swap in the matching date from
-    // the home snapshot instead of using it directly.
-    if (!homeSnapshot) return;
-    const homeDay = homeSnapshot.daily.find((d) => d.date === day.date) ?? homeSnapshot.daily[0];
-    if (!homeDay) return;
-    setAlertDay(homeDay);
-    goToTab('compose');
-  }
-
-  function handleSent(record: AlertRecord) {
-    setHistory([record, ...history]);
   }
 
   const notifySupported = typeof window !== 'undefined' && 'Notification' in window;
@@ -602,15 +487,9 @@ export default function App() {
                           hourly={snapshot.hourly}
                           onSummary={(summary, locationId) => setNowcastSummary({ summary, locationId })}
                         />
-                        <SevereWeatherBanner
-                          daily={snapshot.daily}
-                          onAlertDay={isOwner ? handleAlertDay : undefined}
-                        />
+                        <SevereWeatherBanner daily={snapshot.daily} />
                         <HourlyStrip hourly={snapshot.hourly} />
-                        <DailyForecastList
-                          daily={snapshot.daily}
-                          onAlertDay={isOwner ? handleAlertDay : undefined}
-                        />
+                        <DailyForecastList daily={snapshot.daily} />
                         <SavedLocationsList
                           locations={locations}
                           activeId={location.id}
@@ -628,10 +507,6 @@ export default function App() {
                             Will's Severe Weather Alerts is an independent local project, not an
                             official National Weather Service product — always follow official NWS
                             warnings and local emergency guidance during severe weather.
-                          </p>
-                          <p>
-                            Alerts are sent through your own Messages app; friend data never leaves
-                            this browser.
                           </p>
                         </footer>
                       </div>
@@ -706,54 +581,13 @@ export default function App() {
                         onBack={() => goToTab('more')}
                       />
                     )}
-
-                    {t === 'alerts' && isOwner && (
-                      <div className="alerts-view">
-                        <AlertStats history={history} friends={friends} />
-                        <FriendsManager
-                          friends={friends}
-                          onChange={setFriends}
-                          onViewLocation={handleAddLocation}
-                        />
-                        <DiscordSettings webhookUrl={discordWebhookUrl} onChange={setDiscordWebhookUrl} />
-                        <AlertHistory history={history} friends={friends} onClear={() => setHistory([])} />
-                      </div>
-                    )}
-
-                    {t === 'compose' && isOwner && homeSnapshot && (
-                      <div className="compose-view">
-                        <header className="subscreen-header compose-header">
-                          <button type="button" className="compose-cancel" onClick={() => goToTab('forecast')}>
-                            Cancel
-                          </button>
-                          <h1>Create Alert</h1>
-                          <a href="#compose-preview" className="compose-preview-link">
-                            Preview
-                          </a>
-                        </header>
-                        <AlertComposer
-                          ownerUid={user.uid}
-                          locationName={`${homeLocation.name}${
-                            homeLocation.admin1 ? `, ${homeLocation.admin1}` : ''
-                          }`}
-                          daily={homeSnapshot.daily}
-                          friends={friends}
-                          selectedDate={alertDay?.date ?? null}
-                          discordWebhookUrl={discordWebhookUrl}
-                          onSent={(record) => {
-                            handleSent(record);
-                            goToTab('alerts');
-                          }}
-                        />
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
             </div>
 
 
-            <nav className={`bottom-nav${isOwner ? ' bottom-nav-with-compose' : ''}`}>
+            <nav className="bottom-nav">
               <button
                 className={tab === 'forecast' ? 'active' : ''}
                 onClick={() => goToTab('forecast')}
@@ -761,29 +595,6 @@ export default function App() {
                 <HomeIcon size={21} />
                 Dashboard
               </button>
-              {isOwner && (
-                <button
-                  className={tab === 'alerts' ? 'active' : ''}
-                  onClick={() => goToTab('alerts')}
-                >
-                  <span className="bottom-nav-icon-wrap">
-                    <BellAlertIcon size={21} />
-                    {history.length > 0 && <span className="tab-count">{history.length}</span>}
-                  </span>
-                  Alerts
-                </button>
-              )}
-              {isOwner && (
-                <button
-                  className={`bottom-nav-compose${tab === 'compose' ? ' active' : ''}`}
-                  onClick={() => goToTab('compose')}
-                  aria-label="Create alert"
-                >
-                  <span className="bottom-nav-compose-circle">
-                    <PlusIcon size={22} />
-                  </span>
-                </button>
-              )}
               <button className={tab === 'radar' ? 'active' : ''} onClick={() => goToTab('radar')}>
                 <RadarIcon size={21} />
                 Radar

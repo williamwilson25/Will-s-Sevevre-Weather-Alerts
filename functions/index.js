@@ -1,5 +1,4 @@
 const { onSchedule } = require('firebase-functions/v2/scheduler');
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
@@ -324,56 +323,6 @@ exports.checkSevereWeatherAlerts = onSchedule(
   },
 );
 
-// Fires the moment the owner sends an alert with "App notification" chosen
-// as the delivery method for one or more friends (see src/api/customAlerts.ts)
-// — pushes it to each recipient's device immediately, same delivery
-// mechanism as the scheduled severe-weather checker above but triggered by
-// a Firestore write instead of a timer.
-exports.sendCustomAlert = onDocumentCreated(
-  // Pinned to match checkSevereWeatherAlerts above — without an explicit
-  // region, this Firestore-triggered (Eventarc) function was auto-assigned
-  // us-south1 by the deploy tooling, which is restricted for this project
-  // and failed to deploy.
-  { document: 'customAlerts/{alertId}', region: 'us-central1', secrets: [vapidPrivateKey] },
-  async (event) => {
-    const data = event.data?.data();
-    if (!data) return;
-
-    const recipientUids = Array.isArray(data.recipientUids) ? data.recipientUids : [];
-    if (recipientUids.length === 0) return;
-
-    try {
-      configureVapid();
-    } catch {
-      return;
-    }
-
-    const payload = JSON.stringify({
-      title: data.headline || 'New alert',
-      body: data.body || '',
-      url: './',
-    });
-
-    await Promise.all(
-      recipientUids.map(async (uid) => {
-        const subRef = db.collection('pushSubscriptions').doc(uid);
-        const subSnap = await subRef.get();
-        const sub = subSnap.data();
-        if (!sub || !sub.subscription) return;
-
-        try {
-          await webpush.sendNotification(sub.subscription, payload);
-        } catch (err) {
-          if (err.statusCode === 404 || err.statusCode === 410) {
-            await subRef.set({ subscription: admin.firestore.FieldValue.delete() }, { merge: true });
-          } else {
-            logger.warn(`Custom alert push failed for ${uid}`, err);
-          }
-        }
-      }),
-    );
-  },
-);
 
 
 // Round-trips the caller's own subscription through the real Web Push
